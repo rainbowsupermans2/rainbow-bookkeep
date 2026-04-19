@@ -300,8 +300,9 @@ async function submitRecord(){
   const project=document.getElementById('projectInput').value;
   const today=new Date().toISOString().split('T')[0];
   const amt=parseInt(state.amount)||0;
-  const remark=card?`信用卡：${card}${note?' / '+note:''}`:(note||'');
-  const row=[today,state.type,state.cat,state.cat+(note?' - '+note:''),amt,account,remark,project];
+  const cardNote=card?`信用卡：${card}`:""; const remark=cardNote;
+  const noteText=note?(card?note+' ('+card+')':note):(card?'信用卡:'+card:'');
+  const row=[today,state.type,state.cat,(noteText||state.cat),amt,account,project];
   try{
     const r=await fetch(SCRIPT_URL,{
       method:'POST',
