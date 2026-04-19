@@ -143,7 +143,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 </header>
 
 <!-- 資產頁 -->
-<div class="page active" id="page-asset">
+<div class="page" id="page-asset">
 
   <div class="card">
     <div class="card-title warn">⚠ 投資資產目標進度（嚴格版）<span class="years-badge">還有7年</span></div>
@@ -226,7 +226,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 </div>
 
 <!-- 記帳頁 -->
-<div class="page" id="page-record">
+<div class="page active" id="page-record">
   <div class="steps">
     <div class="step-dot active" id="dot1">1</div>
     <div class="step-line" id="line1"></div>
@@ -327,14 +327,14 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 </div>
 
 <nav class="bottom-nav">
-  <button class="nav-item active" id="nav-asset" onclick="switchPage('asset')">
-    <span class="nav-icon">💰</span><span class="nav-label">資產</span>
+  <button class="nav-item active" id="nav-record" onclick="switchPage('record')">
+    <span class="nav-icon">📝</span><span class="nav-label">記帳</span>
   </button>
   <button class="nav-item" id="nav-expense" onclick="switchPage('expense')">
     <span class="nav-icon">📊</span><span class="nav-label">收支</span>
   </button>
-  <button class="nav-item" id="nav-record" onclick="switchPage('record')">
-    <span class="nav-icon">📝</span><span class="nav-label">記帳</span>
+  <button class="nav-item" id="nav-asset" onclick="switchPage('asset')">
+    <span class="nav-icon">💰</span><span class="nav-label">資產</span>
   </button>
 </nav>
 <div class="toast" id="toast"></div>
@@ -368,7 +368,7 @@ function switchPage(p){
   document.getElementById('page-'+p).classList.add('active');
   document.getElementById('nav-'+p).classList.add('active');
   if(p==='expense')renderExpense();
-  if(p==='asset')renderAsset();
+  if(p==='asset'){if(lastAsset)renderAsset();else loadAsset();}
 }
 
 function loadAsset(){
@@ -608,6 +608,7 @@ document.getElementById('dateFrom').value=firstDay;
 document.getElementById('dateTo').value=today;
 document.getElementById('monthTitle').textContent=`${currentYear}年${currentMonth}月`;
 
+// 預先載入資料
 loadAsset();
 loadExpense();
 </script>
