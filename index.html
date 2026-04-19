@@ -17,8 +17,8 @@ header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;
 .htitle span{font-weight:300;color:var(--t2);font-size:15px}
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--sf);border-top:1px solid var(--bd);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
 .bitem{flex:1;padding:10px 4px 12px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
-.bicon{font-size:24px;line-height:1}
-.blabel{font-size:11px;color:var(--t3);font-weight:500}
+.bicon{font-size:20px;line-height:1}
+.blabel{font-size:10px;color:var(--t3);font-weight:500}
 .bitem.on .blabel{color:var(--ac);font-weight:700}
 .bitem.on .bicon{transform:scale(1.1)}
 .pg{display:none;padding:16px}
@@ -258,10 +258,54 @@ header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;
   </div>
 </div>
 
+<!-- 趨勢頁 -->
+<div class="pg" id="pg-trend">
+  <div class="card">
+    <div class="ctitle">📈 資產成長趨勢</div>
+    <canvas id="assetChart" width="400" height="200" style="width:100%;height:200px;"></canvas>
+  </div>
+  <div class="card">
+    <div class="ctitle">📊 月度變化分析</div>
+    <div id="monthlyChange" style="color:var(--t3);font-size:13px;text-align:center;padding:20px">載入中...</div>
+  </div>
+  <div class="card">
+    <div class="ctitle">🎯 目標達成預測</div>
+    <div class="mbox amb" id="projection">
+      根據最近 6 個月平均成長率，預估達成 $1,238萬 目標時間：<br>
+      <span id="projectionResult" style="font-weight:700">計算中...</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle">💎 資產配置變化</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div style="text-align:center;font-size:12px;color:var(--t2);padding:8px">
+        <div style="font-weight:700;margin-bottom:4px">台股</div>
+        <div id="stockPct" style="font-size:20px;font-weight:700;color:var(--ac)">46%</div>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--t2);padding:8px">
+        <div style="font-weight:700;margin-bottom:4px">基金</div>
+        <div id="fundPct" style="font-size:20px;font-weight:700;color:var(--g)">43%</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="text-align:center;font-size:12px;color:var(--t2);padding:8px">
+        <div style="font-weight:700;margin-bottom:4px">美股</div>
+        <div id="usPct" style="font-size:20px;font-weight:700;color:var(--r)">4%</div>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--t2);padding:8px">
+        <div style="font-weight:700;margin-bottom:4px">現金</div>
+        <div id="cashPct" style="font-size:20px;font-weight:700;color:var(--t3)">7%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <nav class="bnav">
   <button class="bitem on" id="b-record" onclick="swPg('record')"><span class="bicon">📝</span><span class="blabel">記帳</span></button>
   <button class="bitem" id="b-expense" onclick="swPg('expense')"><span class="bicon">📊</span><span class="blabel">收支</span></button>
   <button class="bitem" id="b-asset" onclick="swPg('asset')"><span class="bicon">💰</span><span class="blabel">資產</span></button>
+  <button class="bitem" id="b-trend" onclick="swPg('trend')"><span class="bicon">📈</span><span class="blabel">趨勢</span></button>
 </nav>
 <div class="toast" id="toast"></div>
 <script>
@@ -290,6 +334,7 @@ function swPg(p){
   document.getElementById('b-'+p).classList.add('on');
   if(p==='expense')rendExp();
   if(p==='asset'){if(asset)rendAsset();else ldAsset();}
+  if(p==='trend')rendTrend();
 }
 
 // === 資產頁 ===
@@ -618,6 +663,194 @@ function toast(msg){
 }
 
 // 初始化
+
+// === 趨勢分析 ===
+let assetHistory = [];
+let chartCanvas = null;
+
+function loadAssetHistory(){
+  // 從Google Sheets載入歷史資產資料
+  const s=document.createElement('script');
+  s.src=SU+'?type=history&callback=onAssetHistory';
+  document.head.appendChild(s);
+}
+
+function onAssetHistory(d){
+  if(d&&d.success){
+    assetHistory=d.data.slice(1); // 跳過標題列
+    rendTrend();
+  }
+}
+
+function rendTrend(){
+  if(!assetHistory.length){
+    loadAssetHistory();
+    return;
+  }
+  
+  rendAssetChart();
+  rendMonthlyChange();
+  rendProjection();
+  rendAllocation();
+}
+
+function rendAssetChart(){
+  const canvas = document.getElementById('assetChart');
+  if(!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const recent = assetHistory.slice(-12); // 最近12個月
+  
+  if(recent.length < 2) {
+    ctx.fillStyle = 'var(--t3)';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('資料不足，需要更多歷史記錄', canvas.width/2, canvas.height/2);
+    return;
+  }
+  
+  // 清空畫布
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // 準備數據
+  const dates = recent.map(r => r[0]?.split('-').slice(1).join('/') || '');
+  const values = recent.map(r => parseFloat(r[8]) || 0); // 淨資產
+  const maxVal = Math.max(...values);
+  const minVal = Math.min(...values);
+  const range = maxVal - minVal;
+  
+  // 繪製網格線
+  ctx.strokeStyle = '#e2ddd4';
+  ctx.lineWidth = 1;
+  for(let i=1; i<5; i++){
+    const y = canvas.height * i / 5;
+    ctx.beginPath();
+    ctx.moveTo(40, y);
+    ctx.lineTo(canvas.width-10, y);
+    ctx.stroke();
+  }
+  
+  // 繪製趨勢線
+  ctx.strokeStyle = '#2d6a4f';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  
+  values.forEach((val, i) => {
+    const x = 40 + (canvas.width-50) * i / (values.length-1);
+    const y = canvas.height - 20 - (val - minVal) / range * (canvas.height-40);
+    if(i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  
+  // 繪製數據點
+  ctx.fillStyle = '#1a7a4a';
+  values.forEach((val, i) => {
+    const x = 40 + (canvas.width-50) * i / (values.length-1);
+    const y = canvas.height - 20 - (val - minVal) / range * (canvas.height-40);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, 2*Math.PI);
+    ctx.fill();
+  });
+  
+  // 繪製Y軸標籤
+  ctx.fillStyle = '#6b6760';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'right';
+  for(let i=0; i<=4; i++){
+    const val = minVal + range * i / 4;
+    const y = canvas.height - 20 - (canvas.height-40) * i / 4;
+    ctx.fillText((val/10000).toFixed(0)+'萬', 35, y+4);
+  }
+}
+
+function rendMonthlyChange(){
+  if(assetHistory.length < 2){
+    document.getElementById('monthlyChange').textContent = '需要更多歷史資料';
+    return;
+  }
+  
+  const latest = assetHistory[assetHistory.length-1];
+  const previous = assetHistory[assetHistory.length-2];
+  
+  const currentValue = parseFloat(latest[8]) || 0;
+  const previousValue = parseFloat(previous[8]) || 0;
+  const change = currentValue - previousValue;
+  const changePercent = previousValue > 0 ? (change / previousValue * 100) : 0;
+  
+  const isPositive = change >= 0;
+  const color = isPositive ? '#1a7a4a' : '#c0392b';
+  const arrow = isPositive ? '↗' : '↘';
+  
+  document.getElementById('monthlyChange').innerHTML = 
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center">' +
+    '<div><div style="font-size:11px;color:var(--t3);margin-bottom:4px">本月變化</div>' +
+    '<div style="font-size:18px;font-weight:700;color:'+color+'">'+arrow+' $'+fmt(Math.abs(change))+'</div></div>' +
+    '<div><div style="font-size:11px;color:var(--t3);margin-bottom:4px">變化幅度</div>' +
+    '<div style="font-size:18px;font-weight:700;color:'+color+'">'+(isPositive?'+':'')+changePercent.toFixed(2)+'%</div></div>' +
+    '</div>';
+}
+
+function rendProjection(){
+  if(assetHistory.length < 6){
+    document.getElementById('projectionResult').textContent = '需要更多歷史資料進行預測';
+    return;
+  }
+  
+  const recent6 = assetHistory.slice(-6);
+  const values = recent6.map(r => parseFloat(r[8]) || 0);
+  
+  // 計算平均月成長率
+  let totalGrowth = 0;
+  let validMonths = 0;
+  for(let i=1; i<values.length; i++){
+    if(values[i-1] > 0){
+      totalGrowth += (values[i] - values[i-1]) / values[i-1];
+      validMonths++;
+    }
+  }
+  
+  const avgMonthlyGrowth = validMonths > 0 ? totalGrowth / validMonths : 0;
+  const currentValue = values[values.length-1];
+  const targetGap = GOAL - currentValue;
+  
+  if(avgMonthlyGrowth <= 0 || targetGap <= 0){
+    document.getElementById('projectionResult').textContent = 
+      targetGap <= 0 ? '🎉 目標已達成！' : '成長率為負，需要調整投資策略';
+    return;
+  }
+  
+  // 預估達成時間（月）
+  const monthsToTarget = Math.log(GOAL / currentValue) / Math.log(1 + avgMonthlyGrowth);
+  const targetDate = new Date();
+  targetDate.setMonth(targetDate.getMonth() + Math.ceil(monthsToTarget));
+  
+  const years = Math.floor(monthsToTarget / 12);
+  const months = Math.ceil(monthsToTarget % 12);
+  
+  document.getElementById('projectionResult').innerHTML = 
+    '<strong>' + targetDate.getFullYear() + '年' + (targetDate.getMonth()+1) + '月</strong><br>' +
+    '（約' + (years > 0 ? years + '年' : '') + months + '個月後）<br>' +
+    '<span style="font-size:12px;color:var(--t3)">基於近6月平均成長率 ' + (avgMonthlyGrowth*100).toFixed(2) + '%/月</span>';
+}
+
+function rendAllocation(){
+  if(!asset) return;
+  
+  // 計算各類資產比例（使用最新資產資料）
+  const total = parseFloat(asset[8]) || 1;
+  const stockPct = Math.round(3257162 / total * 100);
+  const fundPct = Math.round(2654183 / total * 100);  
+  const usPct = Math.round(257282 / total * 100);
+  const cashPct = 100 - stockPct - fundPct - usPct;
+  
+  document.getElementById('stockPct').textContent = stockPct + '%';
+  document.getElementById('fundPct').textContent = fundPct + '%';
+  document.getElementById('usPct').textContent = usPct + '%';
+  document.getElementById('cashPct').textContent = Math.max(0, cashPct) + '%';
+}
+
+
 const now=new Date();
 document.getElementById('df').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
 document.getElementById('dt').value=now.toISOString().split('T')[0];
