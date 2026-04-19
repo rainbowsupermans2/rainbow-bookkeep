@@ -21,25 +21,22 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:80px}
-/* Header */
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
 .logo-img{width:36px;height:36px;object-fit:contain}
 .logo-text{font-size:17px;font-weight:700;color:var(--accent)}
 .logo-text span{font-weight:300;color:var(--t2)}
-/* Bottom Nav */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:20}
 .nav-item{flex:1;padding:10px 4px 14px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;transition:all .15s}
 .nav-icon{font-size:22px;line-height:1.2;display:block;margin-bottom:2px}
 .nav-label{font-size:11px;color:var(--t3);font-weight:500}
 .nav-item.active .nav-label{color:var(--accent)}
 .nav-item.active .nav-icon{transform:scale(1.1)}
-/* Pages */
 .page{display:none;padding:16px}
 .page.active{display:block}
-/* Cards */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;margin-bottom:12px}
 .card-title{font-size:12px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
-/* Stat cards */
+.card-title.warn{color:var(--red)}
+.card-title.safe{color:var(--green)}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .stat{background:var(--bg);border-radius:10px;padding:12px;text-align:center}
 .stat-label{font-size:11px;color:var(--t3);margin-bottom:4px}
@@ -48,23 +45,34 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .stat-value.expense{color:var(--red)}
 .stat-value.balance.pos{color:var(--green)}
 .stat-value.balance.neg{color:var(--red)}
-/* Progress bar */
-.progress-wrap{background:var(--bg);border-radius:10px;height:14px;overflow:hidden;margin:8px 0 4px}
-.progress-bar{height:100%;background:linear-gradient(90deg,#1a7a4a,#2d9e6b);border-radius:10px;transition:width .5s}
+.progress-wrap{background:var(--bg);border-radius:10px;height:18px;overflow:hidden;margin:10px 0 6px;position:relative}
+.progress-bar{height:100%;background:linear-gradient(90deg,#c0392b,#e67e22,#1a7a4a);border-radius:10px;transition:width .8s}
+.progress-pct{font-size:28px;font-weight:700;color:var(--red)}
 .progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--t2)}
-/* Big number */
-.big-num{font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.5px}
+.big-num{font-size:26px;font-weight:700;color:var(--text)}
 .big-sub{font-size:12px;color:var(--t3);margin-top:2px}
-/* Month nav */
+.gap-num{font-size:22px;font-weight:700;color:var(--red)}
+.pension-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.pension-row:last-child{border-bottom:none}
+.pension-label{color:var(--t2);flex:1}
+.pension-value{font-weight:700;color:var(--green)}
+.pension-date{font-size:11px;color:var(--t3);margin-top:2px}
+.total-pension{background:var(--gbg);border-radius:10px;padding:12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+.total-pension-label{font-size:13px;color:var(--green);font-weight:600}
+.total-pension-value{font-size:20px;font-weight:700;color:var(--green)}
+.highlight-box{border-radius:10px;padding:12px;margin-top:8px;font-size:12px;line-height:1.7}
+.highlight-box.red{background:var(--rbg);color:var(--red);border:1px solid #f5c4c4}
+.highlight-box.green{background:var(--gbg);color:var(--green);border:1px solid #9FE1CB}
+.sim-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sim-label{font-size:13px;color:var(--t2);flex:1}
+.sim-input{width:130px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;text-align:right}
+.sim-result{background:var(--abg);border-radius:10px;padding:12px;margin-top:8px;font-size:13px;color:var(--amber);line-height:1.8}
 .month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .month-nav button{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:14px;cursor:pointer;color:var(--text)}
-.month-nav button:active{background:var(--bg)}
 .month-title{font-size:16px;font-weight:600}
-/* Date range */
 .date-range{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
 .date-range input{flex:1;min-width:120px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--text)}
 .date-range button{padding:8px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-/* Category list */
 .cat-list{display:flex;flex-direction:column;gap:6px}
 .cat-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)}
 .cat-row:last-child{border-bottom:none}
@@ -72,14 +80,6 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .cat-bar-wrap{flex:2;background:var(--bg);border-radius:4px;height:8px;overflow:hidden}
 .cat-bar{height:100%;border-radius:4px;background:var(--accent);transition:width .4s}
 .cat-amt{font-size:13px;font-weight:600;color:var(--red);min-width:70px;text-align:right}
-/* Loading */
-.loading{text-align:center;padding:40px;color:var(--t3);font-size:14px}
-/* Simulator */
-.sim-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.sim-label{font-size:13px;color:var(--t2);flex:1}
-.sim-input{width:120px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;text-align:right}
-.sim-result{background:var(--abg);border-radius:10px;padding:12px;margin-top:8px;font-size:13px;color:var(--amber)}
-/* Record tab styles */
 .steps{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:14px}
 .step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--t3);transition:all .2s}
 .step-dot.active{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -133,6 +133,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .sec-title{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(60px);background:#1a1916;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.years-badge{display:inline-block;background:var(--rbg);border:1px solid #f5c4c4;border-radius:8px;padding:4px 10px;font-size:12px;color:var(--red);font-weight:600;margin-left:8px}
 </style>
 </head>
 <body>
@@ -143,23 +144,51 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 
 <!-- 資產頁 -->
 <div class="page active" id="page-asset">
+
   <div class="card">
-    <div class="card-title">最新淨資產</div>
-    <div class="big-num" id="assetValue">載入中...</div>
-    <div class="big-sub" id="assetDate"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">退休目標進度</div>
-    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
-      <span style="font-size:24px;font-weight:700;color:var(--accent)" id="progressPct">--%</span>
-      <span style="font-size:12px;color:var(--t2)">目標 $1,238萬</span>
+    <div class="card-title warn">⚠ 投資資產目標進度（嚴格版）<span class="years-badge">還有7年</span></div>
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">
+      <span class="progress-pct" id="progressPct">--%</span>
+      <span style="font-size:13px;color:var(--t2)">距離 $1,238萬目標</span>
     </div>
     <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
     <div class="progress-label">
-      <span>距離目標還差</span>
-      <span id="progressGap" style="color:var(--red);font-weight:600"></span>
+      <span>目前淨資產</span>
+      <span id="assetValue" style="font-weight:600">載入中...</span>
+    </div>
+    <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;color:var(--t2)">還需努力</span>
+      <span class="gap-num" id="progressGap">--</span>
+    </div>
+    <div class="highlight-box red" id="motivationMsg">計算中...</div>
+    <div style="font-size:11px;color:var(--t3);margin-top:6px" id="assetDate"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title safe">✓ 勞保年金底線保障（不受市場影響）</div>
+    <div class="pension-row">
+      <div class="pension-label">
+        先生老年年金
+        <div class="pension-date">2027年11月起（63歲）</div>
+      </div>
+      <div class="pension-value">$25,850/月</div>
+    </div>
+    <div class="pension-row">
+      <div class="pension-label">
+        彩虹老年年金
+        <div class="pension-date">2032年11月起（63歲）</div>
+      </div>
+      <div class="pension-value">$23,512/月</div>
+    </div>
+    <div class="total-pension">
+      <div class="total-pension-label">雙退休後合計（終身）</div>
+      <div class="total-pension-value">$49,362/月</div>
+    </div>
+    <div class="highlight-box green" style="margin-top:8px">
+      即使投資資產沒有達到目標，每月 $49,362 的勞保年金是你們永遠的退休底線，不受市場波動影響。
     </div>
   </div>
+
   <div class="card">
     <div class="card-title">目標試算器</div>
     <div class="sim-row">
@@ -169,6 +198,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
     </div>
     <div class="sim-result" id="simResult">計算中...</div>
   </div>
+
 </div>
 
 <!-- 收支頁 -->
@@ -180,7 +210,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
   </div>
   <div class="date-range">
     <input type="date" id="dateFrom">
-    <span style="font-size:13px;color:var(--t2)">~</span>
+    <span style="font-size:13px;color:var(--t2)">～</span>
     <input type="date" id="dateTo">
     <button onclick="loadCustomRange()">查詢</button>
   </div>
@@ -191,7 +221,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
   </div>
   <div class="card">
     <div class="card-title">支出分類</div>
-    <div class="cat-list" id="catBreakdown"><div class="loading">載入中...</div></div>
+    <div class="cat-list" id="catBreakdown"><div style="text-align:center;padding:20px;color:var(--t3);font-size:13px">載入中...</div></div>
   </div>
 </div>
 
@@ -296,7 +326,6 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
   </div>
 </div>
 
-<!-- Bottom Nav -->
 <nav class="bottom-nav">
   <button class="nav-item active" id="nav-asset" onclick="switchPage('asset')">
     <span class="nav-icon">💰</span><span class="nav-label">資產</span>
@@ -308,11 +337,10 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
     <span class="nav-icon">📝</span><span class="nav-label">記帳</span>
   </button>
 </nav>
-
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxVk1nwWyEXmLrZ6rpc5JBgx_Sp6A6m1YSpwAcAGS9gtxKu9kpW2TIqH-hSFWrIfQE/exec';
+const SCRIPT_URL= + SCRIPT_URL + ;
 const RETIREMENT_GOAL=12380000;
 const CATS={
   '支出':[
@@ -343,70 +371,70 @@ function switchPage(p){
   if(p==='asset')renderAsset();
 }
 
-// === 資產頁 ===
 async function loadAsset(){
   try{
     const r=await fetch(SCRIPT_URL+'?type=asset');
     const d=await r.json();
-    if(d.success&&d.data){
-      lastAsset=d.data;
-      renderAsset();
-    }
-  }catch(e){
-    document.getElementById('assetValue').textContent='無法載入';
-  }
+    if(d.success&&d.data){lastAsset=d.data;renderAsset();}
+  }catch(e){document.getElementById('assetValue').textContent='無法載入';}
 }
+
 function renderAsset(){
   if(!lastAsset)return;
-  const net=parseFloat(lastAsset[6])||0;
+  // 欄位：A=日期, B=台股, C=VT, D=基金, E=現金定存, F=超人勞退, G=彩虹勞退, H=資產總額, I=資產淨值, J=退休進度%, K=距離目標
+  const net=parseFloat(lastAsset[8])||0;
   const date=lastAsset[0]||'';
   const pct=Math.min(100,(net/RETIREMENT_GOAL*100));
   const gap=Math.max(0,RETIREMENT_GOAL-net);
+  const monthsLeft=(2032-2026)*12+5;
+  const monthlyNeeded=monthsLeft>0?Math.round(gap/monthsLeft):0;
+
   document.getElementById('assetValue').textContent='$'+fmt(net)+' 元';
-  document.getElementById('assetDate').textContent='更新日期：'+date;
+  document.getElementById('assetDate').textContent='最後更新：'+date;
   document.getElementById('progressPct').textContent=pct.toFixed(1)+'%';
   document.getElementById('progressBar').style.width=pct+'%';
   document.getElementById('progressGap').textContent='$'+fmt(gap)+' 元';
+  document.getElementById('motivationMsg').innerHTML=
+    `距離 <b>$1,238萬</b> 目標還差 <b>$${fmt(gap)}</b> 元<br>`+
+    `還有約 <b>${monthsLeft}</b> 個月，每月需增加約 <b>$${fmt(monthlyNeeded)}</b> 元`;
   calcSim();
 }
+
 function calcSim(){
-  const net=lastAsset?parseFloat(lastAsset[6])||0:9290000;
+  const net=lastAsset?parseFloat(lastAsset[8])||0:6536390;
   const goal=parseInt(document.getElementById('simGoal').value)||15000000;
   const pct=(net/goal*100).toFixed(1);
   const gap=Math.max(0,goal-net);
   const extraGap=gap-Math.max(0,RETIREMENT_GOAL-net);
-  const months=((2032-2026)*12+6);
-  const monthly=months>0?Math.round(extraGap/months):0;
+  const months=(2032-2026)*12+5;
+  const monthly=months>0?Math.round(gap/months):0;
   document.getElementById('simResult').innerHTML=
-    `目標 <b>${fmt(goal)}</b> 元的話：<br>`+
-    `進度 <b>${pct}%</b>，還差 <b>${fmt(gap)}</b> 元<br>`+
-    (extraGap>0?`比 $1,238萬 多出 <b>${fmt(extraGap)}</b> 元缺口<br>每月需多存約 <b>${fmt(monthly)}</b> 元`:'已超過此目標 ✓');
+    `目標 <b>$${fmt(goal)}</b> 元：<br>`+
+    `進度 <b>${pct}%</b>，還差 <b>$${fmt(gap)}</b> 元<br>`+
+    (extraGap>0?`比 $1,238萬目標 多出 <b>$${fmt(extraGap)}</b> 元缺口<br>每月需多累積約 <b>$${fmt(monthly)}</b> 元`:'已超過此目標 ✓');
 }
 
-// === 收支頁 ===
 async function loadExpense(){
   try{
     const r=await fetch(SCRIPT_URL+'?type=expense');
     const d=await r.json();
-    if(d.success){
-      expenseData=d.data.slice(1);
-      renderExpense();
-    }
+    if(d.success){expenseData=d.data.slice(1);renderExpense();}
   }catch(e){}
 }
+
 function getMonthRange(y,m){
   const from=`${y}-${String(m).padStart(2,'0')}-01`;
   const lastDay=new Date(y,m,0).getDate();
   const to=`${y}-${String(m).padStart(2,'0')}-${String(lastDay).padStart(2,'0')}`;
   return{from,to};
 }
+
 function renderExpense(from,to){
   const r=from&&to?{from,to}:getMonthRange(currentYear,currentMonth);
   document.getElementById('monthTitle').textContent=
-    from&&to?from+' ~ '+to:`${currentYear}年${currentMonth}月`;
+    from&&to?from+' ～ '+to:`${currentYear}年${currentMonth}月`;
   const filtered=expenseData.filter(row=>{
-    const d=String(row[0]);
-    return d>=r.from&&d<=r.to;
+    const d=String(row[0]);return d>=r.from&&d<=r.to;
   });
   let income=0,expense=0;
   const catMap={};
@@ -421,38 +449,40 @@ function renderExpense(from,to){
   document.getElementById('totalIncome').textContent='$'+fmt(income);
   document.getElementById('totalExpense').textContent='$'+fmt(expense);
   const balEl=document.getElementById('totalBalance');
-  balEl.textContent=(balance>=0?'+':'')+'$'+fmt(balance);
+  balEl.textContent=(balance>=0?'+':'')+'$'+fmt(Math.abs(balance));
   balEl.className='stat-value balance '+(balance>=0?'pos':'neg');
   const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
   const max=cats.length?cats[0][1]:1;
-  const html=cats.length?cats.map(([c,a])=>
-    `<div class="cat-row">
+  document.getElementById('catBreakdown').innerHTML=cats.length?
+    cats.map(([c,a])=>`<div class="cat-row">
       <span class="cat-name">${c}</span>
       <div class="cat-bar-wrap"><div class="cat-bar" style="width:${(a/max*100).toFixed(0)}%"></div></div>
       <span class="cat-amt">${fmt(a)}</span>
-    </div>`).join(''):'<div style="text-align:center;padding:20px;color:var(--t3);font-size:13px">本期間無支出記錄</div>';
-  document.getElementById('catBreakdown').innerHTML=html;
+    </div>`).join(''):
+    '<div style="text-align:center;padding:20px;color:var(--t3);font-size:13px">本期間無支出記錄</div>';
 }
+
 function changeMonth(d){
   currentMonth+=d;
   if(currentMonth>12){currentMonth=1;currentYear++;}
   if(currentMonth<1){currentMonth=12;currentYear--;}
   renderExpense();
 }
+
 function loadCustomRange(){
   const from=document.getElementById('dateFrom').value;
   const to=document.getElementById('dateTo').value;
-  if(!from||!to){showToast('請選擇起始和結束日期');return;}
+  if(!from||!to){showToast('請選擇日期區間');return;}
   renderExpense(from,to);
 }
 
-// === 記帳頁 ===
 function selectType(t){
   state.type=t;
   document.getElementById('btn-expense').classList.toggle('selected',t==='支出');
   document.getElementById('btn-income').classList.toggle('selected',t==='收入');
   setTimeout(()=>goStep(2),150);
 }
+
 function buildCatGrid(){
   const grid=document.getElementById('catGrid');
   grid.innerHTML='';
@@ -466,12 +496,14 @@ function buildCatGrid(){
     grid.appendChild(d);
   });
 }
+
 function selectCat(label,el){
   state.cat=label;
   document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
   setTimeout(()=>goStep(3),150);
 }
+
 function keyInput(v){
   if(state.amount==='0')state.amount='';
   if(state.amount.length>=9)return;
@@ -486,6 +518,7 @@ function updateAmtDisplay(){
   else{el.textContent='$'+n.toLocaleString('zh-TW');el.classList.remove('empty');}
   document.getElementById('amtLabel').textContent=state.type==='支出'?'支出金額':'收入金額';
 }
+
 function buildSummary(){
   const n=parseInt(state.amount)||0;
   const isExp=state.type==='支出';
@@ -495,18 +528,17 @@ function buildSummary(){
     <div class="summary-row"><span class="summary-label">金額</span><span class="summary-value ${isExp?'expense':'income'}">$${n.toLocaleString('zh-TW')}</span></div>
     <div class="summary-row"><span class="summary-label">日期</span><span class="summary-value">${new Date().toLocaleDateString('zh-TW')}</span></div>`;
 }
+
 function goStep(n){
   if(n===2&&!state.type){showToast('請先選擇類型');return;}
   if(n===3&&!state.cat){showToast('請先選擇類別');return;}
-  if(n===4){
-    if((parseInt(state.amount)||0)<=0){showToast('請輸入金額');return;}
-    buildSummary();
-  }
+  if(n===4){if((parseInt(state.amount)||0)<=0){showToast('請輸入金額');return;}buildSummary();}
   if(n===2)buildCatGrid();
   document.querySelectorAll('.step-page').forEach((p,i)=>{p.classList.toggle('active',i===n-1);});
   updateStepDots(n);
   window.scrollTo(0,0);
 }
+
 function updateStepDots(current){
   for(let i=1;i<=4;i++){
     const d=document.getElementById('dot'+i);
@@ -516,6 +548,7 @@ function updateStepDots(current){
     if(i<4)document.getElementById('line'+i).className='step-line'+(i<current?' done':'');
   }
 }
+
 async function submitRecord(){
   const btn=document.getElementById('submitBtn');
   btn.disabled=true;btn.textContent='儲存中...';
@@ -530,16 +563,14 @@ async function submitRecord(){
   try{
     const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({row:row})});
     const result=await r.json();
-    if(result.success){
-      showToast('記帳成功！✓');
-      expenseData.push(row);
-      resetAll();
-    }else throw new Error(result.error||'失敗');
+    if(result.success){showToast('記帳成功！✓');expenseData.push(row);resetAll();}
+    else throw new Error(result.error||'失敗');
   }catch(e){
     showToast('失敗：'+e.message);
     btn.disabled=false;btn.textContent='✓ 記帳完成';
   }
 }
+
 function resetAll(){
   state={type:'',cat:'',amount:''};
   document.getElementById('noteInput').value='';
@@ -554,20 +585,19 @@ function resetAll(){
   document.getElementById('submitBtn').textContent='✓ 記帳完成';
   goStep(1);
 }
+
 function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// 初始化日期
 const today=new Date().toISOString().split('T')[0];
 const firstDay=`${currentYear}-${String(currentMonth).padStart(2,'0')}-01`;
 document.getElementById('dateFrom').value=firstDay;
 document.getElementById('dateTo').value=today;
 document.getElementById('monthTitle').textContent=`${currentYear}年${currentMonth}月`;
 
-// 載入資料
 loadAsset();
 loadExpense();
 </script>
