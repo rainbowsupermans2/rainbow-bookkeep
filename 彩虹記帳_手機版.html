@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>彩虹記帳</title>
+<style>
+:root{
+  --green:#1a7a4a;--gbg:#eaf5ef;
+  --red:#c0392b;--rbg:#fdf0ee;
+  --amber:#a05c00;--abg:#fef6e4;
+  --blue:#1a5fa0;--bbg:#eaf2fc;
+  --border:#e2ddd4;--bg:#f7f6f2;
+  --surface:#fff;--text:#1a1916;
+  --t2:#6b6760;--t3:#a09d97;
+  --accent:#2d6a4f;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto}
+
+/* header */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.logo{font-size:17px;font-weight:700;color:var(--accent)}
+.logo span{font-weight:300;color:var(--t2)}
+.setting-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:4px}
+
+/* step indicator */
+.steps{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--t3);transition:all .2s}
+.step-dot.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.step-line{flex:1;height:2px;background:var(--border);border-radius:1px;max-width:40px}
+.step-line.done{background:var(--green)}
+
+main{padding:16px}
+
+/* type buttons */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.type-btn{padding:20px 12px;border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all .15s;position:relative}
+.type-btn:active{transform:scale(.97)}
+.type-btn.expense{border-color:var(--border)}
+.type-btn.expense.selected{border-color:var(--red);background:var(--rbg)}
+.type-btn.income.selected{border-color:var(--green);background:var(--gbg)}
+.type-icon{font-size:28px;margin-bottom:6px}
+.type-label{font-size:15px;font-weight:500}
+
+/* category grid */
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cat-btn{padding:12px 6px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all .15s}
+.cat-btn:active{transform:scale(.96)}
+.cat-btn.selected{border-color:var(--accent);background:var(--gbg)}
+.cat-icon{font-size:22px;margin-bottom:3px}
+.cat-label{font-size:12px;color:var(--t2);font-weight:500}
+.cat-btn.selected .cat-label{color:var(--accent)}
+
+/* amount */
+.amount-display{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:16px;text-align:center;margin-bottom:12px;min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.amount-label{font-size:12px;color:var(--t3);margin-bottom:4px}
+.amount-value{font-size:32px;font-weight:500;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:1px}
+.amount-value.empty{color:var(--t3)}
+
+/* keypad */
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.key{padding:16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);font-size:20px;font-weight:500;cursor:pointer;text-align:center;transition:all .1s;color:var(--text)}
+.key:active{background:var(--bg);transform:scale(.95)}
+.key.del{color:var(--red);font-size:18px}
+.key.zero{grid-column:span 2}
+.key.confirm{background:var(--accent);color:#fff;border-color:var(--accent);font-size:16px}
+
+/* note & account */
+.input-row{display:flex;gap:8px;margin-bottom:10px}
+.input-group{flex:1;display:flex;flex-direction:column;gap:4px}
+.input-group label{font-size:11px;color:var(--t2);font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+.input-group input,.input-group select{padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;width:100%}
+.input-group select:focus,.input-group input:focus{border-color:var(--accent)}
+
+/* submit */
+.submit-btn{width:100%;padding:16px;border-radius:14px;border:none;background:var(--accent);color:#fff;font-size:16px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity .15s;margin-top:4px}
+.submit-btn:active{opacity:.85}
+.submit-btn:disabled{opacity:.5;pointer-events:none}
+
+/* summary card */
+.summary{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;border-bottom:1px solid var(--border)}
+.summary-row:last-child{border-bottom:none}
+.summary-label{color:var(--t2)}
+.summary-value{font-weight:500;font-family:'DM Mono',monospace}
+.summary-value.income{color:var(--green)}
+.summary-value.expense{color:var(--red)}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:#1a1916;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* section title */
+.sec-title{font-size:13px;font-weight:500;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px}
+
+/* setting panel */
+.panel{display:none;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:14px}
+.panel.open{display:block}
+.panel h3{font-size:14px;font-weight:500;color:var(--text);margin-bottom:10px}
+.panel input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'DM Mono',monospace;margin-bottom:8px;outline:none}
+.panel input:focus{border-color:var(--accent)}
+.panel .save-btn{width:100%;padding:10px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:500;cursor:pointer}
+
+/* step pages */
+.step-page{display:none}
+.step-page.active{display:block}
+
+.nav-btn{padding:12px 20px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;color:var(--text)}
+.nav-btn:active{background:var(--bg)}
+.nav-row{display:flex;gap:8px;margin-top:10px}
+.nav-row .next{flex:2;background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <div class="logo">彩虹記帳<span> S2</span></div>
+  <button class="setting-btn" onclick="toggleSettings()">⚙️</button>
+</header>
+
+<!-- Settings Panel -->
+<main>
+<div class="panel" id="settingsPanel">
+  <h3>設定 Google API 金鑰</h3>
+  <input type="password" id="apiKeyInput" placeholder="貼上你的 Google API Key...">
+  <button class="save-btn" onclick="saveApiKey()">儲存金鑰</button>
+</div>
+
+<!-- Step indicator -->
+<div class="steps">
+  <div class="step-dot active" id="dot1">1</div>
+  <div class="step-line" id="line1"></div>
+  <div class="step-dot" id="dot2">2</div>
+  <div class="step-line" id="line2"></div>
+  <div class="step-dot" id="dot3">3</div>
+  <div class="step-line" id="line3"></div>
+  <div class="step-dot" id="dot4">4</div>
+</div>
+
+<!-- Step 1: Type -->
+<div class="step-page active" id="step1">
+  <div class="sec-title" style="margin-top:14px">這筆是？</div>
+  <div class="type-grid">
+    <div class="type-btn expense" id="btn-expense" onclick="selectType('支出')">
+      <div class="type-icon">💸</div>
+      <div class="type-label">支出</div>
+    </div>
+    <div class="type-btn income" id="btn-income" onclick="selectType('收入')">
+      <div class="type-icon">💰</div>
+      <div class="type-label">收入</div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 2: Category -->
+<div class="step-page" id="step2">
+  <div class="sec-title" style="margin-top:14px">類別</div>
+  <div class="cat-grid" id="catGrid"></div>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="goStep(1)">← 返回</button>
+  </div>
+</div>
+
+<!-- Step 3: Amount -->
+<div class="step-page" id="step3">
+  <div class="sec-title" style="margin-top:14px">金額</div>
+  <div class="amount-display">
+    <div class="amount-label" id="amtLabel">輸入金額</div>
+    <div class="amount-value empty" id="amtDisplay">0</div>
+  </div>
+  <div class="keypad">
+    <div class="key" onclick="keyInput('1')">1</div>
+    <div class="key" onclick="keyInput('2')">2</div>
+    <div class="key" onclick="keyInput('3')">3</div>
+    <div class="key" onclick="keyInput('4')">4</div>
+    <div class="key" onclick="keyInput('5')">5</div>
+    <div class="key" onclick="keyInput('6')">6</div>
+    <div class="key" onclick="keyInput('7')">7</div>
+    <div class="key" onclick="keyInput('8')">8</div>
+    <div class="key" onclick="keyInput('9')">9</div>
+    <div class="key del" onclick="keyDel()">⌫</div>
+    <div class="key zero" onclick="keyInput('0')">0</div>
+  </div>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="goStep(2)">← 返回</button>
+    <button class="nav-btn next" onclick="goStep(4)" id="nextToStep4">下一步 →</button>
+  </div>
+</div>
+
+<!-- Step 4: Details & Submit -->
+<div class="step-page" id="step4">
+  <div class="sec-title" style="margin-top:14px">確認並送出</div>
+
+  <!-- Summary -->
+  <div class="summary" id="summaryCard"></div>
+
+  <div class="input-row">
+    <div class="input-group" style="flex:2">
+      <label>備註（選填）</label>
+      <input type="text" id="noteInput" placeholder="例如：早餐、計程車">
+    </div>
+    <div class="input-group">
+      <label>專案</label>
+      <select id="projectInput">
+        <option value="一般">一般</option>
+        <option value="旅遊-東京2026">東京2026</option>
+        <option value="旅遊專款">旅遊專款</option>
+        <option value="醫療專款">醫療專款</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="input-row">
+    <div class="input-group">
+      <label>帳戶</label>
+      <select id="accountInput">
+        <option>富邦活存</option>
+        <option>板信（先生）</option>
+        <option>LINE bank</option>
+        <option>LINE Pay</option>
+        <option>現金</option>
+        <option>信用卡</option>
+        <option>其他</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>信用卡（若適用）</label>
+      <select id="cardInput">
+        <option value="">—</option>
+        <option>富邦</option>
+        <option>玉山日幣</option>
+        <option>中信</option>
+        <option>LINE bank卡</option>
+        <option>聯邦點點卡</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitRecord()">✓ 記帳完成</button>
+
+  <div class="nav-row" style="margin-top:8px">
+    <button class="nav-btn" onclick="goStep(3)">← 返回修改</button>
+  </div>
+</div>
+
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEET_ID = '1PcD6z0CWAMghLgjXgY69W176DQf0LHPV-pbWnTDyjYI';
+const SHEET_NAME = '收支記帳';
+
+const CATS = {
+  '支出': [
+    {icon:'🏠',label:'房貸'},
+    {icon:'🛡️',label:'保險'},
+    {icon:'🍱',label:'伙食費'},
+    {icon:'💡',label:'水電費'},
+    {icon:'📱',label:'手機費'},
+    {icon:'🚌',label:'交通'},
+    {icon:'💊',label:'醫療'},
+    {icon:'🛍️',label:'購物'},
+    {icon:'🎉',label:'娛樂'},
+    {icon:'✈️',label:'旅遊'},
+    {icon:'👵',label:'孝親費'},
+    {icon:'📦',label:'其他支出'},
+  ],
+  '收入': [
+    {icon:'💼',label:'薪資'},
+    {icon:'📚',label:'代課收入'},
+    {icon:'🏛️',label:'勞保年金'},
+    {icon:'📈',label:'投資配息'},
+    {icon:'🏡',label:'租金'},
+    {icon:'🎁',label:'其他收入'},
+  ]
+};
+
+let state = {type:'',cat:'',amount:'',note:'',account:'富邦活存',card:'',project:'一般'};
+
+function getApiKey(){ return localStorage.getItem('rainbow_api_key')||''; }
+function saveApiKey(){
+  const k=document.getElementById('apiKeyInput').value.trim();
+  if(!k){showToast('請輸入 API 金鑰');return;}
+  localStorage.setItem('rainbow_api_key',k);
+  document.getElementById('settingsPanel').classList.remove('open');
+  showToast('金鑰已儲存！');
+}
+function toggleSettings(){
+  const p=document.getElementById('settingsPanel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')){
+    const k=getApiKey();
+    if(k) document.getElementById('apiKeyInput').value=k;
+  }
+}
+
+function selectType(t){
+  state.type=t;
+  document.getElementById('btn-expense').classList.toggle('selected',t==='支出');
+  document.getElementById('btn-income').classList.toggle('selected',t==='收入');
+  setTimeout(()=>goStep(2),150);
+}
+
+function buildCatGrid(){
+  const grid=document.getElementById('catGrid');
+  grid.innerHTML='';
+  (CATS[state.type]||[]).forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cat-btn'+(state.cat===c.label?' selected':'');
+    d.innerHTML<`<div class="cat-icon">${c.icon}</div><div class="cat-label">${c.label}</div>`;
+    d.onclick=()=>selectCat(c.label,d);
+    grid.appendChild(d);
+  });
+}
+
+function selectCat(label,el){
+  state.cat=label;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  setTimeout(()=>goStep(3),150);
+}
+
+function keyInput(v){
+  if(state.amount==='0') state.amount='';
+  if(state.amount.length>=9) return;
+  state.amount=(state.amount||'')+v;
+  updateAmtDisplay();
+}
+function keyDel(){
+  state.amount=state.amount.slice(0,-1)||'';
+  updateAmtDisplay();
+}
+function updateAmtDisplay(){
+  const el=document.getElementById('amtDisplay');
+  const n=parseInt(state.amount)||0;
+  if(!state.amount||n===0){el.textContent='0';el.classList.add('empty');}
+  else{el.textContent='$'+n.toLocaleString('zh-TW');el.classList.remove('empty');}
+  document.getElementById('amtLabel').textContent=state.type==='支出'?'支出金額':'收入金額';
+}
+
+function buildSummary(){
+  const n=parseInt(state.amount)||0;
+  const isExp=state.type==='支出';
+  document.getElementById('summaryCard').innerHTML=`
+    <div class="summary-row"><span class="summary-label">類型</span><span class="summary-value ${isExp?'expense':'income'}">${state.type}</span></div>
+    <div class="summary-row"><span class="summary-label">類別</span><span class="summary-value">${state.cat}</span></div>
+    <div class="summary-row"><span class="summary-label">金額</span><span class="summary-value ${isExp?'expense':'income'}">$${n.toLocaleString('zh-TW')}</span></div>
+    <div class="summary-row"><span class="summary-label">日期</span><span class="summary-value">${new Date().toLocaleDateString('zh-TW')}</span></div>
+  `;
+}
+
+function goStep(n){
+  if(n===2&&!state.type){showToast('請先選擇類型');return;}
+  if(n===3&&!state.cat){showToast('請先選擇類別');return;}
+  if(n===4){
+    const amt=parseInt(state.amount)||0;
+    if(amt<=0){showToast('請輸入金額');return;}
+    buildSummary();
+  }
+  if(n===2) buildCatGrid();
+  document.querySelectorAll('.step-page').forEach((p,i)=>{p.classList.toggle('active',i===n-1);});
+  updateStepDots(n);
+  window.scrollTo(0,0);
+}
+
+function updateStepDots(current){
+  for(let i=1;i<=4;i++){
+    const d=document.getElementById('dot'+i);
+    if(i<current){d.className='step-dot done';d.textContent='✓';}
+    else if(i===current){d.className='step-dot active';d.textContent=i;}
+    else{d.className='step-dot';d.textContent=i;}
+    if(i<4){
+      const l=document.getElementById('line'+i);
+      l.className='step-line'+(i<current?' done':'');
+    }
+  }
+}
+
+async function submitRecord(){
+  const key=getApiKey();
+  if(!key){toggleSettings();showToast('請先設定 API 金鑰');return;}
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='儲存中...';
+  const note=document.getElementById('noteInput').value.trim();
+  const account=document.getElementById('accountInput').value;
+  const card=document.getElementById('cardInput').value;
+  const project=document.getElementById('projectInput').value;
+  const today=new Date().toISOString().split('T')[0];
+  const amt=parseInt(state.amount)||0;
+  const remark=card?`信用卡：${card}${note?' / '+note:''}`:(note||'');
+  const row=[today,state.type,state.cat,state.cat+(note?' - '+note:''),amt,account,remark,project];
+  try{
+    const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}!A:H:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS&key=${key}`;
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:[row]})});
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||r.statusText);}
+    showToast('記帳成功！已寫入 Google Sheets');
+    resetAll();
+  } catch(e){
+    showToast('儲存失敗：'+e.message);
+    btn.disabled=false;btn.textContent='✓ 記帳完成';
+  }
+}
+
+function resetAll(){
+  state={type:'',cat:'',amount:'',note:'',account:'富邦活存',card:'',project:'一般'};
+  document.getElementById('noteInput').value='';
+  document.getElementById('accountInput').value='富邦活存';
+  document.getElementById('cardInput').value='';
+  document.getElementById('projectInput').value='一般';
+  document.getElementById('btn-expense').classList.remove('selected');
+  document.getElementById('btn-income').classList.remove('selected');
+  document.getElementById('amtDisplay').textContent='0';
+  document.getElementById('amtDisplay').classList.add('empty');
+  document.getElementById('submitBtn').disabled=false;
+  document.getElementById('submitBtn').textContent='✓ 記帳完成';
+  goStep(1);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// 初始化
+if(!getApiKey()) setTimeout(()=>{document.getElementById('settingsPanel').classList.add('open');},500);
+</script>
+</body>
+</html>
