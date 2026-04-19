@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="彩虹S2">
@@ -20,14 +20,14 @@
   --accent:#2d6a4f;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:80px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
 .logo-img{width:36px;height:36px;object-fit:contain}
 .logo-text{font-size:17px;font-weight:700;color:var(--accent)}
 .logo-text span{font-weight:300;color:var(--t2)}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:20}
-.nav-item{flex:1;padding:10px 4px 14px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;transition:all .15s}
-.nav-icon{font-size:22px;line-height:1.2;display:block;margin-bottom:2px}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-item{flex:1;padding:10px 4px 14px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;transition:all .15s;min-height:60px}
+.nav-icon{font-size:24px;line-height:1.3;display:block;margin-bottom:3px}
 .nav-label{font-size:11px;color:var(--t3);font-weight:500}
 .nav-item.active .nav-label{color:var(--accent)}
 .nav-item.active .nav-icon{transform:scale(1.1)}
@@ -381,9 +381,16 @@ async function loadAsset(){
 
 function renderAsset(){
   if(!lastAsset)return;
-  // 欄位：A=日期, B=台股, C=VT, D=基金, E=現金定存, F=超人勞退, G=彩虹勞退, H=資產總額, I=資產淨值, J=退休進度%, K=距離目標
   const net=parseFloat(lastAsset[8])||0;
-  const date=lastAsset[0]||'';
+  // 日期格式處理（Google Sheets回傳UTC格式，轉換為台灣日期）
+  let date='';
+  try{
+    const raw=lastAsset[0];
+    if(raw&&raw.includes('T')){
+      const d=new Date(raw);
+      date=(d.getFullYear())+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()+1).padStart(2,'0');
+    }else{date=String(raw);}
+  }catch(e){date=String(lastAsset[0]);}
   const pct=Math.min(100,(net/RETIREMENT_GOAL*100));
   const gap=Math.max(0,RETIREMENT_GOAL-net);
   const monthsLeft=(2032-2026)*12+5;
