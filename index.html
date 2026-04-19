@@ -102,6 +102,10 @@ header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;
 .kkey:active{background:var(--bg);transform:scale(.94)}
 .kkey.del{color:var(--r)}
 .kkey.z2{grid-column:span 2}
+.kkey.op{background:var(--gbg);color:var(--g);font-weight:700;font-size:18px}
+.kkey.eq{background:var(--ac);color:#fff;font-size:18px}
+.kkey.op:active{background:var(--g);color:#fff}
+.expr{font-size:13px;color:var(--t3);min-height:18px;margin-bottom:2px}
 .subbtn{width:100%;padding:16px;border-radius:14px;border:none;background:var(--ac);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;-webkit-tap-highlight-color:transparent}
 .subbtn:active{opacity:.8}
 .subbtn:disabled{opacity:.5;pointer-events:none}
@@ -157,6 +161,7 @@ header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;
     <div class="stitle">金額</div>
     <button class="jptoggle" id="jpybtn" onclick="toggleJpy()" style="display:none">🇯🇵 切換成日幣輸入</button>
     <div class="adisp">
+      <div class="expr" id="expr"></div>
       <div class="alab" id="al">輸入金額</div>
       <div class="aval empty" id="av">0</div>
       <div class="jpconv" id="jpconv"></div>
@@ -165,7 +170,8 @@ header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;
       <div class="kkey" onclick="kIn('1')">1</div><div class="kkey" onclick="kIn('2')">2</div><div class="kkey" onclick="kIn('3')">3</div>
       <div class="kkey" onclick="kIn('4')">4</div><div class="kkey" onclick="kIn('5')">5</div><div class="kkey" onclick="kIn('6')">6</div>
       <div class="kkey" onclick="kIn('7')">7</div><div class="kkey" onclick="kIn('8')">8</div><div class="kkey" onclick="kIn('9')">9</div>
-      <div class="kkey del" onclick="kDel()">⌫</div><div class="kkey z2" onclick="kIn('0')">0</div>
+      <div class="kkey op" onclick="kOp('×')">×</div><div class="kkey" onclick="kIn('0')">0</div><div class="kkey del" onclick="kDel()">⌫</div>
+      <div class="kkey op" onclick="kOp('+')">+</div><div class="kkey op eq" onclick="kEq()">=</div><div class="kkey op" onclick="kOp('-')">−</div>
     </div>
     <div class="nrow"><button class="nbtn" onclick="goS(2)">← 返回</button><button class="nbtn nx" onclick="goS(4)">下一步 →</button></div>
   </div>
@@ -270,7 +276,7 @@ const CATS={'支出':[
   {i:'💼',l:'薪資'},{i:'📚',l:'代課收入'},{i:'🏛',l:'勞保年金'},
   {i:'📈',l:'投資配息'},{i:'🏡',l:'租金'},{i:'🎁',l:'其他收入'}
 ]};
-let st={type:'',cat:'',amt:'',jpyMode:false,jpyRate:0};
+let st={type:'',cat:'',amt:'',amt1:'',amt2:'',op:'',jpyMode:false,jpyRate:0};
 let cy=new Date().getFullYear(),cm=new Date().getMonth()+1;
 let edata=[],asset=null;
 
@@ -450,12 +456,44 @@ function selCat(l,el){
   setTimeout(()=>goS(3),120);
 }
 function kIn(v){
-  if(st.amt==='0')st.amt='';
-  if(st.amt.length>=9)return;
-  st.amt=(st.amt||'')+v;
+  if(st.op){
+    if(st.amt2==='0')st.amt2='';
+    if(st.amt2.length>=9)return;
+    st.amt2=(st.amt2||'')+v;
+    st.amt=st.amt2;
+  }else{
+    if(st.amt==='0')st.amt='';
+    if(st.amt.length>=9)return;
+    st.amt=(st.amt||'')+v;
+  }
   updAmt();
 }
-function kDel(){st.amt=st.amt.slice(0,-1)||'';updAmt();}
+function kDel(){
+  if(st.op&&!st.amt2){st.op='';st.amt1='';document.getElementById('expr').textContent='';updAmt();return;}
+  if(st.op&&st.amt2){st.amt2=st.amt2.slice(0,-1)||'';st.amt=st.amt2;updAmt();return;}
+  st.amt=st.amt.slice(0,-1)||'';updAmt();
+}
+function kOp(op){
+  if(!st.amt&&!st.amt1)return;
+  if(!st.amt1){st.amt1=st.amt;st.amt='';}
+  st.op=op;
+  document.getElementById('expr').textContent=st.amt1.toLocaleString()+' '+op;
+  st.amt2='';
+  updAmt();
+}
+function kEq(){
+  if(!st.op||!st.amt1)return;
+  const a=parseFloat(st.amt1)||0;
+  const b=parseFloat(st.amt||st.amt2||0);
+  let result=0;
+  if(st.op==='×')result=Math.round(a*b);
+  else if(st.op==='+')result=Math.round(a+b);
+  else if(st.op==='-')result=Math.max(0,Math.round(a-b));
+  document.getElementById('expr').textContent=a.toLocaleString()+' '+st.op+' '+b.toLocaleString()+' =';
+  st.amt=String(result);
+  st.amt1='';st.op='';st.amt2='';
+  updAmt();
+}
 function updAmt(){
   const n=parseInt(st.amt)||0;
   const av=document.getElementById('av');
@@ -557,7 +595,7 @@ async function doSubmit(){
   }
 }
 function resetAll(){
-  st={type:'',cat:'',amt:'',jpyMode:false,jpyRate:0};
+  st={type:'',cat:'',amt:'',amt1:'',amt2:'',op:'',jpyMode:false,jpyRate:0};document.getElementById('expr').textContent='';
   document.getElementById('ni').value='';
   document.getElementById('ai').value='富邦活存';
   document.getElementById('ci').value='';
