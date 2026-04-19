@@ -18,7 +18,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans TC','Microsoft Jhen
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
 .logo{font-size:17px;font-weight:700;color:var(--accent)}
 .logo span{font-weight:300;color:var(--t2)}
-.setting-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:4px}
 .steps{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
 .step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--t3);transition:all .2s}
 .step-dot.active{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -42,12 +41,12 @@ main{padding:16px}
 .cat-btn.selected .cat-label{color:var(--accent)}
 .amount-display{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:16px;text-align:center;margin-bottom:12px;min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .amount-label{font-size:12px;color:var(--t3);margin-bottom:4px}
-.amount-value{font-size:32px;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums}
+.amount-value{font-size:32px;font-weight:500;color:var(--text)}
 .amount-value.empty{color:var(--t3)}
 .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .key{padding:16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);font-size:20px;font-weight:500;cursor:pointer;text-align:center;transition:all .1s;color:var(--text)}
 .key:active{background:var(--bg);transform:scale(.95)}
-.key.del{color:var(--red);font-size:18px}
+.key.del{color:var(--red)}
 .key.zero{grid-column:span 2}
 .submit-btn{width:100%;padding:16px;border-radius:14px;border:none;background:var(--accent);color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s;margin-top:4px}
 .submit-btn:active{opacity:.85}
@@ -62,12 +61,6 @@ main{padding:16px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:#1a1916;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .sec-title{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px}
-.panel{display:none;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:14px}
-.panel.open{display:block}
-.panel h3{font-size:14px;font-weight:600;margin-bottom:10px}
-.panel input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:monospace;margin-bottom:8px;outline:none}
-.panel input:focus{border-color:var(--accent)}
-.panel .save-btn{width:100%;padding:10px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer}
 .step-page{display:none}
 .step-page.active{display:block}
 .input-row{display:flex;gap:8px;margin-bottom:10px}
@@ -84,14 +77,8 @@ main{padding:16px}
 <body>
 <header>
   <div class="logo">彩虹記帳<span> S2</span></div>
-  <button class="setting-btn" onclick="toggleSettings()">⚙️</button>
 </header>
 <main>
-<div class="panel" id="settingsPanel">
-  <h3>設定 Google API 金鑰</h3>
-  <input type="password" id="apiKeyInput" placeholder="貼上你的 Google API Key...">
-  <button class="save-btn" onclick="saveApiKey()">儲存金鑰</button>
-</div>
 <div class="steps">
   <div class="step-dot active" id="dot1">1</div>
   <div class="step-line" id="line1"></div>
@@ -196,8 +183,7 @@ main{padding:16px}
 </main>
 <div class="toast" id="toast"></div>
 <script>
-const SHEET_ID='1PcD6z0CWAMghLgjXgY69W176DQf0LHPV-pbWnTDyjYI';
-const SHEET_NAME='收支記帳';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxVk1nwWyEXmLrZ6rpc5JBgx_Sp6A6m1YSpwAcAGS9gtxKu9kpW2TIqH-hSFWrIfQE/exec';
 const CATS={
   '支出':[
     {icon:'🏠',label:'房貸'},
@@ -222,23 +208,7 @@ const CATS={
     {icon:'🎁',label:'其他收入'},
   ]
 };
-let state={type:'',cat:'',amount:'',note:'',account:'富邦活存',card:'',project:'一般'};
-function getApiKey(){return localStorage.getItem('rainbow_api_key')||'';}
-function saveApiKey(){
-  const k=document.getElementById('apiKeyInput').value.trim();
-  if(!k){showToast('請輸入 API 金鑰');return;}
-  localStorage.setItem('rainbow_api_key',k);
-  document.getElementById('settingsPanel').classList.remove('open');
-  showToast('金鑰已儲存！');
-}
-function toggleSettings(){
-  const p=document.getElementById('settingsPanel');
-  p.classList.toggle('open');
-  if(p.classList.contains('open')){
-    const k=getApiKey();
-    if(k)document.getElementById('apiKeyInput').value=k;
-  }
-}
+let state={type:'',cat:'',amount:''};
 function selectType(t){
   state.type=t;
   document.getElementById('btn-expense').classList.toggle('selected',t==='支出');
@@ -322,8 +292,6 @@ function updateStepDots(current){
   }
 }
 async function submitRecord(){
-  const key=getApiKey();
-  if(!key){toggleSettings();showToast('請先設定 API 金鑰');return;}
   const btn=document.getElementById('submitBtn');
   btn.disabled=true;btn.textContent='儲存中...';
   const note=document.getElementById('noteInput').value.trim();
@@ -335,18 +303,24 @@ async function submitRecord(){
   const remark=card?`信用卡：${card}${note?' / '+note:''}`:(note||'');
   const row=[today,state.type,state.cat,state.cat+(note?' - '+note:''),amt,account,remark,project];
   try{
-    const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}!A:H:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS&key=${key}`;
-    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({values:[row]})});
-    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||r.statusText);}
-    showToast('記帳成功！已寫入 Google Sheets');
-    resetAll();
+    const r=await fetch(SCRIPT_URL,{
+      method:'POST',
+      body:JSON.stringify({row:row})
+    });
+    const result=await r.json();
+    if(result.success){
+      showToast('記帳成功！已寫入 Google Sheets ✓');
+      resetAll();
+    } else {
+      throw new Error(result.error||'未知錯誤');
+    }
   }catch(e){
     showToast('儲存失敗：'+e.message);
     btn.disabled=false;btn.textContent='✓ 記帳完成';
   }
 }
 function resetAll(){
-  state={type:'',cat:'',amount:'',note:'',account:'富邦活存',card:'',project:'一般'};
+  state={type:'',cat:'',amount:''};
   document.getElementById('noteInput').value='';
   document.getElementById('accountInput').value='富邦活存';
   document.getElementById('cardInput').value='';
@@ -364,7 +338,6 @@ function showToast(msg){
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
 }
-if(!getApiKey())setTimeout(()=>{document.getElementById('settingsPanel').classList.add('open');},500);
 </script>
 </body>
 </html>
