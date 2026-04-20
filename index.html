@@ -557,7 +557,7 @@
 const SCRIPT_ID = 'AKfycbxVk1nwWyEXmLrZ6rpc5JBgx_Sp6A6m1YSpwAcAGS9gtxKu9kpW2TIqH-hSFWrIfQE';
 const SCRIPT_URL = `https://script.google.com/macros/s/${SCRIPT_ID}/exec`;
 const RETIRE_TARGET = 12380000;
-const MORTGAGE = 1530000;  // 房貸餘額（可手動更新）
+const MORTGAGE = 1528295;  // 房貸餘額（來自Sheets 2026/4/20）
 
 // 預算設定（每月）
 // fixed:true = 固定支出，直接顯示預算金額；false = 從記帳記錄抓實際數字
@@ -639,42 +639,56 @@ function parseAssetRow(row) {
 }
 
 function loadAssets() {
-    // 先取歷史（含所有列）
     jsonp(`${SCRIPT_URL}?type=history`, (err, data) => {
         if (err || !data || !data.success) {
             loadAssetsFallback();
             return;
         }
         const rows = data.data || [];
-        // 第一列通常是標題列，跳過
-        const dataRows = rows.filter(r => r[0] && r[0] !== '日期');
+        // 跳過標題列
+        const dataRows = rows.filter(r => r[0] && r[0] !== '日期' && r[0] !== '日期 ');
         if (!dataRows.length) { loadAssetsFallback(); return; }
 
-        gAssetHistory = dataRows.map(parseAssetRow);
-        gAssets = gAssetHistory[gAssetHistory.length - 1];
+        gAssetHistory = dataRows.map(parseAssetRow).filter(r => r.total > 0);
+
+        // ⚠️ 找最後一筆「完整有效」資料：台股/VT/基金至少有兩項 > 0
+        // 避免 analyze_portfolio.py 寫入不完整資料時顯示錯誤
+        const validRows = gAssetHistory.filter(r => {
+            const hasStock = r.stock > 0;
+            const hasVT    = r.vt > 0;
+            const hasFund  = r.fund > 0;
+            return [hasStock, hasVT, hasFund].filter(Boolean).length >= 2;
+        });
+
+        if (validRows.length) {
+            gAssets = validRows[validRows.length - 1]; // 最新完整列
+        } else {
+            gAssets = gAssetHistory[gAssetHistory.length - 1]; // fallback 最新列
+        }
+
         renderAllAsset();
         updateTimestamp();
     });
 }
 
-// fallback：使用手冊中的靜態數據
+// fallback：使用 Sheets 最近一筆正確數據（2026/4/19）
 function loadAssetsFallback() {
     gAssets = {
-        date: new Date().toLocaleDateString('zh-TW'),
-        stock: 1286500,   // 台股總估值（估）
-        vt: 247180,
-        fund: 963297,
-        cash: 5372,
-        husbandRetire: 876792,
-        wifeRetire: 431850,
-        total: 3810991,
-        netWorth: 3810991 - MORTGAGE,
-        progress: ((3810991 - MORTGAGE) / RETIRE_TARGET * 100).toFixed(1),
-        distToTarget: RETIRE_TARGET - (3810991 - MORTGAGE)
+        date: '2026/4/19',
+        stock:         3257162,  // 台股市值（帳戶一2,853,570 + 帳戶二403,592）
+        vt:             257282,  // VT 54.67269股
+        fund:          2654183,  // 鉅亨五支基金合計
+        cash:           600000,  // 現金定存
+        husbandRetire:  876792,  // 先生勞退專戶
+        wifeRetire:     431850,  // 彩虹勞退專戶
+        total:         8077269,
+        netWorth:      6536390,  // 總額 - 房貸
+        progress:          52.8,
+        distToTarget:  5843610,
     };
     gAssetHistory = [gAssets];
     renderAllAsset();
-    document.getElementById('last-update').textContent = '⚠️ 離線數據（請重新整理）';
+    document.getElementById('last-update').textContent = '⚠️ 離線數據 4/19（Sheets連線失敗）';
 }
 
 // ═══════════════════════════════════
