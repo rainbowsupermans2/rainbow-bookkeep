@@ -99,24 +99,44 @@
             background: white;
             border-top: 1px solid var(--border);
             display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             z-index: 200;
+            /* 隱藏捲軸 */
+            scrollbar-width: none;
         }
+        .bnav::-webkit-scrollbar { display: none; }
         .bitem {
-            flex: 1; padding: 5px 1px 7px;
+            flex: 0 0 64px;          /* 固定寬度，不壓縮 */
+            scroll-snap-align: start;
+            padding: 5px 0 7px;
             text-align: center;
             cursor: pointer;
             border: none;
             background: none;
             font-family: inherit;
             display: flex; flex-direction: column; align-items: center; gap: 1px;
-            min-width: 0;
+            -webkit-tap-highlight-color: transparent;
             transition: background 0.15s;
         }
         .bitem.on { background: #f0fff4; }
-        .bicon { font-size: 17px; line-height: 1; }
-        .blabel { font-size: 9px; color: var(--t3); font-weight: 500; }
+        .bitem.on-jp { background: #fff0ef; }  /* 東京tab選中用紅色背景 */
+        .bicon { font-size: 18px; line-height: 1; }
+        .blabel { font-size: 10px; color: var(--t3); font-weight: 500; white-space: nowrap; }
         .bitem.on .blabel { color: var(--g); font-weight: 700; }
+        .bitem.on-jp .blabel { color: var(--jp); font-weight: 700; }
+        /* 捲動提示漸層 */
+        .bnav-wrap {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 199;
+            pointer-events: none;
+        }
+        .bnav-wrap::after {
+            content: '';
+            position: absolute; right: 0; top: 0; bottom: 0; width: 28px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.9));
+        }
 
         /* Form */
         .form-row { margin-bottom: 12px; }
@@ -918,7 +938,7 @@ function renderRecentRecords(records) {
             </div>
             <div class="list-right">
                 <div class="list-amount" style="color:${color}">${sign}NT$${fmt(r.amount)}</div>
-                <div class="list-date">${r.date || ''}</div>
+                <div class="list-date">${fmtDate(r.date)}</div>
             </div>
         </div>`;
     }).join('');
@@ -1267,9 +1287,19 @@ function renderHealth(netWorth, totalAsset, progress) {
 // ═══════════════════════════════════
 function swPg(page) {
     document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
-    document.querySelectorAll('.bitem').forEach(b => b.classList.remove('on'));
+    document.querySelectorAll('.bitem').forEach(b => {
+        b.classList.remove('on');
+        b.classList.remove('on-jp');
+    });
     document.getElementById('pg-' + page).classList.add('on');
-    document.getElementById('b-' + page).classList.add('on');
+    const btn = document.getElementById('b-' + page);
+    if (page === 'tokyo') {
+        btn.classList.add('on-jp');
+    } else {
+        btn.classList.add('on');
+    }
+    // 東京按鈕滑進視野
+    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 }
 
 function fmt(n) {
@@ -1282,6 +1312,18 @@ function fmtW(n) {
     if (n >= 1000000) return (n/1000000).toFixed(2) + '百萬';
     if (n >= 10000) return (n/10000).toFixed(1) + '萬';
     return fmt(n);
+}
+
+// 日期格式化：處理 ISO 字串（如 2026-04-19T16:00:00.000Z）→ 只取日期部分
+function fmtDate(raw) {
+    if (!raw) return '';
+    const s = String(raw);
+    // 若是 ISO 字串，取 T 之前的部分
+    const dateOnly = s.includes('T') ? s.split('T')[0] : s;
+    // 嘗試轉成 YYYY/M/D 格式
+    const m = dateOnly.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    if (m) return `${m[1]}/${parseInt(m[2])}/${parseInt(m[3])}`;
+    return dateOnly;
 }
 
 function updateTimestamp() {
