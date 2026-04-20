@@ -922,142 +922,39 @@ function rendAllocation(){
   document.getElementById('cashPct').textContent = Math.max(0, cashPct) + '%';
 }
 
-// === 現金流分析 ===
-let cashflowData = null;
+// === 現金流分析（展示模式）===
 let selectedMonth = -1;
 
-function loadCashflowData(){
-  const s=document.createElement('script');
-  s.src=SU+'?type=cashflow&callback=onCashflowData';
-  document.head.appendChild(s);
-}
+// 移除 loadCashflowData, loadExpenseCategories, onCashflowData, onExpenseCategoriesData 函數
+// 改為使用 renderCashflowSummaryDemo, renderExpensePieChartDemo, renderCashflowTrendDemo
 
-function loadExpenseCategories(){
-  const s=document.createElement('script');
-  s.src=SU+'?type=expense_categories&callback=onExpenseCategoriesData';
-  document.head.appendChild(s);
-}
-
-function onCashflowData(data){
-  if(data&&data.success){
-    cashflowData=data.data;
-    renderCashflowSummary();
-  }else{
-    showCashflowPlaceholder();
-  }
-}
-
-function onExpenseCategoriesData(data){
-  if(data&&data.success){
-    renderExpensePieChart(data.data);
-  }else{
-    console.error('載入支出分類數據失敗:',data);
-  }
-}
-
-function renderCashflowSummary(){
-  // 模擬計算（實際會從API獲取）
-  const totalIncome=85000;
-  const essentialExpense=45000;
-  const nonessentialExpense=25000;
-  const disposableIncome=totalIncome-essentialExpense;
-  const actualBalance=disposableIncome-nonessentialExpense;
-  
-  document.getElementById('total-income').textContent=fmt(totalIncome);
-  document.getElementById('total-expense').textContent=fmt(essentialExpense+nonessentialExpense);
-  document.getElementById('disposable-income').textContent=fmt(disposableIncome);
-  document.getElementById('actual-balance').textContent=fmt(actualBalance);
-  
-  const balanceEl=document.getElementById('actual-balance');
-  balanceEl.style.color=actualBalance>0?'var(--g)':'var(--r)';
-  
-  updateHealthBar(calculateCashflowHealth(totalIncome,essentialExpense,actualBalance));
-  renderCashflowTrend();
-}
-
-function calculateCashflowHealth(income,essential,balance){
-  if(income<=0)return 0;
-  const essentialRatio=essential/income;
-  const balanceRatio=balance/income;
-  let score=0;
-  if(essentialRatio<=0.5)score+=50;
-  else score+=Math.max(0,50-(essentialRatio-0.5)*100);
-  if(balanceRatio>=0.2)score+=50;
-  else score+=Math.max(0,balanceRatio*250);
-  return Math.round(Math.max(0,Math.min(100,score)));
+function calculateCashflowHealth(income, essential, balance){
+  if(income <= 0) return 0;
+  const essentialRatio = essential / income;
+  const balanceRatio = balance / income;
+  let score = 0;
+  if(essentialRatio <= 0.5) score += 50;
+  else score += Math.max(0, 50 - (essentialRatio - 0.5) * 100);
+  if(balanceRatio >= 0.2) score += 50;
+  else score += Math.max(0, balanceRatio * 250);
+  return Math.round(Math.max(0, Math.min(100, score)));
 }
 
 function updateHealthBar(score){
-  const fillEl=document.getElementById('cashflow-health-fill');
-  const scoreEl=document.getElementById('cashflow-health-score');
-  fillEl.style.width=score+'%';
-  scoreEl.textContent=score+'分';
-  if(score>=80){
-    fillEl.style.background='var(--g)';
-    scoreEl.style.color='var(--g)';
-  }else if(score>=60){
-    fillEl.style.background='var(--ac)';
-    scoreEl.style.color='var(--ac)';
+  const fillEl = document.getElementById('cashflow-health-fill');
+  const scoreEl = document.getElementById('cashflow-health-score');
+  fillEl.style.width = score + '%';
+  scoreEl.textContent = score + '分';
+  if(score >= 80){
+    fillEl.style.background = 'var(--g)';
+    scoreEl.style.color = 'var(--g)';
+  }else if(score >= 60){
+    fillEl.style.background = 'var(--ac)';
+    scoreEl.style.color = 'var(--ac)';
   }else{
-    fillEl.style.background='var(--r)';
-    scoreEl.style.color='var(--r)';
+    fillEl.style.background = 'var(--r)';
+    scoreEl.style.color = 'var(--r)';
   }
-}
-
-function renderExpensePieChart(categories){
-  const canvas=document.getElementById('expense-pie-chart');
-  const ctx=canvas.getContext('2d');
-  const centerX=100,centerY=100,radius=80;
-  
-  ctx.clearRect(0,0,200,200);
-  
-  const categoryTotals={};
-  const colors=['#2d6a4f','#40916c','#52b788','#74c69d','#95d5b2'];
-  let colorIndex=0;
-  
-  Object.keys(categories).forEach(mainCategory=>{
-    let total=0;
-    Object.values(categories[mainCategory]).forEach(amount=>total+=amount);
-    if(total>0){
-      categoryTotals[mainCategory]={amount:total,color:colors[colorIndex%colors.length]};
-      colorIndex++;
-    }
-  });
-  
-  const grandTotal=Object.values(categoryTotals).reduce((sum,cat)=>sum+cat.amount,0);
-  
-  if(grandTotal===0){
-    ctx.fillStyle='#ccc';
-    ctx.font='14px sans-serif';
-    ctx.textAlign='center';
-    ctx.fillText('暫無支出資料',centerX,centerY);
-    return;
-  }
-  
-  let currentAngle=-Math.PI/2;
-  Object.entries(categoryTotals).forEach(([name,data])=>{
-    const sliceAngle=(data.amount/grandTotal)*2*Math.PI;
-    ctx.fillStyle=data.color;
-    ctx.beginPath();
-    ctx.moveTo(centerX,centerY);
-    ctx.arc(centerX,centerY,radius,currentAngle,currentAngle+sliceAngle);
-    ctx.closePath();
-    ctx.fill();
-    currentAngle+=sliceAngle;
-  });
-  
-  ctx.fillStyle='var(--bg2)';
-  ctx.beginPath();
-  ctx.arc(centerX,centerY,30,0,2*Math.PI);
-  ctx.fill();
-  
-  ctx.fillStyle='var(--t1)';
-  ctx.font='bold 12px sans-serif';
-  ctx.textAlign='center';
-  ctx.fillText('總支出',centerX,centerY-5);
-  ctx.fillText(fmt(grandTotal),centerX,centerY+10);
-  
-  updateExpenseLegend(categoryTotals,grandTotal);
 }
 
 function updateExpenseLegend(categories,total){
@@ -1069,49 +966,6 @@ function updateExpenseLegend(categories,total){
     item.className='legend-item';
     item.innerHTML=`<div class="legend-color" style="background:${data.color}"></div><div class="legend-text">${name}</div><div class="legend-amount">${percentage}%</div>`;
     legendEl.appendChild(item);
-  });
-}
-
-function renderCashflowTrend(){
-  const canvas=document.getElementById('cashflow-trend-chart');
-  const ctx=canvas.getContext('2d');
-  const width=canvas.width;
-  const height=canvas.height;
-  
-  const months=['10月','11月','12月','1月','2月','3月'];
-  const incomeData=[78000,82000,85000,79000,83000,85000];
-  const expenseData=[65000,68000,70000,67000,69000,70000];
-  const balanceData=incomeData.map((income,i)=>income-expenseData[i]);
-  
-  ctx.clearRect(0,0,width,height);
-  
-  const maxValue=Math.max(...incomeData,...expenseData);
-  const minValue=Math.min(0,...balanceData);
-  const valueRange=maxValue-minValue;
-  const padding=40;
-  const chartWidth=width-padding*2;
-  const chartHeight=height-padding*2;
-  
-  ctx.strokeStyle='#e2ddd4';
-  ctx.lineWidth=1;
-  for(let i=1;i<5;i++){
-    const y=padding+(chartHeight*i/5);
-    ctx.beginPath();
-    ctx.moveTo(padding,y);
-    ctx.lineTo(width-padding,y);
-    ctx.stroke();
-  }
-  
-  drawTrendLine(ctx,incomeData,maxValue,minValue,chartWidth,chartHeight,padding,'#2d6a4f');
-  drawTrendLine(ctx,expenseData,maxValue,minValue,chartWidth,chartHeight,padding,'#d62828');
-  drawTrendLine(ctx,balanceData,maxValue,minValue,chartWidth,chartHeight,padding,'#f77f00');
-  
-  ctx.fillStyle='#6b6760';
-  ctx.font='12px sans-serif';
-  ctx.textAlign='center';
-  months.forEach((month,i)=>{
-    const x=padding+(chartWidth*i/(months.length-1));
-    ctx.fillText(month,x,height-10);
   });
 }
 
@@ -1138,29 +992,130 @@ function drawTrendLine(ctx,data,maxValue,minValue,chartWidth,chartHeight,padding
   });
 }
 
-function showCashflowPlaceholder(){
-  document.getElementById('total-income').textContent='--';
-  document.getElementById('total-expense').textContent='--';
-  document.getElementById('disposable-income').textContent='--';
-  document.getElementById('actual-balance').textContent='--';
-  document.getElementById('cashflow-health-score').textContent='待分析';
-}
-
 function initMonthSelector(){
   document.querySelectorAll('.month-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('.month-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       selectedMonth=parseInt(btn.dataset.month);
-      renderCashflowSummary();
+      renderCashflowSummaryDemo();
     });
   });
 }
 
 function renderCashflow(){
-  loadCashflowData();
-  loadExpenseCategories();
+  // 展示模式：使用模擬數據，不依賴API載入
+  renderCashflowSummaryDemo();
+  renderExpensePieChartDemo(); 
+  renderCashflowTrendDemo();
   initMonthSelector();
+}
+
+function renderCashflowSummaryDemo(){
+  // 模擬數據展示
+  const totalIncome = 85000;
+  const essentialExpense = 45000;
+  const nonessentialExpense = 25000;
+  const disposableIncome = totalIncome - essentialExpense;
+  const actualBalance = disposableIncome - nonessentialExpense;
+  
+  document.getElementById('total-income').textContent = fmt(totalIncome);
+  document.getElementById('total-expense').textContent = fmt(essentialExpense + nonessentialExpense);
+  document.getElementById('disposable-income').textContent = fmt(disposableIncome);
+  document.getElementById('actual-balance').textContent = fmt(actualBalance);
+  
+  const balanceEl = document.getElementById('actual-balance');
+  balanceEl.style.color = actualBalance > 0 ? 'var(--g)' : 'var(--r)';
+  
+  updateHealthBar(calculateCashflowHealth(totalIncome, essentialExpense, actualBalance));
+}
+
+function renderExpensePieChartDemo(){
+  const canvas = document.getElementById('expense-pie-chart');
+  const ctx = canvas.getContext('2d');
+  const centerX = 100, centerY = 100, radius = 80;
+  
+  ctx.clearRect(0, 0, 200, 200);
+  
+  // 模擬支出分類
+  const categoryTotals = {
+    '必要支出': { amount: 45000, color: '#2d6a4f' },
+    '非必要支出': { amount: 25000, color: '#40916c' },
+  };
+  
+  const grandTotal = 70000;
+  let currentAngle = -Math.PI / 2;
+  
+  Object.entries(categoryTotals).forEach(([name, data]) => {
+    const sliceAngle = (data.amount / grandTotal) * 2 * Math.PI;
+    ctx.fillStyle = data.color;
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fill();
+    currentAngle += sliceAngle;
+  });
+  
+  // 中心圓和文字
+  ctx.fillStyle = 'var(--bg2)';
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, 30, 0, 2 * Math.PI);
+  ctx.fill();
+  
+  ctx.fillStyle = 'var(--t1)';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('總支出', centerX, centerY - 5);
+  ctx.fillText(fmt(grandTotal), centerX, centerY + 10);
+  
+  updateExpenseLegend(categoryTotals, grandTotal);
+}
+
+function renderCashflowTrendDemo(){
+  const canvas = document.getElementById('cashflow-trend-chart');
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  
+  const months = ['10月', '11月', '12月', '1月', '2月', '3月'];
+  const incomeData = [78000, 82000, 85000, 79000, 83000, 85000];
+  const expenseData = [65000, 68000, 70000, 67000, 69000, 70000];
+  const balanceData = incomeData.map((income, i) => income - expenseData[i]);
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  const maxValue = Math.max(...incomeData, ...expenseData);
+  const minValue = Math.min(0, ...balanceData);
+  const valueRange = maxValue - minValue;
+  const padding = 40;
+  const chartWidth = width - padding * 2;
+  const chartHeight = height - padding * 2;
+  
+  // 網格線
+  ctx.strokeStyle = '#e2ddd4';
+  ctx.lineWidth = 1;
+  for (let i = 1; i < 5; i++) {
+    const y = padding + (chartHeight * i / 5);
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+    ctx.stroke();
+  }
+  
+  // 三條趨勢線
+  drawTrendLine(ctx, incomeData, maxValue, minValue, chartWidth, chartHeight, padding, '#2d6a4f');
+  drawTrendLine(ctx, expenseData, maxValue, minValue, chartWidth, chartHeight, padding, '#d62828');
+  drawTrendLine(ctx, balanceData, maxValue, minValue, chartWidth, chartHeight, padding, '#f77f00');
+  
+  // 月份標籤
+  ctx.fillStyle = '#6b6760';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'center';
+  months.forEach((month, i) => {
+    const x = padding + (chartWidth * i / (months.length - 1));
+    ctx.fillText(month, x, height - 10);
+  });
 }
 
 const now=new Date();
