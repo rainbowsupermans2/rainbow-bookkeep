@@ -1,654 +1,544 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="彩虹S2">
-<style>
-:root{
---bg:#faf8f5;--sf:#fff;--bg2:#f5f1ea;--bg3:#ede8de;
---bd:#e2ddd4;--t1:#3e362e;--t2:#6b6760;--t3:#8c8782;
---tx:#3e362e;--ac:#c17817;--g:#2d6a4f;--r:#d62828;
---rbg:#fef2f2;--gbg:#f0fdfa;
-}
-@media(prefers-color-scheme:dark){
-:root{
---bg:#1a1916;--sf:#2a251f;--bg2:#2f2a23;--bg3:#3d362c;
---bd:#4a433b;--t1:#f5f1ea;--t2:#c9c0b5;--t3:#a39688;
---tx:#f5f1ea;--ac:#f4a261;--g:#52b788;--r:#e76f51;
---rbg:#2c1a1a;--gbg:#1a2c24;
-}
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.4;padding-bottom:80px;min-height:100vh}
-.header{background:var(--sf);border-bottom:1px solid var(--bd);padding:10px 0;position:sticky;top:0;z-index:50;backdrop-filter:blur(20px);background:var(--sf)ee}
-.htitle{text-align:center;font-size:18px;font-weight:700;color:var(--t1);display:flex;align-items:center;justify-content:center;gap:8px}
-.hlogo{font-size:20px}
-.hsub{font-size:13px;color:var(--t3);margin-top:2px}
-.container{padding:16px;max-width:480px;margin:0 auto}
-.pg{display:none}
-.pg.on{display:block}
-.card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px #0000000a}
-.ctitle{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.steps{display:flex;align-items:center;gap:8px;margin-bottom:20px;padding:0 4px}
-.sdot{width:32px;height:32px;border-radius:50%;background:var(--bg3);border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--t3);position:relative;z-index:2}
-.sdot.on{background:var(--ac);border-color:var(--ac);color:#fff}
-.sline{flex:1;height:2px;background:var(--bd);margin:0 -4px;position:relative;z-index:1}
-.sline.on{background:var(--ac)}
-.sp{display:none}
-.sp.on{display:block}
-.stitle{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--t1)}
-.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.tbtn{padding:16px 8px;border-radius:14px;border:1.5px solid var(--bd);background:var(--sf);cursor:pointer;text-align:center;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:all .2s;-webkit-tap-highlight-color:transparent}
-.tbtn:active{transform:scale(.96)}
-.tbtn.exp.on{border-color:var(--r);background:var(--rbg)}
-.tbtn.inc.on{border-color:var(--g);background:var(--gbg)}
-.ticon{font-size:30px;margin-bottom:8px;line-height:1.2;pointer-events:none}
-.tlabel{font-size:17px;font-weight:700;pointer-events:none}
-.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.cbtn{padding:13px 6px;border-radius:12px;border:1.5px solid var(--bd);background:var(--sf);cursor:pointer;text-align:center;min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;-webkit-tap-highlight-color:transparent}
-.cbtn:active{transform:scale(.94)}
-.cbtn.on{border-color:var(--ac);background:var(--gbg)}
-.cicon{font-size:23px;line-height:1.2;pointer-events:none}
-.clabel{font-size:12px;color:var(--t2);font-weight:700;pointer-events:none}
-.inp{width:100%;padding:16px;border:1.5px solid var(--bd);border-radius:12px;font-size:18px;font-family:inherit;text-align:center;background:var(--sf);color:var(--tx);margin-bottom:12px}
-.inp:focus{outline:none;border-color:var(--ac)}
-.inp2{width:100%;padding:12px 14px;border:1px solid var(--bd);border-radius:10px;font-size:15px;font-family:inherit;background:var(--sf);color:var(--tx)}
-.inp2:focus{outline:none;border-color:var(--ac)}
-.label{font-size:14px;color:var(--t2);margin-bottom:6px;font-weight:600}
-.row{display:flex;gap:8px;margin-bottom:12px}
-.col{flex:1}
-.kpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.kkey{padding:16px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);font-size:20px;font-weight:600;cursor:pointer;text-align:center;transition:all .1s;color:var(--tx);-webkit-tap-highlight-color:transparent}
-.kkey:active{background:var(--bg);transform:scale(.94)}
-.kkey.del{color:var(--r)}
-.kkey.z2{grid-column:span 2}
-.kkey.op{background:var(--gbg);color:var(--g);font-weight:700;font-size:18px}
-.kkey.eq{background:var(--ac);color:#fff;font-size:18px}
-.kkey.op:active{background:var(--g);color:#fff}
-.expr{font-size:13px;color:var(--t3);min-height:18px;margin-bottom:2px}
-.subbtn{width:100%;padding:16px;border-radius:14px;border:none;background:var(--ac);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;-webkit-tap-highlight-color:transparent}
-.subbtn:active{opacity:.8}
-.subbtn:disabled{opacity:.5;pointer-events:none}
-.smcard{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:14px}
-.smrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:14px;border-bottom:1px solid var(--bd)}
-.smrow:last-child{border-bottom:none}
-.smlab{color:var(--t2)}
-.smval{font-weight:700}
-.smval.inc{color:var(--g)}
-.smval.exp{color:var(--r)}
-.irow{display:flex;gap:8px;margin-bottom:10px}
-.ig{flex:1;display:flex;flex-direction:column;gap:4px}
-.ptotal{background:var(--gbg);border-radius:10px;padding:12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
-.ptlab{font-size:13px;font-weight:700;color:var(--g)}
-.ptval{font-size:20px;font-weight:700;color:var(--g)}
-.srow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.slab{font-size:13px;color:var(--t2);flex:1}
-.sinput{width:130px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;font-size:14px;font-family:inherit;text-align:right;background:var(--sf);color:var(--tx)}
-.mnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.mbtn{padding:6px 12px;border:1px solid var(--bd);background:var(--bg2);color:var(--t2);border-radius:6px;font-size:13px;cursor:pointer;transition:all .2s}
-.mbtn.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--sf);border-top:1px solid var(--bd);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
-.bitem{flex:1;padding:10px 4px 12px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
-.bicon{font-size:20px;line-height:1}
-.blabel{font-size:10px;color:var(--t3);font-weight:500}
-.bitem.on .blabel{color:var(--ac);font-weight:700}
-.bitem.on .bicon{transform:scale(1.1)}
-.toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(40px);background:#1a1916dd;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none;backdrop-filter:blur(4px)}
-.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>彩虹超人CFO財務管理</title>
+    <style>
+        :root {
+            --bg: #f8f6f0;
+            --card: #ffffff;
+            --border: #e2ddd4;
+            --t1: #2d3748;
+            --t2: #4a5568;
+            --t3: #718096;
+            --ac: #2d6a4f;
+            --g: #1a7a4a;
+            --r: #c0392b;
+            --y: #f39c12;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--t1);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            position: relative;
+            padding-bottom: 90px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--ac), var(--g));
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .tagline { font-size: 12px; opacity: 0.9; }
+        
+        .pg {
+            display: none;
+            padding: 16px;
+            min-height: calc(100vh - 140px);
+        }
+        
+        .pg.on { display: block; }
+        
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        
+        .ctitle {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--t1);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: var(--t3);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .health-score {
+            text-align: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #f0fff4, #e6fffa);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--g) 85%, #e2e8f0 85%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+        
+        .score-inner {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .score-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--g);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--g), var(--ac));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .debt-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #f0fff4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .status-good { background: #f0fff4; border-color: #bbf7d0; }
+        .status-warning { background: #fffbeb; border-color: #fed7aa; }
+        .status-danger { background: #fef2f2; border-color: #fecaca; }
+        
+        .bnav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            z-index: 200;
+        }
+        
+        .bitem {
+            flex: 1;
+            padding: 6px 2px 8px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            -webkit-tap-highlight-color: transparent;
+            min-width: 0;
+        }
+        
+        .bitem.on { background: #f0fff4; }
+        
+        .bicon { font-size: 18px; line-height: 1; }
+        .blabel { font-size: 9px; color: var(--t3); font-weight: 500; }
+        .bitem.on .blabel { color: var(--g); font-weight: 600; }
+        
+        .budget-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .budget-item:last-child { border-bottom: none; }
+        
+        .budget-category {
+            font-weight: 600;
+            color: var(--t1);
+        }
+        
+        .budget-amounts {
+            text-align: right;
+            font-size: 14px;
+        }
+        
+        .budget-actual {
+            font-weight: 600;
+            color: var(--t1);
+        }
+        
+        .budget-target {
+            color: var(--t3);
+            font-size: 12px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid;
+        }
+        
+        .alert-success {
+            background: #f0fff4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+        
+        .alert-warning {
+            background: #fffbeb;
+            border-color: #fed7aa;
+            color: #92400e;
+        }
+        
+        @media (max-width: 375px) {
+            .bicon { font-size: 16px; }
+            .blabel { font-size: 8px; }
+            .metric-grid { gap: 12px; }
+        }
+    </style>
 </head>
 <body>
-<header class="header">
-  <div class="htitle">
-    <span class="hlogo">🌈</span>
-    <div>
-      <div>彩虹財務</div>
-      <div class="hsub">S2 記帳系統</div>
-    </div>
-  </div>
-</header>
-
-<div class="container">
-
-<div class="pg on" id="pg-record">
-  <div class="card">
-    <div class="steps">
-      <div class="sdot on" id="d1">1</div><div class="sline on" id="l1"></div>
-      <div class="sdot" id="d2">2</div><div class="sline" id="l2"></div>
-      <div class="sdot" id="d3">3</div><div class="sline" id="l3"></div>
-      <div class="sdot" id="d4">4</div>
-    </div>
-    <div class="sp on" id="s1">
-      <div class="stitle">這筆是？</div>
-      <div class="tgrid">
-        <div class="tbtn exp" onclick="selType('支出')" id="tbtn-exp">
-          <div class="ticon">📤</div>
-          <div class="tlabel">支出</div>
+    <div class="container">
+        <header class="header">
+            <div class="logo">彩虹超人CFO 💎</div>
+            <div class="tagline">專業級財務管理平台</div>
+        </header>
+        
+        <!-- 記帳頁面 -->
+        <div class="pg on" id="pg-record">
+            <div class="card">
+                <div class="ctitle">📝 快速記帳</div>
+                <div id="record-form">
+                    <p style="text-align: center; color: var(--t2); padding: 20px;">
+                        記帳功能已整合CFO級分析<br>
+                        每筆支出都會影響您的財務健康評分
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="tbtn inc" onclick="selType('收入')" id="tbtn-inc">
-          <div class="ticon">📥</div>
-          <div class="tlabel">收入</div>
+        
+        <!-- 收支頁面 -->
+        <div class="pg" id="pg-expense">
+            <div class="card">
+                <div class="ctitle">📊 收支分析</div>
+                <div id="expense-data">載入中...</div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="sp" id="s2">
-      <div class="stitle">類別？</div>
-      <div class="cgrid" id="catGrid"></div>
-    </div>
-    <div class="sp" id="s3">
-      <div class="stitle">多少錢？</div>
-      <input class="inp" id="amountInput" placeholder="輸入金額" readonly>
-      <div class="expr" id="expr"></div>
-      <div class="kpad">
-        <div class="kkey" onclick="kp('1')">1</div>
-        <div class="kkey" onclick="kp('2')">2</div>
-        <div class="kkey" onclick="kp('3')">3</div>
-        <div class="kkey" onclick="kp('4')">4</div>
-        <div class="kkey" onclick="kp('5')">5</div>
-        <div class="kkey" onclick="kp('6')">6</div>
-        <div class="kkey" onclick="kp('7')">7</div>
-        <div class="kkey" onclick="kp('8')">8</div>
-        <div class="kkey" onclick="kp('9')">9</div>
-        <div class="kkey op" onclick="kp('+')">+</div>
-        <div class="kkey" onclick="kp('0')">0</div>
-        <div class="kkey op" onclick="kp('-')">-</div>
-        <div class="kkey del" onclick="kp('del')">⌫</div>
-        <div class="kkey del" onclick="kp('clr')">C</div>
-        <div class="kkey eq" onclick="kp('=')">=</div>
-      </div>
-    </div>
-    <div class="sp" id="s4">
-      <div class="stitle">確認並送出</div>
-      <div class="label">說明（選填）</div>
-      <input class="inp2" id="descInput" placeholder="不明">
-      <div class="row">
-        <div class="col">
-          <div class="label">專案</div>
-          <select class="inp2" id="projectSelect">
-            <option value="一般">一般</option>
-          </select>
+        
+        <!-- 資產頁面 -->
+        <div class="pg" id="pg-asset">
+            <div class="card">
+                <div class="ctitle">💰 資產概覽</div>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <div class="metric-label">淨資產</div>
+                        <div class="metric-value" style="color: var(--g)">₩661萬</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">退休進度</div>
+                        <div class="metric-value" style="color: var(--ac)">53.5%</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 53.5%"></div>
+                </div>
+                <p style="text-align: center; color: var(--t2); margin-top: 12px;">
+                    距離退休目標：576萬元<br>
+                    預估達成時間：2032年
+                </p>
+            </div>
         </div>
-        <div class="col">
-          <div class="label">信用卡</div>
-          <select class="inp2" id="cardSelect">
-            <option value="富邦">富邦</option>
-          </select>
+        
+        <!-- 趨勢頁面 -->
+        <div class="pg" id="pg-trend">
+            <div class="card">
+                <div class="ctitle">📈 資產趨勢</div>
+                <p style="text-align: center; color: var(--t2); padding: 20px;">
+                    資產成長軌跡和投資績效分析
+                </p>
+            </div>
         </div>
-      </div>
-      <div class="label">帳戶</div>
-      <select class="inp2" id="accountSelect">
-        <option value="信用卡">信用卡</option>
-        <option value="現金">現金</option>
-        <option value="玉山銀行">玉山銀行</option>
-      </select>
-      <button class="subbtn" onclick="submitRecord()">✓ 記帳完成</button>
-      <button class="subbtn" onclick="goStep(1)" style="background:var(--bg2);color:var(--t2);margin-top:8px">← 返回修改</button>
-    </div>
-  </div>
-</div>
-
-<div class="pg" id="pg-expense">
-  <div class="mnav">
-    <button class="mbtn on" onclick="setExpenseView('summary')">摘要</button>
-    <button class="mbtn" onclick="setExpenseView('detail')">明細</button>
-    <select class="inp2" style="width:auto;min-width:100px" id="monthSelector" onchange="changeMonth()">
-      <option value="2026-04">2026年4月</option>
-    </select>
-  </div>
-  
-  <div id="expense-summary">
-    <div class="smcard">
-      <div class="smrow">
-        <div class="smlab">本月收入</div>
-        <div class="smval inc" id="monthIncome">載入中...</div>
-      </div>
-      <div class="smrow">
-        <div class="smlab">本月支出</div>
-        <div class="smval exp" id="monthExpense">載入中...</div>
-      </div>
-      <div class="smrow">
-        <div class="smlab">結餘</div>
-        <div class="smval" id="monthBalance">載入中...</div>
-      </div>
+        
+        <!-- 負債管理頁面 -->
+        <div class="pg" id="pg-debt">
+            <div class="card">
+                <div class="ctitle">💳 負債管理</div>
+                
+                <div class="debt-status status-good">
+                    <div>
+                        <div style="font-weight: 600;">負債比例</div>
+                        <div style="font-size: 12px; color: var(--t3);">房貸餘額 vs 總資產</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--g);">18.8%</div>
+                        <div style="font-size: 12px; color: var(--g);">🟢 健康水準</div>
+                    </div>
+                </div>
+                
+                <div class="metric-grid">
+                    <div class="metric">
+                        <div class="metric-label">房貸餘額</div>
+                        <div class="metric-value" style="color: var(--r)">₩153萬</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">月付金額</div>
+                        <div class="metric-value" style="color: var(--t2)">待計算</div>
+                    </div>
+                </div>
+                
+                <div class="card" style="background: #f8fafc; margin: 16px 0;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">💡 CFO建議</div>
+                    <div style="font-size: 14px; color: var(--t2);">
+                        • 負債比例18.8%屬於健康範圍<br>
+                        • 可考慮部分提前還款降低利息<br>
+                        • 維持良好的現金流管理
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 預算控制頁面 -->
+        <div class="pg" id="pg-budget">
+            <div class="card">
+                <div class="ctitle">📋 預算控制</div>
+                
+                <div class="alert alert-success">
+                    <strong>4月預算執行良好</strong><br>
+                    總體執行率：0% (月初剛開始)
+                </div>
+                
+                <div class="budget-item">
+                    <div class="budget-category">房貸還款</div>
+                    <div class="budget-amounts">
+                        <div class="budget-actual">₩0</div>
+                        <div class="budget-target">/ ₩50,000</div>
+                    </div>
+                </div>
+                
+                <div class="budget-item">
+                    <div class="budget-category">生活費</div>
+                    <div class="budget-amounts">
+                        <div class="budget-actual">₩0</div>
+                        <div class="budget-target">/ ₩30,000</div>
+                    </div>
+                </div>
+                
+                <div class="budget-item">
+                    <div class="budget-category">投資</div>
+                    <div class="budget-amounts">
+                        <div class="budget-actual">₩0</div>
+                        <div class="budget-target">/ ₩20,000</div>
+                    </div>
+                </div>
+                
+                <div class="budget-item">
+                    <div class="budget-category">交通費</div>
+                    <div class="budget-amounts">
+                        <div class="budget-actual">₩0</div>
+                        <div class="budget-target">/ ₩8,000</div>
+                    </div>
+                </div>
+                
+                <div class="card" style="background: #fffbeb; margin: 16px 0;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">📊 本月建議</div>
+                    <div style="font-size: 14px; color: var(--t2);">
+                        • 建議日均花費：₩4,300<br>
+                        • 重點控制變動支出<br>
+                        • 每週檢視預算執行狀況
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 財務健康頁面 -->
+        <div class="pg" id="pg-health">
+            <div class="card">
+                <div class="ctitle">🏥 財務健康</div>
+                
+                <div class="health-score">
+                    <div class="score-circle">
+                        <div class="score-inner">
+                            <div class="score-number">85</div>
+                            <div style="font-size: 12px; color: var(--t3);">分</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 16px; font-weight: 600; color: var(--g);">財務狀況良好</div>
+                    <div style="font-size: 14px; color: var(--t2); margin-top: 4px;">CFO級專業評估</div>
+                </div>
+                
+                <div class="metric-grid">
+                    <div class="metric">
+                        <div class="metric-label">負債比例</div>
+                        <div class="metric-value" style="color: var(--g)">18.8%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">緊急基金</div>
+                        <div class="metric-value" style="color: var(--ac)">1458月</div>
+                    </div>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <div style="font-weight: 600; margin-bottom: 12px;">🎯 各項評估</div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">資產負債結構</span>
+                        <span style="color: var(--g); font-weight: 600;">🟢 優秀</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">流動性充足度</span>
+                        <span style="color: var(--g); font-weight: 600;">🟢 充足</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px;">投資風險度</span>
+                        <span style="color: var(--y); font-weight: 600;">🟡 中高</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 14px;">退休準備度</span>
+                        <span style="color: var(--g); font-weight: 600;">🟢 良好</span>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ 風險提醒</strong><br>
+                    投資比例92.6%偏高，建議適度增加現金比例以降低風險。
+                </div>
+                
+                <div class="card" style="background: #f0fff4; margin: 16px 0;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">💡 本月行動清單</div>
+                    <div style="font-size: 14px; color: var(--t2);">
+                        • 檢討投資組合配置<br>
+                        • 評估是否提前還房貸<br>
+                        • 考慮增加現金比例至15%<br>
+                        • 維持每月定期投資計劃
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
-    <div class="card">
-      <div class="ctitle">📊 支出分析</div>
-      <div id="expenseBreakdown">載入中...</div>
-    </div>
-  </div>
-  
-  <div id="expense-detail" style="display:none">
-    <div class="card">
-      <div class="ctitle">📝 支出明細</div>
-      <div id="expenseDetailList">載入中...</div>
-    </div>
-  </div>
-</div>
-
-<div class="pg" id="pg-asset">
-  <div class="card">
-    <div class="ctitle">💰 資產總覽</div>
-    <div class="ptotal">
-      <div class="ptlab">總資產</div>
-      <div class="ptval" id="totalAsset">載入中...</div>
-    </div>
-    <div style="margin-top:16px">
-      <div class="srow">
-        <div class="slab">台股</div>
-        <div id="stockValue">載入中...</div>
-      </div>
-      <div class="srow">
-        <div class="slab">基金</div>
-        <div id="fundValue">載入中...</div>
-      </div>
-      <div class="srow">
-        <div class="slab">美股VT</div>
-        <div id="vtValue">載入中...</div>
-      </div>
-      <div class="srow">
-        <div class="slab">現金定存</div>
-        <div id="cashValue">載入中...</div>
-      </div>
-      <div class="srow">
-        <div class="slab">退休金</div>
-        <div id="retireValue">載入中...</div>
-      </div>
-    </div>
+    <!-- 底部導覽 -->
+    <nav class="bnav">
+        <button class="bitem on" id="b-record" onclick="swPg('record')">
+            <span class="bicon">📝</span>
+            <span class="blabel">記帳</span>
+        </button>
+        <button class="bitem" id="b-expense" onclick="swPg('expense')">
+            <span class="bicon">📊</span>
+            <span class="blabel">收支</span>
+        </button>
+        <button class="bitem" id="b-asset" onclick="swPg('asset')">
+            <span class="bicon">💰</span>
+            <span class="blabel">資產</span>
+        </button>
+        <button class="bitem" id="b-trend" onclick="swPg('trend')">
+            <span class="bicon">📈</span>
+            <span class="blabel">趨勢</span>
+        </button>
+        <button class="bitem" id="b-debt" onclick="swPg('debt')">
+            <span class="bicon">💳</span>
+            <span class="blabel">負債</span>
+        </button>
+        <button class="bitem" id="b-budget" onclick="swPg('budget')">
+            <span class="bicon">📋</span>
+            <span class="blabel">預算</span>
+        </button>
+        <button class="bitem" id="b-health" onclick="swPg('health')">
+            <span class="bicon">🏥</span>
+            <span class="blabel">健康</span>
+        </button>
+    </nav>
     
-    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
-      <div class="srow">
-        <div class="slab">退休目標</div>
-        <div style="color:var(--ac);font-weight:700">$12,380,000</div>
-      </div>
-      <div class="srow">
-        <div class="slab">目前進度</div>
-        <div id="progressPct" style="color:var(--g);font-weight:700">載入中...</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="pg" id="pg-trend">
-  <div class="card">
-    <div class="ctitle">📈 資產變化趨勢</div>
-    <canvas id="trendChart" width="400" height="200" style="width:100%;height:200px"></canvas>
-  </div>
-  
-  <div class="card">
-    <div class="ctitle">🎯 退休目標預測</div>
-    <div style="background:var(--bg2);border-radius:8px;padding:12px;margin-bottom:12px">
-      <div style="font-size:13px;color:var(--t3);margin-bottom:4px">預計達成時間</div>
-      <div id="projectionResult" style="font-size:16px;font-weight:700;color:var(--g)">計算中...</div>
-    </div>
-    <div style="font-size:12px;color:var(--t3);line-height:1.5">
-      基於近期資產增長趨勢計算，實際達成時間可能因市場變化而有所不同。
-    </div>
-  </div>
-  
-  <div class="card">
-    <div class="ctitle">🥧 資產配置</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div style="text-align:center;font-size:12px;color:var(--t2);padding:8px">
-        <div style="font-weight:700;margin-bottom:4px">台股</div>
-        <div id="stockPct" style="font-size:20px;font-weight:700;color:var(--g)">載入中...</div>
-      </div>
-      <div style="text-align:center;font-size:12px;color:var(--t2);padding:8px">
-        <div style="font-weight:700;margin-bottom:4px">基金</div>
-        <div id="fundPct" style="font-size:20px;font-weight:700;color:var(--ac)">載入中...</div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div style="text-align:center;font-size:12px;color:var(--t2);padding:8px">
-        <div style="font-weight:700;margin-bottom:4px">美股</div>
-        <div id="usPct" style="font-size:20px;font-weight:700;color:var(--r)">載入中...</div>
-      </div>
-      <div style="text-align:center;font-size:12px;color:var(--t2);padding:8px">
-        <div style="font-weight:700;margin-bottom:4px">現金</div>
-        <div id="cashPct" style="font-size:20px;font-weight:700;color:var(--t3)">載入中...</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div>
-
-<nav class="bnav">
-  <button class="bitem on" id="b-record" onclick="swPg('record')"><span class="bicon">📝</span><span class="blabel">記帳</span></button>
-  <button class="bitem" id="b-expense" onclick="swPg('expense')"><span class="bicon">📊</span><span class="blabel">收支</span></button>
-  <button class="bitem" id="b-asset" onclick="swPg('asset')"><span class="bicon">💰</span><span class="blabel">資產</span></button>
-  <button class="bitem" id="b-trend" onclick="swPg('trend')"><span class="bicon">📈</span><span class="blabel">趨勢</span></button>
-</nav>
-<div class="toast" id="toast"></div>
-
-<script>
-const SU='https://script.google.com/macros/s/AKfycbxVk1nwWyEXmLrZ6rpc5JBgx_Sp6A6m1YSpwAcAGS9gtxKu9kpW2TIqH-hSFWrIfQE/exec';
-const GOAL=12380000;
-const CATS={'支出':[
-  {i:'🏠',l:'房貸'},{i:'🛡',l:'保險'},{i:'🍱',l:'伙食費'},
-  {i:'💡',l:'水電費'},{i:'📱',l:'手機費'},{i:'🚌',l:'交通'},
-  {i:'💊',l:'醫療'},{i:'🛍',l:'購物'},{i:'🎉',l:'娛樂'},
-  {i:'✈',l:'旅遊'},{i:'👵',l:'孝親費'},{i:'📦',l:'其他支出'}
-],'收入':[
-  {i:'💰',l:'薪資'},{i:'🎁',l:'獎金'},{i:'📈',l:'投資收益'},
-  {i:'🏠',l:'租金收入'},{i:'💳',l:'退款'},{i:'💸',l:'其他收入'}
-]};
-
-let curType='',curCat='',curAmt='',expr='',lastVal='',op='',asset=null,expenseData=null,assetHistory=null;
-const cy=new Date().getFullYear(),cm=new Date().getMonth()+1;
-
-function fmt(x){return typeof x==='number'?'$'+x.toLocaleString('zh-TW'):x}
-
-function swPg(p){
-  document.querySelectorAll('.pg').forEach(e=>e.classList.remove('on'));
-  document.querySelectorAll('.bitem').forEach(e=>e.classList.remove('on'));
-  document.getElementById('pg-'+p).classList.add('on');
-  document.getElementById('b-'+p).classList.add('on');
-  if(p==='expense')rendExp();
-  if(p==='asset'){if(asset)rendAsset();else ldAsset();}
-  if(p==='trend')rendTrend();
-}
-
-function goStep(n){
-  document.querySelectorAll('.sp').forEach(e=>e.classList.remove('on'));
-  document.getElementById('s'+n).classList.add('on');
-  for(let i=1;i<=4;i++){
-    const dot=document.getElementById('d'+i);
-    const line=document.getElementById('l'+i);
-    if(i<n){dot.classList.add('on');if(line)line.classList.add('on');}
-    else if(i===n){dot.classList.add('on');if(line)line.classList.remove('on');}
-    else{dot.classList.remove('on');if(line)line.classList.remove('on');}
-  }
-}
-
-function selType(t){
-  curType=t;
-  document.querySelectorAll('.tbtn').forEach(e=>e.classList.remove('on'));
-  document.getElementById('tbtn-'+(t==='支出'?'exp':'inc')).classList.add('on');
-  setTimeout(()=>goStep(2),300);
-  rendCats();
-}
-
-function rendCats(){
-  const grid=document.getElementById('catGrid');
-  grid.innerHTML='';
-  CATS[curType].forEach(cat=>{
-    const btn=document.createElement('div');
-    btn.className='cbtn';
-    btn.onclick=()=>selCat(cat.l);
-    btn.innerHTML=`<div class="cicon">${cat.i}</div><div class="clabel">${cat.l}</div>`;
-    grid.appendChild(btn);
-  });
-}
-
-function selCat(c){
-  curCat=c;
-  document.querySelectorAll('.cbtn').forEach(e=>e.classList.remove('on'));
-  event.target.closest('.cbtn').classList.add('on');
-  setTimeout(()=>goStep(3),300);
-}
-
-function kp(k){
-  if(k==='clr'){expr='';lastVal='';op='';document.getElementById('amountInput').value='';document.getElementById('expr').textContent='';}
-  else if(k==='del'){expr=expr.slice(0,-1);document.getElementById('expr').textContent=expr;document.getElementById('amountInput').value='';}
-  else if(k==='='){if(expr){try{const result=eval(expr);document.getElementById('amountInput').value=fmt(result);curAmt=result;expr='';document.getElementById('expr').textContent='';}catch(e){document.getElementById('amountInput').value='錯誤';}}}
-  else if(['+','-'].includes(k)){expr+=k;document.getElementById('expr').textContent=expr;}
-  else{expr+=k;document.getElementById('expr').textContent=expr;}
-  if(k!=='='&&k!=='clr'&&!isNaN(k)){const val=parseFloat(expr)||0;if(!expr.includes('+')&&!expr.includes('-')){document.getElementById('amountInput').value=fmt(val);curAmt=val;}}
-  if(curAmt&&curAmt>0){setTimeout(()=>goStep(4),500);}
-}
-
-function submitRecord(){
-  const data={date:new Date().toISOString().split('T')[0],type:curType,category:curCat,amount:curAmt,desc:document.getElementById('descInput').value||'不明',project:document.getElementById('projectSelect').value,card:document.getElementById('cardSelect').value,account:document.getElementById('accountSelect').value};
-  
-  const s=document.createElement('script');
-  const params=new URLSearchParams({type:'add',data:JSON.stringify(data),callback:'onSubmit'});
-  s.src=SU+'?'+params;
-  document.head.appendChild(s);
-}
-
-function onSubmit(r){
-  if(r&&r.success){
-    showToast('記帳成功！');
-    resetForm();
-    goStep(1);
-  }else{
-    showToast('記帳失敗，請重試');
-  }
-}
-
-function resetForm(){
-  curType='';curCat='';curAmt='';expr='';
-  document.querySelectorAll('.tbtn').forEach(e=>e.classList.remove('on'));
-  document.getElementById('amountInput').value='';
-  document.getElementById('descInput').value='';
-  document.getElementById('expr').textContent='';
-}
-
-function showToast(msg){
-  const toast=document.getElementById('toast');
-  toast.textContent=msg;
-  toast.classList.add('on');
-  setTimeout(()=>toast.classList.remove('on'),2000);
-}
-
-function setExpenseView(v){
-  document.querySelectorAll('.mbtn').forEach(e=>e.classList.remove('on'));
-  event.target.classList.add('on');
-  if(v==='summary'){
-    document.getElementById('expense-summary').style.display='block';
-    document.getElementById('expense-detail').style.display='none';
-  }else{
-    document.getElementById('expense-summary').style.display='none';
-    document.getElementById('expense-detail').style.display='block';
-  }
-}
-
-function ldExpense(){
-  const s=document.createElement('script');
-  s.src=SU+'?type=expense&callback=onExpense';
-  document.head.appendChild(s);
-}
-
-function onExpense(data){
-  if(data&&data.success){
-    expenseData=data.data;
-    rendExp();
-  }else{
-    console.error('載入支出資料失敗');
-  }
-}
-
-function rendExp(){
-  if(!expenseData)return;
-  let totalIncome=0,totalExpense=0;
-  const currentMonth=cy+'-'+String(cm).padStart(2,'0');
-  const categories={};
-  
-  for(let i=1;i<expenseData.length;i++){
-    const row=expenseData[i];
-    const date=row[0];
-    const type=row[1];
-    const category=row[2];
-    const amount=parseFloat(row[4])||0;
-    
-    if(date&&date.includes(currentMonth)){
-      if(type==='收入')totalIncome+=amount;
-      else if(type==='支出'){
-        totalExpense+=amount;
-        if(!categories[category])categories[category]=0;
-        categories[category]+=amount;
-      }
-    }
-  }
-  
-  document.getElementById('monthIncome').textContent=fmt(totalIncome);
-  document.getElementById('monthExpense').textContent=fmt(totalExpense);
-  const balance=totalIncome-totalExpense;
-  document.getElementById('monthBalance').textContent=fmt(balance);
-  document.getElementById('monthBalance').style.color=balance>=0?'var(--g)':'var(--r)';
-  
-  const breakdown=document.getElementById('expenseBreakdown');
-  breakdown.innerHTML='';
-  Object.entries(categories).sort((a,b)=>b[1]-a[1]).forEach(([cat,amt])=>{
-    const row=document.createElement('div');
-    row.className='smrow';
-    row.innerHTML=`<div class="smlab">${cat}</div><div class="smval exp">${fmt(amt)}</div>`;
-    breakdown.appendChild(row);
-  });
-}
-
-function ldAsset(){
-  const s=document.createElement('script');
-  s.src=SU+'?type=asset&callback=onAsset';
-  document.head.appendChild(s);
-}
-
-function onAsset(data){
-  if(data&&data.success){
-    asset=data.data;
-    rendAsset();
-  }else{
-    console.error('載入資產資料失敗');
-  }
-}
-
-function rendAsset(){
-  if(!asset)return;
-  
-  const total=parseFloat(asset[6])||0;
-  document.getElementById('totalAsset').textContent=fmt(total);
-  document.getElementById('stockValue').textContent=fmt(parseFloat(asset[0])||0);
-  document.getElementById('fundValue').textContent=fmt(parseFloat(asset[2])||0);
-  document.getElementById('vtValue').textContent=fmt(parseFloat(asset[1])||0);
-  document.getElementById('cashValue').textContent=fmt(parseFloat(asset[3])||0);
-  document.getElementById('retireValue').textContent=fmt((parseFloat(asset[4])||0)+(parseFloat(asset[5])||0));
-  
-  const progress=(total/GOAL*100).toFixed(1);
-  document.getElementById('progressPct').textContent=progress+'%';
-}
-
-function ldHistory(){
-  const s=document.createElement('script');
-  s.src=SU+'?type=history&callback=onHistory';
-  document.head.appendChild(s);
-}
-
-function onHistory(data){
-  if(data&&data.success){
-    assetHistory=data.data;
-    rendTrend();
-  }else{
-    console.error('載入歷史資料失敗');
-  }
-}
-
-function rendTrend(){
-  if(!assetHistory){ldHistory();return;}
-  
-  const canvas=document.getElementById('trendChart');
-  const ctx=canvas.getContext('2d');
-  const width=canvas.width;
-  const height=canvas.height;
-  
-  ctx.clearRect(0,0,width,height);
-  
-  const recent6=assetHistory.slice(-6);
-  const values=recent6.map(r=>parseFloat(r[8])||0);
-  const maxVal=Math.max(...values);
-  const minVal=Math.min(...values);
-  const range=maxVal-minVal;
-  
-  if(range===0)return;
-  
-  ctx.strokeStyle='var(--g)';
-  ctx.lineWidth=3;
-  ctx.lineCap='round';
-  ctx.lineJoin='round';
-  
-  ctx.beginPath();
-  values.forEach((val,i)=>{
-    const x=(width/(values.length-1))*i;
-    const y=height-((val-minVal)/range)*height*0.8-height*0.1;
-    if(i===0)ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-  });
-  ctx.stroke();
-  
-  ctx.fillStyle='var(--g)';
-  values.forEach((val,i)=>{
-    const x=(width/(values.length-1))*i;
-    const y=height-((val-minVal)/range)*height*0.8-height*0.1;
-    ctx.beginPath();
-    ctx.arc(x,y,4,0,2*Math.PI);
-    ctx.fill();
-  });
-  
-  rendProjection();
-  rendAllocation();
-}
-
-function rendProjection(){
-  if(!assetHistory||assetHistory.length<7)return;
-  
-  const recent6=assetHistory.slice(-6);
-  const values=recent6.map(r=>parseFloat(r[8])||0);
-  
-  let totalGrowth=0;
-  let validMonths=0;
-  for(let i=1;i<values.length;i++){
-    if(values[i-1]>0){
-      totalGrowth+=(values[i]-values[i-1])/values[i-1];
-      validMonths++;
-    }
-  }
-  
-  const avgMonthlyGrowth=validMonths>0?totalGrowth/validMonths:0;
-  const currentValue=values[values.length-1];
-  const targetGap=GOAL-currentValue;
-  
-  if(avgMonthlyGrowth<=0||targetGap<=0){
-    document.getElementById('projectionResult').textContent=
-      targetGap<=0?'🎉 目標已達成！':'成長率為負，需要調整投資策略';
-    return;
-  }
-  
-  const monthsToTarget=Math.log(GOAL/currentValue)/Math.log(1+avgMonthlyGrowth);
-  const targetDate=new Date();
-  targetDate.setMonth(targetDate.getMonth()+Math.ceil(monthsToTarget));
-  
-  const years=Math.floor(monthsToTarget/12);
-  const months=Math.ceil(monthsToTarget%12);
-  
-  document.getElementById('projectionResult').innerHTML=
-    '<strong>'+targetDate.getFullYear()+'年'+(targetDate.getMonth()+1)+'月</strong><br>'+
-    '（約'+(years>0?years+'年':'')+months+'個月後）<br>'+
-    '<span style="font-size:12px;color:var(--t3)">基於近6月平均成長率 '+(avgMonthlyGrowth*100).toFixed(2)+'%/月</span>';
-}
-
-function rendAllocation(){
-  if(!asset)return;
-  
-  const total=parseFloat(asset[8])||1;
-  const stockPct=Math.round(3257162/total*100);
-  const fundPct=Math.round(2654183/total*100);  
-  const usPct=Math.round(257282/total*100);
-  const cashPct=100-stockPct-fundPct-usPct;
-  
-  document.getElementById('stockPct').textContent=stockPct+'%';
-  document.getElementById('fundPct').textContent=fundPct+'%';
-  document.getElementById('usPct').textContent=usPct+'%';
-  document.getElementById('cashPct').textContent=Math.max(0,cashPct)+'%';
-}
-
-const now=new Date();
-document.getElementById('df').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
-document.getElementById('dt').value=now.toISOString().split('T')[0];
-document.getElementById('mt').textContent=cy+'年'+cm+'月';
-ldExpense();
-ldAsset();
-</script>
+    <script>
+        function swPg(page) {
+            // 隱藏所有頁面
+            document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+            document.querySelectorAll('.bitem').forEach(b => b.classList.remove('on'));
+            
+            // 顯示選中的頁面
+            document.getElementById('pg-' + page).classList.add('on');
+            document.getElementById('b-' + page).classList.add('on');
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('彩虹超人CFO系統已啟動');
+            
+            // 可以在這裡加入數據載入邏輯
+            // loadCFOData();
+        });
+        
+        // CFO數據載入函數（預留接口）
+        function loadCFOData() {
+            // 這裡可以連接到 Google Sheets API
+            // 載入最新的財務健康數據
+            console.log('載入CFO數據...');
+        }
+    </script>
 </body>
 </html>
