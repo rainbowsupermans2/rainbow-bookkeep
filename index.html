@@ -337,6 +337,7 @@
                             <option>玉山日幣</option>
                             <option>玉山台幣</option>
                             <option>LINE Bank</option>
+                            <option>第一銀行</option>
                             <option>Suica（日幣）</option>
                         </optgroup>
                         <optgroup label="💳 信用卡">
@@ -677,13 +678,14 @@ const MORTGAGE = 1528295;  // 房貸餘額（來自Sheets 2026/4/20）
 // 預算設定（每月）
 // fixed:true = 固定支出，直接顯示預算金額；false = 從記帳記錄抓實際數字
 const BUDGETS = [
-    { name: '房貸還款', budget: 15515, icon: '🏠', fixed: true  },  // 固定 NT$15,515
-    { name: '保險費',   budget: 9494,  icon: '🛡', fixed: true  },  // 彩虹4,559 + 先生4,935（年繳分攤）
-    { name: '投資',     budget: 35000, icon: '📈', fixed: true  },  // 正常月份 NT$35,000
+    { name: '房貸還款', budget: 15515, icon: '🏠', fixed: true  },
+    { name: '保險費',   budget: 9494,  icon: '🛡', fixed: true  },
+    { name: '健身房',   budget: 2376,  icon: '🏋', fixed: true  },  // 聯邦聯名卡 1,188×2，到11月
+    { name: '投資',     budget: 35000, icon: '📈', fixed: true  },
     { name: '生活費',   budget: 30000, icon: '🛒', fixed: false },
-    { name: '伙食費',   budget: 15000, icon: '🍱', fixed: false },  // 含買菜+外食
+    { name: '伙食費',   budget: 15000, icon: '🍱', fixed: false },
     { name: '水電費',   budget: 2000,  icon: '💡', fixed: false },
-    { name: '手機費',   budget: 1098,  icon: '📱', fixed: true  },  // 彩虹599 + 先生499
+    { name: '手機費',   budget: 1098,  icon: '📱', fixed: true  },
     { name: '交通',     budget: 3000,  icon: '🚌', fixed: false },
     { name: '醫療',     budget: 3000,  icon: '💊', fixed: false },
 ];
