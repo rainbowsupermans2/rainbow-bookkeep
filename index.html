@@ -16,9 +16,9 @@ header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;
 .htitle{font-size:18px;font-weight:700;color:var(--ac);line-height:1.2}
 .htitle span{font-weight:300;color:var(--t2);font-size:15px}
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--sf);border-top:1px solid var(--bd);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
-.bitem{flex:1;padding:10px 4px 12px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
-.bicon{font-size:20px;line-height:1}
-.blabel{font-size:10px;color:var(--t3);font-weight:500}
+.bitem{flex:1;padding:8px 2px 10px;text-align:center;cursor:pointer;border:none;background:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;-webkit-tap-highlight-color:transparent}
+.bicon{font-size:18px;line-height:1}
+.blabel{font-size:9px;color:var(--t3);font-weight:500}
 .bitem.on .blabel{color:var(--ac);font-weight:700}
 .bitem.on .bicon{transform:scale(1.1)}
 .pg{display:none;padding:16px}
@@ -129,6 +129,12 @@ header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;
 .ybadge{display:inline-block;background:var(--rbg);border:1px solid #f5c4c4;border-radius:8px;padding:3px 10px;font-size:12px;color:var(--r);font-weight:700;margin-left:8px}
 .toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(40px);background:#1a1916dd;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none;backdrop-filter:blur(4px)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.month-btn{padding:6px 12px;border:1px solid var(--bd);background:var(--bg2);color:var(--t2);border-radius:4px;font-size:12px;cursor:pointer;transition:all 0.2s}
+.month-btn.active{background:var(--ac);color:white;border-color:var(--ac)}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px}
+.legend-color{width:12px;height:12px;border-radius:2px}
+.legend-text{color:var(--t2);flex:1}
+.legend-amount{font-weight:600;color:var(--t1)}
 </style>
 </head>
 <body>
@@ -301,11 +307,76 @@ header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 16px;
 </div>
 
 
+<!-- 現金流分頁 -->
+<div class="pg" id="pg-cashflow">
+  <!-- 月度選擇器 -->
+  <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px">
+    <button class="month-btn" data-month="0">本月</button>
+    <button class="month-btn active" data-month="-1">上月</button>
+    <button class="month-btn" data-month="-2">前月</button>
+  </div>
+  
+  <!-- 現金流摘要 -->
+  <div class="card">
+    <div class="ctitle">💸 現金流總覽</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:linear-gradient(135deg,var(--bg2),var(--bg3));padding:12px;border-radius:8px;text-align:center;border:1px solid var(--bd)">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:4px;font-weight:500">總收入</div>
+        <div style="font-size:18px;font-weight:700;color:var(--g)" id="total-income">$0</div>
+      </div>
+      <div style="background:linear-gradient(135deg,var(--bg2),var(--bg3));padding:12px;border-radius:8px;text-align:center;border:1px solid var(--bd)">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:4px;font-weight:500">總支出</div>
+        <div style="font-size:18px;font-weight:700;color:var(--r)" id="total-expense">$0</div>
+      </div>
+      <div style="background:linear-gradient(135deg,var(--bg2),var(--bg3));padding:12px;border-radius:8px;text-align:center;border:1px solid var(--bd)">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:4px;font-weight:500">可支配收入</div>
+        <div style="font-size:18px;font-weight:700;color:var(--ac)" id="disposable-income">$0</div>
+      </div>
+      <div style="background:linear-gradient(135deg,var(--bg2),var(--bg3));padding:12px;border-radius:8px;text-align:center;border:1px solid var(--bd)">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:4px;font-weight:500">實際結餘</div>
+        <div style="font-size:18px;font-weight:700" id="actual-balance">$0</div>
+      </div>
+    </div>
+    
+    <!-- 現金流健康度 -->
+    <div style="background:var(--bg3);border-radius:12px;padding:12px;margin-top:16px">
+      <div style="font-size:12px;color:var(--t3);margin-bottom:6px;text-align:center">現金流健康度</div>
+      <div style="width:100%;height:8px;background:var(--bg1);border-radius:4px;overflow:hidden;position:relative">
+        <div style="height:100%;border-radius:4px;transition:width 0.3s ease;width:0%" id="cashflow-health-fill"></div>
+      </div>
+      <div style="text-align:center;margin-top:6px;font-size:14px;font-weight:700" id="cashflow-health-score">計算中...</div>
+    </div>
+  </div>
+  
+  <!-- 支出分類圓餅圖 -->
+  <div class="card">
+    <div class="ctitle">🥧 支出分類分析</div>
+    <div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--bd)">
+      <div style="position:relative;width:200px;height:200px;margin:0 auto 16px">
+        <canvas id="expense-pie-chart" width="200" height="200"></canvas>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="expense-legend">
+        <!-- 動態生成圖例 -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- 現金流趨勢 -->
+  <div class="card">
+    <div class="ctitle">📈 近6月現金流趨勢</div>
+    <div style="background:var(--bg2);border-radius:8px;padding:16px;border:1px solid var(--bd)">
+      <canvas id="cashflow-trend-chart" style="width:100%;height:180px;margin-top:12px"></canvas>
+    </div>
+  </div>
+</div>
+
+
 <nav class="bnav">
   <button class="bitem on" id="b-record" onclick="swPg('record')"><span class="bicon">📝</span><span class="blabel">記帳</span></button>
   <button class="bitem" id="b-expense" onclick="swPg('expense')"><span class="bicon">📊</span><span class="blabel">收支</span></button>
   <button class="bitem" id="b-asset" onclick="swPg('asset')"><span class="bicon">💰</span><span class="blabel">資產</span></button>
   <button class="bitem" id="b-trend" onclick="swPg('trend')"><span class="bicon">📈</span><span class="blabel">趨勢</span></button>
+  <button class="bitem" id="b-cashflow" onclick="swPg('cashflow')"><span class="bicon">💸</span><span class="blabel">現金流</span></button>
 </nav>
 <div class="toast" id="toast"></div>
 <script>
@@ -335,6 +406,7 @@ function swPg(p){
   if(p==='expense')rendExp();
   if(p==='asset'){if(asset)rendAsset();else ldAsset();}
   if(p==='trend')rendTrend();
+  if(p==='cashflow')renderCashflow();
 }
 
 // === 資產頁 ===
@@ -850,6 +922,246 @@ function rendAllocation(){
   document.getElementById('cashPct').textContent = Math.max(0, cashPct) + '%';
 }
 
+// === 現金流分析 ===
+let cashflowData = null;
+let selectedMonth = -1;
+
+function loadCashflowData(){
+  const s=document.createElement('script');
+  s.src=SU+'?type=cashflow&callback=onCashflowData';
+  document.head.appendChild(s);
+}
+
+function loadExpenseCategories(){
+  const s=document.createElement('script');
+  s.src=SU+'?type=expense_categories&callback=onExpenseCategoriesData';
+  document.head.appendChild(s);
+}
+
+function onCashflowData(data){
+  if(data&&data.success){
+    cashflowData=data.data;
+    renderCashflowSummary();
+  }else{
+    showCashflowPlaceholder();
+  }
+}
+
+function onExpenseCategoriesData(data){
+  if(data&&data.success){
+    renderExpensePieChart(data.data);
+  }else{
+    console.error('載入支出分類數據失敗:',data);
+  }
+}
+
+function renderCashflowSummary(){
+  // 模擬計算（實際會從API獲取）
+  const totalIncome=85000;
+  const essentialExpense=45000;
+  const nonessentialExpense=25000;
+  const disposableIncome=totalIncome-essentialExpense;
+  const actualBalance=disposableIncome-nonessentialExpense;
+  
+  document.getElementById('total-income').textContent=fmt(totalIncome);
+  document.getElementById('total-expense').textContent=fmt(essentialExpense+nonessentialExpense);
+  document.getElementById('disposable-income').textContent=fmt(disposableIncome);
+  document.getElementById('actual-balance').textContent=fmt(actualBalance);
+  
+  const balanceEl=document.getElementById('actual-balance');
+  balanceEl.style.color=actualBalance>0?'var(--g)':'var(--r)';
+  
+  updateHealthBar(calculateCashflowHealth(totalIncome,essentialExpense,actualBalance));
+  renderCashflowTrend();
+}
+
+function calculateCashflowHealth(income,essential,balance){
+  if(income<=0)return 0;
+  const essentialRatio=essential/income;
+  const balanceRatio=balance/income;
+  let score=0;
+  if(essentialRatio<=0.5)score+=50;
+  else score+=Math.max(0,50-(essentialRatio-0.5)*100);
+  if(balanceRatio>=0.2)score+=50;
+  else score+=Math.max(0,balanceRatio*250);
+  return Math.round(Math.max(0,Math.min(100,score)));
+}
+
+function updateHealthBar(score){
+  const fillEl=document.getElementById('cashflow-health-fill');
+  const scoreEl=document.getElementById('cashflow-health-score');
+  fillEl.style.width=score+'%';
+  scoreEl.textContent=score+'分';
+  if(score>=80){
+    fillEl.style.background='var(--g)';
+    scoreEl.style.color='var(--g)';
+  }else if(score>=60){
+    fillEl.style.background='var(--ac)';
+    scoreEl.style.color='var(--ac)';
+  }else{
+    fillEl.style.background='var(--r)';
+    scoreEl.style.color='var(--r)';
+  }
+}
+
+function renderExpensePieChart(categories){
+  const canvas=document.getElementById('expense-pie-chart');
+  const ctx=canvas.getContext('2d');
+  const centerX=100,centerY=100,radius=80;
+  
+  ctx.clearRect(0,0,200,200);
+  
+  const categoryTotals={};
+  const colors=['#2d6a4f','#40916c','#52b788','#74c69d','#95d5b2'];
+  let colorIndex=0;
+  
+  Object.keys(categories).forEach(mainCategory=>{
+    let total=0;
+    Object.values(categories[mainCategory]).forEach(amount=>total+=amount);
+    if(total>0){
+      categoryTotals[mainCategory]={amount:total,color:colors[colorIndex%colors.length]};
+      colorIndex++;
+    }
+  });
+  
+  const grandTotal=Object.values(categoryTotals).reduce((sum,cat)=>sum+cat.amount,0);
+  
+  if(grandTotal===0){
+    ctx.fillStyle='#ccc';
+    ctx.font='14px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('暫無支出資料',centerX,centerY);
+    return;
+  }
+  
+  let currentAngle=-Math.PI/2;
+  Object.entries(categoryTotals).forEach(([name,data])=>{
+    const sliceAngle=(data.amount/grandTotal)*2*Math.PI;
+    ctx.fillStyle=data.color;
+    ctx.beginPath();
+    ctx.moveTo(centerX,centerY);
+    ctx.arc(centerX,centerY,radius,currentAngle,currentAngle+sliceAngle);
+    ctx.closePath();
+    ctx.fill();
+    currentAngle+=sliceAngle;
+  });
+  
+  ctx.fillStyle='var(--bg2)';
+  ctx.beginPath();
+  ctx.arc(centerX,centerY,30,0,2*Math.PI);
+  ctx.fill();
+  
+  ctx.fillStyle='var(--t1)';
+  ctx.font='bold 12px sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('總支出',centerX,centerY-5);
+  ctx.fillText(fmt(grandTotal),centerX,centerY+10);
+  
+  updateExpenseLegend(categoryTotals,grandTotal);
+}
+
+function updateExpenseLegend(categories,total){
+  const legendEl=document.getElementById('expense-legend');
+  legendEl.innerHTML='';
+  Object.entries(categories).forEach(([name,data])=>{
+    const percentage=((data.amount/total)*100).toFixed(1);
+    const item=document.createElement('div');
+    item.className='legend-item';
+    item.innerHTML=`<div class="legend-color" style="background:${data.color}"></div><div class="legend-text">${name}</div><div class="legend-amount">${percentage}%</div>`;
+    legendEl.appendChild(item);
+  });
+}
+
+function renderCashflowTrend(){
+  const canvas=document.getElementById('cashflow-trend-chart');
+  const ctx=canvas.getContext('2d');
+  const width=canvas.width;
+  const height=canvas.height;
+  
+  const months=['10月','11月','12月','1月','2月','3月'];
+  const incomeData=[78000,82000,85000,79000,83000,85000];
+  const expenseData=[65000,68000,70000,67000,69000,70000];
+  const balanceData=incomeData.map((income,i)=>income-expenseData[i]);
+  
+  ctx.clearRect(0,0,width,height);
+  
+  const maxValue=Math.max(...incomeData,...expenseData);
+  const minValue=Math.min(0,...balanceData);
+  const valueRange=maxValue-minValue;
+  const padding=40;
+  const chartWidth=width-padding*2;
+  const chartHeight=height-padding*2;
+  
+  ctx.strokeStyle='#e2ddd4';
+  ctx.lineWidth=1;
+  for(let i=1;i<5;i++){
+    const y=padding+(chartHeight*i/5);
+    ctx.beginPath();
+    ctx.moveTo(padding,y);
+    ctx.lineTo(width-padding,y);
+    ctx.stroke();
+  }
+  
+  drawTrendLine(ctx,incomeData,maxValue,minValue,chartWidth,chartHeight,padding,'#2d6a4f');
+  drawTrendLine(ctx,expenseData,maxValue,minValue,chartWidth,chartHeight,padding,'#d62828');
+  drawTrendLine(ctx,balanceData,maxValue,minValue,chartWidth,chartHeight,padding,'#f77f00');
+  
+  ctx.fillStyle='#6b6760';
+  ctx.font='12px sans-serif';
+  ctx.textAlign='center';
+  months.forEach((month,i)=>{
+    const x=padding+(chartWidth*i/(months.length-1));
+    ctx.fillText(month,x,height-10);
+  });
+}
+
+function drawTrendLine(ctx,data,maxValue,minValue,chartWidth,chartHeight,padding,color){
+  const valueRange=maxValue-minValue;
+  ctx.strokeStyle=color;
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  data.forEach((value,i)=>{
+    const x=padding+(chartWidth*i/(data.length-1));
+    const y=padding+chartHeight-((value-minValue)/valueRange*chartHeight);
+    if(i===0)ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  
+  ctx.fillStyle=color;
+  data.forEach((value,i)=>{
+    const x=padding+(chartWidth*i/(data.length-1));
+    const y=padding+chartHeight-((value-minValue)/valueRange*chartHeight);
+    ctx.beginPath();
+    ctx.arc(x,y,3,0,2*Math.PI);
+    ctx.fill();
+  });
+}
+
+function showCashflowPlaceholder(){
+  document.getElementById('total-income').textContent='--';
+  document.getElementById('total-expense').textContent='--';
+  document.getElementById('disposable-income').textContent='--';
+  document.getElementById('actual-balance').textContent='--';
+  document.getElementById('cashflow-health-score').textContent='待分析';
+}
+
+function initMonthSelector(){
+  document.querySelectorAll('.month-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.month-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedMonth=parseInt(btn.dataset.month);
+      renderCashflowSummary();
+    });
+  });
+}
+
+function renderCashflow(){
+  loadCashflowData();
+  loadExpenseCategories();
+  initMonthSelector();
+}
 
 const now=new Date();
 document.getElementById('df').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
