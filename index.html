@@ -15,12 +15,10 @@
             --ac: #2d6a4f;
             --g: #1a7a4a;
             --r: #c0392b;
-            --y: #f39c12;
+            --y: #d97706;
             --shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
@@ -28,517 +26,1115 @@
             line-height: 1.5;
             overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 420px;
-            margin: 0 auto;
-            position: relative;
-            padding-bottom: 90px;
-        }
-        
+        .container { max-width: 420px; margin: 0 auto; position: relative; padding-bottom: 90px; }
         .header {
             background: linear-gradient(135deg, var(--ac), var(--g));
             color: white;
-            padding: 20px 16px;
+            padding: 18px 16px 14px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
         }
-        
-        .logo { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-        .tagline { font-size: 12px; opacity: 0.9; }
-        
-        .pg {
-            display: none;
-            padding: 16px;
-            min-height: calc(100vh - 140px);
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 19px; font-weight: 700; }
+        .tagline { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+        .refresh-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
-        
+        .last-update { font-size: 10px; opacity: 0.7; text-align: right; margin-top: 4px; }
+
+        /* Pages */
+        .pg { display: none; padding: 16px; min-height: calc(100vh - 140px); }
         .pg.on { display: block; }
-        
+
+        /* Cards */
         .card {
             background: var(--card);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
+            padding: 18px;
+            margin-bottom: 14px;
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
         }
-        
         .ctitle {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--t1);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        
-        .metric-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-        
+
+        /* Metrics */
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
         .metric {
             text-align: center;
-            padding: 16px;
+            padding: 14px 10px;
             background: #f8fafc;
             border-radius: 8px;
         }
-        
-        .metric-label {
-            font-size: 12px;
-            color: var(--t3);
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-        
-        .metric-value {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        
-        .health-score {
-            text-align: center;
-            padding: 24px;
-            background: linear-gradient(135deg, #f0fff4, #e6fffa);
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: conic-gradient(var(--g) 85%, #e2e8f0 85%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            position: relative;
-        }
-        
-        .score-inner {
-            width: 90px;
-            height: 90px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        
-        .score-number {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--g);
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 12px 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--g), var(--ac));
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-        
-        .debt-status {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            background: #f0fff4;
-            border: 1px solid #bbf7d0;
-            border-radius: 8px;
-            margin-bottom: 16px;
-        }
-        
-        .status-good { background: #f0fff4; border-color: #bbf7d0; }
-        .status-warning { background: #fffbeb; border-color: #fed7aa; }
-        .status-danger { background: #fef2f2; border-color: #fecaca; }
-        
+        .metric-label { font-size: 11px; color: var(--t3); margin-bottom: 4px; font-weight: 500; }
+        .metric-value { font-size: 18px; font-weight: 700; }
+
+        /* Progress */
+        .progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin: 8px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--g), var(--ac)); border-radius: 5px; transition: width 0.6s ease; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--t3); }
+
+        /* Bottom nav */
         .bnav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            position: fixed; bottom: 0; left: 0; right: 0;
             background: white;
             border-top: 1px solid var(--border);
             display: flex;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             z-index: 200;
         }
-        
         .bitem {
-            flex: 1;
-            padding: 6px 2px 8px;
+            flex: 1; padding: 5px 1px 7px;
             text-align: center;
             cursor: pointer;
             border: none;
             background: none;
             font-family: inherit;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            -webkit-tap-highlight-color: transparent;
+            display: flex; flex-direction: column; align-items: center; gap: 1px;
             min-width: 0;
+            transition: background 0.15s;
         }
-        
         .bitem.on { background: #f0fff4; }
-        
-        .bicon { font-size: 18px; line-height: 1; }
+        .bicon { font-size: 17px; line-height: 1; }
         .blabel { font-size: 9px; color: var(--t3); font-weight: 500; }
-        .bitem.on .blabel { color: var(--g); font-weight: 600; }
-        
-        .budget-item {
+        .bitem.on .blabel { color: var(--g); font-weight: 700; }
+
+        /* Form */
+        .form-row { margin-bottom: 12px; }
+        .form-row label { display: block; font-size: 12px; color: var(--t2); font-weight: 600; margin-bottom: 4px; }
+        .form-row input, .form-row select, .form-row textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--t1);
+            background: white;
+            transition: border-color 0.2s;
+        }
+        .form-row input:focus, .form-row select:focus { outline: none; border-color: var(--ac); }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--ac), var(--g));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:active { opacity: 0.8; }
+        .btn-primary:disabled { opacity: 0.5; }
+
+        /* Alerts */
+        .alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid; font-size: 14px; }
+        .alert-success { background: #f0fff4; border-color: #bbf7d0; color: #166534; }
+        .alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+        .alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+        .alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+
+        /* Lists */
+        .list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 11px 0;
             border-bottom: 1px solid #f1f5f9;
         }
-        
-        .budget-item:last-child { border-bottom: none; }
-        
-        .budget-category {
-            font-weight: 600;
-            color: var(--t1);
-        }
-        
-        .budget-amounts {
-            text-align: right;
-            font-size: 14px;
-        }
-        
-        .budget-actual {
-            font-weight: 600;
-            color: var(--t1);
-        }
-        
-        .budget-target {
-            color: var(--t3);
-            font-size: 12px;
-        }
-        
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
+        .list-item:last-child { border-bottom: none; }
+        .list-left { display: flex; flex-direction: column; }
+        .list-title { font-size: 14px; font-weight: 600; color: var(--t1); }
+        .list-sub { font-size: 12px; color: var(--t3); }
+        .list-right { text-align: right; }
+        .list-amount { font-size: 15px; font-weight: 700; }
+        .list-date { font-size: 11px; color: var(--t3); }
+
+        /* Health Score */
+        .health-score {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0fff4, #e6fffa);
+            border-radius: 12px;
             margin-bottom: 16px;
+        }
+        .score-circle {
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px;
+            position: relative;
+        }
+        .score-inner {
+            width: 82px; height: 82px;
+            background: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
+        }
+        .score-number { font-size: 26px; font-weight: 700; color: var(--g); }
+        .score-label { font-size: 11px; color: var(--t3); }
+
+        /* Debt bar */
+        .debt-status {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
             border: 1px solid;
         }
-        
-        .alert-success {
-            background: #f0fff4;
-            border-color: #bbf7d0;
-            color: #166534;
+        .status-good { background: #f0fff4; border-color: #bbf7d0; }
+
+        /* Budget row */
+        .budget-row {
+            padding: 11px 0;
+            border-bottom: 1px solid #f1f5f9;
         }
-        
-        .alert-warning {
-            background: #fffbeb;
-            border-color: #fed7aa;
-            color: #92400e;
+        .budget-row:last-child { border-bottom: none; }
+        .budget-row-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .budget-name { font-size: 14px; font-weight: 600; }
+        .budget-nums { font-size: 13px; color: var(--t2); }
+        .budget-mini-bar { width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+        .budget-mini-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+        /* Loading */
+        .loading {
+            display: flex; align-items: center; justify-content: center;
+            padding: 30px;
+            color: var(--t3);
+            font-size: 14px;
+            gap: 8px;
         }
-        
-        @media (max-width: 375px) {
-            .bicon { font-size: 16px; }
+        .spin { animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Tag chips */
+        .chip {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .chip-green { background: #dcfce7; color: #166534; }
+        .chip-yellow { background: #fef9c3; color: #854d0e; }
+        .chip-red { background: #fee2e2; color: #991b1b; }
+
+        /* Canvas chart wrapper */
+        .chart-wrap { width: 100%; overflow: hidden; border-radius: 8px; }
+
+        /* Type switch */
+        .type-switch {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 0;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 3px;
+            margin-bottom: 14px;
+        }
+        .type-btn {
+            padding: 8px;
+            border: none; background: none;
+            border-radius: 6px;
+            font-size: 14px; font-weight: 600;
+            font-family: inherit;
+            color: var(--t3);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .type-btn.on {
+            background: white;
+            color: var(--t1);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+
+        /* Asset allocation bars */
+        .alloc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .alloc-label { font-size: 12px; color: var(--t2); width: 60px; flex-shrink: 0; }
+        .alloc-bar-wrap { flex: 1; height: 14px; background: #e2e8f0; border-radius: 7px; overflow: hidden; }
+        .alloc-bar { height: 100%; border-radius: 7px; transition: width 0.5s; }
+        .alloc-pct { font-size: 12px; font-weight: 700; color: var(--t1); width: 36px; text-align: right; }
+
+        @media (max-width: 380px) {
+            .bicon { font-size: 15px; }
             .blabel { font-size: 8px; }
-            .metric-grid { gap: 12px; }
+            .metric-value { font-size: 16px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="logo">彩虹超人CFO 💎</div>
-            <div class="tagline">專業級財務管理平台</div>
-        </header>
-        
-        <!-- 記帳頁面 -->
-        <div class="pg on" id="pg-record">
-            <div class="card">
-                <div class="ctitle">📝 快速記帳</div>
-                <div id="record-form">
-                    <p style="text-align: center; color: var(--t2); padding: 20px;">
-                        記帳功能已整合CFO級分析<br>
-                        每筆支出都會影響您的財務健康評分
-                    </p>
+<div class="container">
+    <header class="header">
+        <div class="header-top">
+            <div style="font-size:10px;opacity:.7;width:32px"></div>
+            <div>
+                <div class="logo">彩虹超人CFO 💎</div>
+                <div class="tagline">專業級財務管理平台</div>
+            </div>
+            <button class="refresh-btn" onclick="loadAll()" title="重新整理">↻</button>
+        </div>
+        <div class="last-update" id="last-update">數據載入中…</div>
+    </header>
+
+    <!-- ① 記帳 -->
+    <div class="pg on" id="pg-record">
+        <div class="card">
+            <div class="ctitle">📝 快速記帳</div>
+            <div class="type-switch">
+                <button class="type-btn on" id="tb-out" onclick="setType('支出')">💸 支出</button>
+                <button class="type-btn" id="tb-in" onclick="setType('收入')">💰 收入</button>
+            </div>
+            <div class="form-row">
+                <label>金額（元）</label>
+                <input type="number" id="f-amount" placeholder="0" inputmode="decimal">
+            </div>
+            <div class="form-row-2">
+                <div class="form-row" style="margin:0">
+                    <label>類別</label>
+                    <select id="f-cat">
+                        <option>餐飲</option><option>交通</option><option>購物</option>
+                        <option>娛樂</option><option>醫療</option><option>房貸</option>
+                        <option>投資</option><option>薪資</option><option>其他</option>
+                    </select>
+                </div>
+                <div class="form-row" style="margin:0">
+                    <label>帳戶</label>
+                    <select id="f-acct">
+                        <optgroup label="💳 銀行帳戶">
+                            <option>玉山台幣</option>
+                            <option>玉山日幣</option>
+                            <option>富邦美元</option>
+                            <option>LINE Bank</option>
+                            <option>現金</option>
+                        </optgroup>
+                        <optgroup label="💳 信用卡">
+                            <option>富邦信用卡</option>
+                            <option>中信信用卡</option>
+                            <option>玉山熊本熊卡</option>
+                            <option>LINE Bank聯邦聯名卡</option>
+                        </optgroup>
+                    </select>
                 </div>
             </div>
+            <div class="form-row">
+                <label>說明（選填）</label>
+                <input type="text" id="f-desc" placeholder="記帳備註">
+            </div>
+            <div class="form-row">
+                <label>日期</label>
+                <input type="date" id="f-date">
+            </div>
+            <button class="btn-primary" id="sub-btn" onclick="submitRecord()">✔ 記帳</button>
+            <div id="record-msg" style="margin-top:10px;display:none;"></div>
         </div>
-        
-        <!-- 收支頁面 -->
-        <div class="pg" id="pg-expense">
+
+        <div class="card">
+            <div class="ctitle">📋 最近記錄</div>
+            <div id="recent-records"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
+        </div>
+    </div>
+
+    <!-- ② 收支 -->
+    <div class="pg" id="pg-expense">
+        <div id="expense-summary">
             <div class="card">
-                <div class="ctitle">📊 收支分析</div>
-                <div id="expense-data">載入中...</div>
+                <div class="ctitle">📊 本月收支概況</div>
+                <div id="expense-metrics"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
+            </div>
+            <div class="card">
+                <div class="ctitle">🏷 支出分類</div>
+                <div id="expense-cats"><div class="loading"><span class="spin">⟳</span></div></div>
             </div>
         </div>
-        
-        <!-- 資產頁面 -->
-        <div class="pg" id="pg-asset">
-            <div class="card">
-                <div class="ctitle">💰 資產概覽</div>
-                <div class="metric-grid">
-                    <div class="metric">
-                        <div class="metric-label">淨資產</div>
-                        <div class="metric-value" style="color: var(--g)">₩661萬</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-label">退休進度</div>
-                        <div class="metric-value" style="color: var(--ac)">53.5%</div>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 53.5%"></div>
-                </div>
-                <p style="text-align: center; color: var(--t2); margin-top: 12px;">
-                    距離退休目標：576萬元<br>
-                    預估達成時間：2032年
-                </p>
+    </div>
+
+    <!-- ③ 資產 -->
+    <div class="pg" id="pg-asset">
+        <div class="card">
+            <div class="ctitle">💰 總資產</div>
+            <div id="asset-total">
+                <div class="loading"><span class="spin">⟳</span> 載入中…</div>
             </div>
         </div>
-        
-        <!-- 趨勢頁面 -->
-        <div class="pg" id="pg-trend">
-            <div class="card">
-                <div class="ctitle">📈 資產趨勢</div>
-                <p style="text-align: center; color: var(--t2); padding: 20px;">
-                    資產成長軌跡和投資績效分析
-                </p>
+        <div class="card">
+            <div class="ctitle">🎯 退休目標進度</div>
+            <div id="retire-progress">
+                <div class="loading"><span class="spin">⟳</span></div>
             </div>
         </div>
-        
-        <!-- 負債管理頁面 -->
-        <div class="pg" id="pg-debt">
-            <div class="card">
-                <div class="ctitle">💳 負債管理</div>
-                
-                <div class="debt-status status-good">
-                    <div>
-                        <div style="font-weight: 600;">負債比例</div>
-                        <div style="font-size: 12px; color: var(--t3);">房貸餘額 vs 總資產</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 24px; font-weight: 700; color: var(--g);">18.8%</div>
-                        <div style="font-size: 12px; color: var(--g);">🟢 健康水準</div>
-                    </div>
-                </div>
-                
-                <div class="metric-grid">
-                    <div class="metric">
-                        <div class="metric-label">房貸餘額</div>
-                        <div class="metric-value" style="color: var(--r)">₩153萬</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-label">月付金額</div>
-                        <div class="metric-value" style="color: var(--t2)">待計算</div>
-                    </div>
-                </div>
-                
-                <div class="card" style="background: #f8fafc; margin: 16px 0;">
-                    <div style="font-weight: 600; margin-bottom: 8px;">💡 CFO建議</div>
-                    <div style="font-size: 14px; color: var(--t2);">
-                        • 負債比例18.8%屬於健康範圍<br>
-                        • 可考慮部分提前還款降低利息<br>
-                        • 維持良好的現金流管理
-                    </div>
-                </div>
+        <div class="card">
+            <div class="ctitle">📂 資產配置</div>
+            <div id="asset-alloc">
+                <div class="loading"><span class="spin">⟳</span></div>
             </div>
         </div>
-        
-        <!-- 預算控制頁面 -->
-        <div class="pg" id="pg-budget">
-            <div class="card">
-                <div class="ctitle">📋 預算控制</div>
-                
-                <div class="alert alert-success">
-                    <strong>4月預算執行良好</strong><br>
-                    總體執行率：0% (月初剛開始)
-                </div>
-                
-                <div class="budget-item">
-                    <div class="budget-category">房貸還款</div>
-                    <div class="budget-amounts">
-                        <div class="budget-actual">₩0</div>
-                        <div class="budget-target">/ ₩50,000</div>
-                    </div>
-                </div>
-                
-                <div class="budget-item">
-                    <div class="budget-category">生活費</div>
-                    <div class="budget-amounts">
-                        <div class="budget-actual">₩0</div>
-                        <div class="budget-target">/ ₩30,000</div>
-                    </div>
-                </div>
-                
-                <div class="budget-item">
-                    <div class="budget-category">投資</div>
-                    <div class="budget-amounts">
-                        <div class="budget-actual">₩0</div>
-                        <div class="budget-target">/ ₩20,000</div>
-                    </div>
-                </div>
-                
-                <div class="budget-item">
-                    <div class="budget-category">交通費</div>
-                    <div class="budget-amounts">
-                        <div class="budget-actual">₩0</div>
-                        <div class="budget-target">/ ₩8,000</div>
-                    </div>
-                </div>
-                
-                <div class="card" style="background: #fffbeb; margin: 16px 0;">
-                    <div style="font-weight: 600; margin-bottom: 8px;">📊 本月建議</div>
-                    <div style="font-size: 14px; color: var(--t2);">
-                        • 建議日均花費：₩4,300<br>
-                        • 重點控制變動支出<br>
-                        • 每週檢視預算執行狀況
-                    </div>
-                </div>
+    </div>
+
+    <!-- ④ 趨勢 -->
+    <div class="pg" id="pg-trend">
+        <div class="card">
+            <div class="ctitle">📈 資產成長趨勢</div>
+            <div id="trend-chart">
+                <div class="loading"><span class="spin">⟳</span> 載入中…</div>
             </div>
         </div>
-        
-        <!-- 財務健康頁面 -->
-        <div class="pg" id="pg-health">
-            <div class="card">
-                <div class="ctitle">🏥 財務健康</div>
-                
-                <div class="health-score">
-                    <div class="score-circle">
-                        <div class="score-inner">
-                            <div class="score-number">85</div>
-                            <div style="font-size: 12px; color: var(--t3);">分</div>
-                        </div>
-                    </div>
-                    <div style="font-size: 16px; font-weight: 600; color: var(--g);">財務狀況良好</div>
-                    <div style="font-size: 14px; color: var(--t2); margin-top: 4px;">CFO級專業評估</div>
+        <div class="card">
+            <div class="ctitle">📊 各期資產明細</div>
+            <div id="trend-table"><div class="loading"><span class="spin">⟳</span></div></div>
+        </div>
+    </div>
+
+    <!-- ⑤ 負債 -->
+    <div class="pg" id="pg-debt">
+        <div class="card">
+            <div class="ctitle">💳 負債概況</div>
+            <div class="debt-status status-good" id="debt-ratio-card">
+                <div>
+                    <div style="font-weight:600">負債比例</div>
+                    <div style="font-size:12px;color:var(--t3)">房貸餘額 vs 總資產</div>
                 </div>
-                
-                <div class="metric-grid">
-                    <div class="metric">
-                        <div class="metric-label">負債比例</div>
-                        <div class="metric-value" style="color: var(--g)">18.8%</div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-label">緊急基金</div>
-                        <div class="metric-value" style="color: var(--ac)">1458月</div>
+                <div style="text-align:right">
+                    <div style="font-size:26px;font-weight:700;color:var(--g)" id="debt-pct">—</div>
+                    <div style="font-size:12px;color:var(--g)" id="debt-status-label">計算中</div>
+                </div>
+            </div>
+            <div class="metric-grid">
+                <div class="metric">
+                    <div class="metric-label">房貸餘額</div>
+                    <div class="metric-value" style="color:var(--r)" id="debt-balance">NT$1,530,000</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">負債/資產比</div>
+                    <div class="metric-value" id="debt-ratio2" style="color:var(--t2)">—</div>
+                </div>
+            </div>
+            <div class="alert alert-success" id="debt-advice">
+                • 負債比例屬健康範圍<br>
+                • 維持良好現金流管理<br>
+                • 可考慮部分提前還款降息
+            </div>
+        </div>
+        <div class="card" style="background:#f8fafc">
+            <div style="font-weight:600;margin-bottom:10px">💡 CFO還款建議</div>
+            <div style="font-size:14px;color:var(--t2);line-height:1.8">
+                • 目前雙薪期間：積極還款最划算<br>
+                • 2026年6月彩虹待業後：轉保守策略<br>
+                • 先生2027年退休後：以勞退月領$25,850覆蓋<br>
+                • 建議保留6個月生活費緊急備用金
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑥ 預算 -->
+    <div class="pg" id="pg-budget">
+        <div class="card">
+            <div class="ctitle">📋 本月預算執行</div>
+            <div id="budget-alert-area"></div>
+            <div id="budget-rows">
+                <div class="loading"><span class="spin">⟳</span> 載入中…</div>
+            </div>
+        </div>
+        <div class="card" style="background:#fffbeb">
+            <div style="font-weight:600;margin-bottom:8px">📊 CFO本月建議</div>
+            <div id="budget-advice" style="font-size:14px;color:var(--t2);line-height:1.8">
+                • 重點控制餐飲與購物變動支出<br>
+                • 每週五檢視預算執行狀況<br>
+                • 超支項目優先削減非必要費用
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑦ 財務健康 -->
+    <div class="pg" id="pg-health">
+        <div class="card">
+            <div class="ctitle">🏥 CFO財務健康評分</div>
+            <div class="health-score">
+                <div class="score-circle" id="score-circle">
+                    <div class="score-inner">
+                        <div class="score-number" id="score-num">—</div>
+                        <div class="score-label">分</div>
                     </div>
                 </div>
-                
-                <div style="margin: 20px 0;">
-                    <div style="font-weight: 600; margin-bottom: 12px;">🎯 各項評估</div>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 14px;">資產負債結構</span>
-                        <span style="color: var(--g); font-weight: 600;">🟢 優秀</span>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 14px;">流動性充足度</span>
-                        <span style="color: var(--g); font-weight: 600;">🟢 充足</span>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 14px;">投資風險度</span>
-                        <span style="color: var(--y); font-weight: 600;">🟡 中高</span>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 14px;">退休準備度</span>
-                        <span style="color: var(--g); font-weight: 600;">🟢 良好</span>
-                    </div>
+                <div style="font-size:16px;font-weight:600" id="score-grade">評估中…</div>
+                <div style="font-size:13px;color:var(--t2);margin-top:4px">CFO級專業評估</div>
+            </div>
+            <div class="metric-grid" id="health-metrics">
+                <div class="metric">
+                    <div class="metric-label">負債比例</div>
+                    <div class="metric-value" id="hm-debt" style="color:var(--g)">—</div>
                 </div>
-                
-                <div class="alert alert-warning">
-                    <strong>⚠️ 風險提醒</strong><br>
-                    投資比例92.6%偏高，建議適度增加現金比例以降低風險。
+                <div class="metric">
+                    <div class="metric-label">退休進度</div>
+                    <div class="metric-value" id="hm-retire" style="color:var(--ac)">—</div>
                 </div>
-                
-                <div class="card" style="background: #f0fff4; margin: 16px 0;">
-                    <div style="font-weight: 600; margin-bottom: 8px;">💡 本月行動清單</div>
-                    <div style="font-size: 14px; color: var(--t2);">
-                        • 檢討投資組合配置<br>
-                        • 評估是否提前還房貸<br>
-                        • 考慮增加現金比例至15%<br>
-                        • 維持每月定期投資計劃
-                    </div>
+            </div>
+            <div style="margin:16px 0">
+                <div style="font-weight:600;margin-bottom:12px">🎯 各項評估</div>
+                <div class="list-item" style="padding:10px 0">
+                    <span style="font-size:14px">資產負債結構</span>
+                    <span id="ev-debt">⏳</span>
+                </div>
+                <div class="list-item" style="padding:10px 0">
+                    <span style="font-size:14px">退休準備度</span>
+                    <span id="ev-retire">⏳</span>
+                </div>
+                <div class="list-item" style="padding:10px 0">
+                    <span style="font-size:14px">投資分散度</span>
+                    <span id="ev-invest">🟡 中高風險</span>
+                </div>
+                <div class="list-item" style="padding:10px 0">
+                    <span style="font-size:14px">現金流動性</span>
+                    <span id="ev-cash">⏳</span>
+                </div>
+            </div>
+            <div class="alert alert-warning" id="health-warn">
+                ⚠️ 正在計算風險指標…
+            </div>
+            <div class="card" style="background:#f0fff4;margin-top:4px">
+                <div style="font-weight:600;margin-bottom:8px">💡 本月行動清單</div>
+                <div style="font-size:14px;color:var(--t2);line-height:1.8" id="health-action">
+                    • 每月執行 analyze_portfolio.py<br>
+                    • 評估投資組合是否需再平衡<br>
+                    • 保持定期定額安聯日本 USD300<br>
+                    • 確認下月記帳數據完整
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- 底部導覽 -->
-    <nav class="bnav">
-        <button class="bitem on" id="b-record" onclick="swPg('record')">
-            <span class="bicon">📝</span>
-            <span class="blabel">記帳</span>
-        </button>
-        <button class="bitem" id="b-expense" onclick="swPg('expense')">
-            <span class="bicon">📊</span>
-            <span class="blabel">收支</span>
-        </button>
-        <button class="bitem" id="b-asset" onclick="swPg('asset')">
-            <span class="bicon">💰</span>
-            <span class="blabel">資產</span>
-        </button>
-        <button class="bitem" id="b-trend" onclick="swPg('trend')">
-            <span class="bicon">📈</span>
-            <span class="blabel">趨勢</span>
-        </button>
-        <button class="bitem" id="b-debt" onclick="swPg('debt')">
-            <span class="bicon">💳</span>
-            <span class="blabel">負債</span>
-        </button>
-        <button class="bitem" id="b-budget" onclick="swPg('budget')">
-            <span class="bicon">📋</span>
-            <span class="blabel">預算</span>
-        </button>
-        <button class="bitem" id="b-health" onclick="swPg('health')">
-            <span class="bicon">🏥</span>
-            <span class="blabel">健康</span>
-        </button>
-    </nav>
-    
-    <script>
-        function swPg(page) {
-            // 隱藏所有頁面
-            document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
-            document.querySelectorAll('.bitem').forEach(b => b.classList.remove('on'));
-            
-            // 顯示選中的頁面
-            document.getElementById('pg-' + page).classList.add('on');
-            document.getElementById('b-' + page).classList.add('on');
+</div>
+
+<!-- 底部導覽 -->
+<nav class="bnav">
+    <button class="bitem on" id="b-record" onclick="swPg('record')">
+        <span class="bicon">📝</span><span class="blabel">記帳</span>
+    </button>
+    <button class="bitem" id="b-expense" onclick="swPg('expense')">
+        <span class="bicon">📊</span><span class="blabel">收支</span>
+    </button>
+    <button class="bitem" id="b-asset" onclick="swPg('asset')">
+        <span class="bicon">💰</span><span class="blabel">資產</span>
+    </button>
+    <button class="bitem" id="b-trend" onclick="swPg('trend')">
+        <span class="bicon">📈</span><span class="blabel">趨勢</span>
+    </button>
+    <button class="bitem" id="b-debt" onclick="swPg('debt')">
+        <span class="bicon">💳</span><span class="blabel">負債</span>
+    </button>
+    <button class="bitem" id="b-budget" onclick="swPg('budget')">
+        <span class="bicon">📋</span><span class="blabel">預算</span>
+    </button>
+    <button class="bitem" id="b-health" onclick="swPg('health')">
+        <span class="bicon">🏥</span><span class="blabel">健康</span>
+    </button>
+</nav>
+
+<script>
+// ═══════════════════════════════════
+// 設定區（修改這裡）
+// ═══════════════════════════════════
+const SCRIPT_ID = 'AKfycbxVk1nwWyEXmLrZ6rpc5JBgx_Sp6A6m1YSpwAcAGS9gtxKu9kpW2TIqH-hSFWrIfQE';
+const SCRIPT_URL = `https://script.google.com/macros/s/${SCRIPT_ID}/exec`;
+const RETIRE_TARGET = 12380000;
+const MORTGAGE = 1530000;  // 房貸餘額（可手動更新）
+
+// 預算設定（每月）
+const BUDGETS = [
+    { name: '房貸還款', budget: 50000, icon: '🏠' },
+    { name: '生活費',   budget: 30000, icon: '🛒' },
+    { name: '投資',     budget: 20000, icon: '📈' },
+    { name: '餐飲',     budget: 15000, icon: '🍽' },
+    { name: '交通',     budget: 8000,  icon: '🚌' },
+    { name: '醫療',     budget: 5000,  icon: '💊' },
+];
+
+// ═══════════════════════════════════
+// 全域狀態
+// ═══════════════════════════════════
+let gAssets = null;     // 最新資產列
+let gAssetHistory = []; // 歷史資產資料
+let gRecords = [];      // 記帳記錄
+let currentType = '支出';
+
+// ═══════════════════════════════════
+// 初始化
+// ═══════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    // 設定今天日期
+    document.getElementById('f-date').valueAsDate = new Date();
+    loadAll();
+});
+
+function loadAll() {
+    document.getElementById('last-update').textContent = '數據更新中…';
+    loadAssets();
+    loadRecords();
+}
+
+// ═══════════════════════════════════
+// JSONP 工具
+// ═══════════════════════════════════
+function jsonp(url, cb) {
+    const id = 'cb_' + Date.now();
+    const s = document.createElement('script');
+    s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + id;
+    window[id] = (data) => {
+        delete window[id];
+        document.body.removeChild(s);
+        cb(null, data);
+    };
+    s.onerror = () => {
+        delete window[id];
+        try { document.body.removeChild(s); } catch(e) {}
+        cb(new Error('載入失敗'));
+    };
+    document.body.appendChild(s);
+}
+
+// ═══════════════════════════════════
+// 讀取資產歷史（來自 Google Sheets 資產記錄分頁）
+// 資產記錄欄位：A=日期,B=台股,C=VT,D=基金,E=現金,
+//              F=超人勞退,G=彩虹勞退,H=總額,I=淨值,J=進度%,K=距目標
+// ═══════════════════════════════════
+function parseAssetRow(row) {
+    // row 是陣列：[日期,台股,VT,基金,現金,超人勞退,彩虹勞退,總額,淨值,進度%,距目標]
+    return {
+        date:         String(row[0] || ''),
+        stock:        +row[1] || 0,
+        vt:           +row[2] || 0,
+        fund:         +row[3] || 0,
+        cash:         +row[4] || 0,
+        husbandRetire:+row[5] || 0,
+        wifeRetire:   +row[6] || 0,
+        total:        +row[7] || 0,
+        netWorth:     +row[8] || 0,
+        progress:     +row[9] || 0,
+        distToTarget: +row[10] || 0,
+    };
+}
+
+function loadAssets() {
+    // 先取歷史（含所有列）
+    jsonp(`${SCRIPT_URL}?type=history`, (err, data) => {
+        if (err || !data || !data.success) {
+            loadAssetsFallback();
+            return;
         }
-        
-        // 初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('彩虹超人CFO系統已啟動');
-            
-            // 可以在這裡加入數據載入邏輯
-            // loadCFOData();
-        });
-        
-        // CFO數據載入函數（預留接口）
-        function loadCFOData() {
-            // 這裡可以連接到 Google Sheets API
-            // 載入最新的財務健康數據
-            console.log('載入CFO數據...');
+        const rows = data.data || [];
+        // 第一列通常是標題列，跳過
+        const dataRows = rows.filter(r => r[0] && r[0] !== '日期');
+        if (!dataRows.length) { loadAssetsFallback(); return; }
+
+        gAssetHistory = dataRows.map(parseAssetRow);
+        gAssets = gAssetHistory[gAssetHistory.length - 1];
+        renderAllAsset();
+        updateTimestamp();
+    });
+}
+
+// fallback：使用手冊中的靜態數據
+function loadAssetsFallback() {
+    gAssets = {
+        date: new Date().toLocaleDateString('zh-TW'),
+        stock: 1286500,   // 台股總估值（估）
+        vt: 247180,
+        fund: 963297,
+        cash: 5372,
+        husbandRetire: 876792,
+        wifeRetire: 431850,
+        total: 3810991,
+        netWorth: 3810991 - MORTGAGE,
+        progress: ((3810991 - MORTGAGE) / RETIRE_TARGET * 100).toFixed(1),
+        distToTarget: RETIRE_TARGET - (3810991 - MORTGAGE)
+    };
+    gAssetHistory = [gAssets];
+    renderAllAsset();
+    document.getElementById('last-update').textContent = '⚠️ 離線數據（請重新整理）';
+}
+
+// ═══════════════════════════════════
+// 讀取記帳記錄
+// 收支記帳欄位：A=日期,B=類型,C=類別,D=說明,E=金額,F=帳戶,G=專案
+// ═══════════════════════════════════
+function parseRecordRow(row) {
+    return {
+        date:    String(row[0] || ''),
+        type:    String(row[1] || ''),
+        cat:     String(row[2] || ''),
+        desc:    String(row[3] || ''),
+        amount:  +row[4] || 0,
+        account: String(row[5] || ''),
+        project: String(row[6] || ''),
+    };
+}
+
+function loadRecords() {
+    jsonp(`${SCRIPT_URL}?type=expense`, (err, data) => {
+        if (err || !data || !data.success) {
+            renderRecentRecords([]);
+            renderExpense([]);
+            renderBudget([]);
+            return;
         }
-    </script>
+        const rows = data.data || [];
+        // 跳過標題列
+        const dataRows = rows.filter(r => r[0] && r[0] !== '日期' && r[1] !== '類型');
+        gRecords = dataRows.map(parseRecordRow)
+                           .filter(r => r.amount > 0)
+                           .reverse(); // 最新的在前
+        renderRecentRecords(gRecords);
+        renderExpense(gRecords);
+        renderBudget(gRecords);
+    });
+}
+
+// ═══════════════════════════════════
+// 記帳提交
+// ═══════════════════════════════════
+function setType(t) {
+    currentType = t;
+    document.getElementById('tb-out').classList.toggle('on', t === '支出');
+    document.getElementById('tb-in').classList.toggle('on', t === '收入');
+
+    // 切換類別選項
+    const catSel = document.getElementById('f-cat');
+    if (t === '收入') {
+        catSel.innerHTML = '<option>薪資</option><option>投資收益</option><option>退休金</option><option>兼職</option><option>其他</option>';
+    } else {
+        catSel.innerHTML = '<option>餐飲</option><option>交通</option><option>購物</option><option>娛樂</option><option>醫療</option><option>房貸</option><option>投資</option><option>其他</option>';
+    }
+}
+
+function submitRecord() {
+    const amt = parseFloat(document.getElementById('f-amount').value);
+    if (!amt || amt <= 0) {
+        showMsg('record-msg', '請輸入有效金額', 'warning'); return;
+    }
+    const btn = document.getElementById('sub-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ 送出中…';
+
+    // Apps Script 用 GET + type=add + data=JSON（不是 POST）
+    const payload = {
+        date:     document.getElementById('f-date').value,
+        type:     currentType,
+        category: document.getElementById('f-cat').value,   // Apps Script 用 category
+        desc:     document.getElementById('f-desc').value || document.getElementById('f-cat').value,
+        amount:   amt,
+        account:  document.getElementById('f-acct').value,
+        project:  '一般'
+    };
+
+    const dataParam = encodeURIComponent(JSON.stringify(payload));
+    jsonp(`${SCRIPT_URL}?type=add&data=${dataParam}`, (err, data) => {
+        btn.disabled = false;
+        btn.textContent = '✔ 記帳';
+
+        if (err) {
+            showMsg('record-msg', `❌ 送出失敗，請重試`, 'warning');
+            return;
+        }
+        if (data && data.success) {
+            showMsg('record-msg', `✅ 記帳成功！${payload.category} NT$${fmt(amt)}`, 'success');
+            document.getElementById('f-amount').value = '';
+            document.getElementById('f-desc').value = '';
+            setTimeout(loadRecords, 1200);
+        } else {
+            showMsg('record-msg', `❌ ${(data && data.error) || '記帳失敗，請重試'}`, 'warning');
+        }
+    });
+}
+
+function showMsg(id, msg, type) {
+    const el = document.getElementById(id);
+    el.style.display = 'block';
+    el.innerHTML = `<div class="alert alert-${type === 'success' ? 'success' : 'warning'}">${msg}</div>`;
+    setTimeout(() => { el.style.display = 'none'; }, 3500);
+}
+
+// ═══════════════════════════════════
+// 渲染：最近記錄
+// ═══════════════════════════════════
+function renderRecentRecords(records) {
+    const el = document.getElementById('recent-records');
+    if (!records.length) {
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t3);font-size:14px">尚無記錄，開始記帳吧！</div>';
+        return;
+    }
+    const rows = records.slice(0, 8).map(r => {
+        const isOut = r.type === '支出';
+        const color = isOut ? 'var(--r)' : 'var(--g)';
+        const sign = isOut ? '-' : '+';
+        return `<div class="list-item">
+            <div class="list-left">
+                <div class="list-title">${r.cat || r.category || '—'}</div>
+                <div class="list-sub">${r.desc || r.description || ''} · ${r.account || ''}</div>
+            </div>
+            <div class="list-right">
+                <div class="list-amount" style="color:${color}">${sign}NT$${fmt(r.amount)}</div>
+                <div class="list-date">${r.date || ''}</div>
+            </div>
+        </div>`;
+    }).join('');
+    el.innerHTML = rows;
+}
+
+// ═══════════════════════════════════
+// 渲染：收支分析
+// ═══════════════════════════════════
+function renderExpense(records) {
+    const now = new Date();
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const monthly = records.filter(r => (r.date || '').startsWith(thisMonth));
+
+    const income = monthly.filter(r => r.type === '收入').reduce((s,r) => s + (+r.amount||0), 0);
+    const expense = monthly.filter(r => r.type === '支出').reduce((s,r) => s + (+r.amount||0), 0);
+    const balance = income - expense;
+
+    document.getElementById('expense-metrics').innerHTML = `
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-label">本月收入</div>
+                <div class="metric-value" style="color:var(--g)">NT$${fmt(income)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">本月支出</div>
+                <div class="metric-value" style="color:var(--r)">NT$${fmt(expense)}</div>
+            </div>
+        </div>
+        <div class="metric" style="margin-bottom:12px">
+            <div class="metric-label">結餘</div>
+            <div class="metric-value" style="color:${balance>=0?'var(--g)':'var(--r)'}">
+                ${balance>=0?'+':''} NT$${fmt(Math.abs(balance))}
+            </div>
+        </div>
+        <div class="progress-label">
+            <span>支出率</span>
+            <span>${income > 0 ? Math.round(expense/income*100) : 0}%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width:${income>0?Math.min(100,expense/income*100):0}%;background:${expense>income?'var(--r)':''}"></div>
+        </div>
+    `;
+
+    // 類別圓餅（橫條）
+    const catMap = {};
+    monthly.filter(r=>r.type==='支出').forEach(r => {
+        const c = r.cat || r.category || '其他';
+        catMap[c] = (catMap[c]||0) + (+r.amount||0);
+    });
+    const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+    const colors = ['#2d6a4f','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16'];
+    if (!cats.length) {
+        document.getElementById('expense-cats').innerHTML = '<div style="text-align:center;padding:16px;color:var(--t3);font-size:14px">本月尚無支出記錄</div>';
+    } else {
+        document.getElementById('expense-cats').innerHTML = cats.map(([cat, amt], i) => `
+            <div class="alloc-row">
+                <div class="alloc-label">${cat}</div>
+                <div class="alloc-bar-wrap">
+                    <div class="alloc-bar" style="width:${Math.round(amt/expense*100)}%;background:${colors[i%colors.length]}"></div>
+                </div>
+                <div class="alloc-pct">NT$${fmt(amt)}</div>
+            </div>
+        `).join('');
+    }
+}
+
+// ═══════════════════════════════════
+// 渲染：資產頁面
+// ═══════════════════════════════════
+function renderAllAsset() {
+    if (!gAssets) return;
+    const a = gAssets;
+
+    // 計算淨資產
+    const totalAsset = a.total || (+(a.stock||0) + +(a.vt||0) + +(a.fund||0) + +(a.cash||0) + +(a.husbandRetire||0) + +(a.wifeRetire||0));
+    const netWorth = a.netWorth || (totalAsset - MORTGAGE);
+    const progress = a.progress || (netWorth / RETIRE_TARGET * 100);
+    const dist = a.distToTarget || (RETIRE_TARGET - netWorth);
+
+    document.getElementById('asset-total').innerHTML = `
+        <div class="metric-grid-3">
+            <div class="metric">
+                <div class="metric-label">總資產</div>
+                <div class="metric-value" style="color:var(--t1);font-size:16px">NT$${fmtW(totalAsset)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">淨資產</div>
+                <div class="metric-value" style="color:var(--g);font-size:16px">NT$${fmtW(netWorth)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">負債</div>
+                <div class="metric-value" style="color:var(--r);font-size:16px">NT$${fmtW(MORTGAGE)}</div>
+            </div>
+        </div>
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-label">台股</div>
+                <div class="metric-value" style="font-size:16px">NT$${fmtW(a.stock||0)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">基金</div>
+                <div class="metric-value" style="font-size:16px">NT$${fmtW(a.fund||0)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">美股VT</div>
+                <div class="metric-value" style="font-size:16px">NT$${fmtW(a.vt||0)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">勞退合計</div>
+                <div class="metric-value" style="font-size:16px">NT$${fmtW((+(a.husbandRetire||0))+(+(a.wifeRetire||0)))}</div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('retire-progress').innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:22px;font-weight:700;color:var(--g)">${parseFloat(progress).toFixed(1)}%</span>
+            <span class="chip chip-green">2032年達成</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100,progress)}%"></div></div>
+        <div class="progress-label">
+            <span>淨資產 NT$${fmtW(netWorth)}</span>
+            <span>目標 NT$${fmtW(RETIRE_TARGET)}</span>
+        </div>
+        <div style="margin-top:12px;text-align:center;font-size:14px;color:var(--t2)">
+            距離目標還差 <strong style="color:var(--ac)">NT$${fmtW(dist)}</strong>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--t3);text-align:center">
+            退休月收入：先生 $25,850 + 彩虹 $23,512 = <strong>$49,362/月</strong>
+        </div>
+    `;
+
+    // 資產配置橫條
+    const items = [
+        { label: '台股', val: +(a.stock||0), color: '#2d6a4f' },
+        { label: '基金', val: +(a.fund||0), color: '#3b82f6' },
+        { label: '美股VT', val: +(a.vt||0), color: '#8b5cf6' },
+        { label: '勞退', val: (+(a.husbandRetire||0))+(+(a.wifeRetire||0)), color: '#f59e0b' },
+        { label: '現金', val: +(a.cash||0), color: '#06b6d4' },
+    ];
+    document.getElementById('asset-alloc').innerHTML = items.map(it => `
+        <div class="alloc-row">
+            <div class="alloc-label">${it.label}</div>
+            <div class="alloc-bar-wrap">
+                <div class="alloc-bar" style="width:${Math.round(it.val/totalAsset*100)}%;background:${it.color}"></div>
+            </div>
+            <div class="alloc-pct">${Math.round(it.val/totalAsset*100)}%</div>
+        </div>
+    `).join('');
+
+    // 同步更新負債 & 健康頁面
+    renderDebt(netWorth, totalAsset);
+    renderHealth(netWorth, totalAsset, progress);
+    renderTrend();
+}
+
+// ═══════════════════════════════════
+// 渲染：趨勢
+// ═══════════════════════════════════
+function renderTrend() {
+    const hist = gAssetHistory;
+    if (!hist.length) {
+        document.getElementById('trend-chart').innerHTML = '<div style="text-align:center;padding:20px;color:var(--t3)">資產歷史數據不足</div>';
+        return;
+    }
+
+    // 繪製 Canvas 折線圖
+    const w = 360, h = 180;
+    const vals = hist.map(r => +(r.netWorth || r.total || 0));
+    const dates = hist.map(r => r.date || '');
+    const minV = Math.min(...vals) * 0.95;
+    const maxV = Math.max(...vals) * 1.02;
+
+    const pts = vals.map((v, i) => ({
+        x: 30 + (i / Math.max(vals.length-1,1)) * (w - 50),
+        y: h - 30 - ((v - minV) / (maxV - minV)) * (h - 50)
+    }));
+
+    const pathD = pts.map((p,i) => `${i===0?'M':'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const fillD = pathD + ` L ${pts[pts.length-1].x.toFixed(1)} ${(h-30)} L 30 ${(h-30)} Z`;
+
+    document.getElementById('trend-chart').innerHTML = `
+        <div class="chart-wrap">
+            <svg width="100%" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#2d6a4f" stop-opacity="0.3"/>
+                        <stop offset="100%" stop-color="#2d6a4f" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <path d="${fillD}" fill="url(#grad)"/>
+                <path d="${pathD}" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                ${pts.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="#2d6a4f"/>`).join('')}
+                <text x="14" y="${(h-30)}" font-size="10" fill="#718096">NT$${fmtW(minV)}</text>
+                <text x="14" y="20" font-size="10" fill="#718096">NT$${fmtW(maxV)}</text>
+                ${dates.length > 1 ? `
+                    <text x="30" y="${h-8}" font-size="9" fill="#718096">${dates[0]?.slice(5)||''}</text>
+                    <text x="${w-50}" y="${h-8}" font-size="9" fill="#718096" text-anchor="end">${dates[dates.length-1]?.slice(5)||''}</text>
+                ` : ''}
+            </svg>
+        </div>
+        <div style="text-align:center;font-size:12px;color:var(--t3);margin-top:4px">淨資產成長軌跡</div>
+    `;
+
+    // 歷史表格
+    const tableRows = [...hist].reverse().slice(0, 6).map(r => {
+        const nw = +(r.netWorth || r.total || 0);
+        return `<div class="list-item">
+            <div class="list-left">
+                <div class="list-title">${r.date || '—'}</div>
+            </div>
+            <div class="list-right">
+                <div class="list-amount" style="color:var(--g)">NT$${fmtW(nw)}</div>
+                <div class="list-date">${r.progress || (nw/RETIRE_TARGET*100).toFixed(1)}%</div>
+            </div>
+        </div>`;
+    }).join('');
+    document.getElementById('trend-table').innerHTML = tableRows || '<div style="color:var(--t3);text-align:center;padding:16px">暫無歷史數據</div>';
+}
+
+// ═══════════════════════════════════
+// 渲染：負債
+// ═══════════════════════════════════
+function renderDebt(netWorth, totalAsset) {
+    const pct = (MORTGAGE / totalAsset * 100).toFixed(1);
+    document.getElementById('debt-pct').textContent = pct + '%';
+    document.getElementById('debt-balance').textContent = 'NT$' + fmt(MORTGAGE);
+    document.getElementById('debt-ratio2').textContent = pct + '%';
+    const good = pct < 30;
+    document.getElementById('debt-status-label').textContent = good ? '🟢 健康水準' : '🟡 注意';
+}
+
+// ═══════════════════════════════════
+// 渲染：預算
+// ═══════════════════════════════════
+function renderBudget(records) {
+    const now = new Date();
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const monthly = records.filter(r => r.type === '支出' && (r.date||'').startsWith(thisMonth));
+
+    // 合計支出
+    const totalBudget = BUDGETS.reduce((s,b) => s+b.budget, 0);
+    const totalSpent = monthly.reduce((s,r) => s+(+r.amount||0), 0);
+    const pct = totalBudget > 0 ? Math.round(totalSpent/totalBudget*100) : 0;
+
+    document.getElementById('budget-alert-area').innerHTML = `
+        <div class="alert ${pct > 80 ? 'alert-warning' : 'alert-success'}" style="margin-bottom:14px">
+            <strong>${now.getMonth()+1}月預算執行</strong><br>
+            總支出 NT$${fmt(totalSpent)} / 預算 NT$${fmt(totalBudget)}（${pct}%）
+        </div>
+    `;
+
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    const dayOfMonth = now.getDate();
+    const monthlyAdv = Math.round(totalBudget / daysInMonth);
+
+    document.getElementById('budget-rows').innerHTML = BUDGETS.map(b => {
+        const spent = monthly.filter(r => (r.cat||r.category||'') === b.name).reduce((s,r) => s+(+r.amount||0), 0);
+        const bpct = Math.min(100, b.budget > 0 ? spent/b.budget*100 : 0);
+        const color = bpct > 90 ? 'var(--r)' : bpct > 70 ? 'var(--y)' : 'var(--g)';
+        return `<div class="budget-row">
+            <div class="budget-row-top">
+                <span class="budget-name">${b.icon} ${b.name}</span>
+                <span class="budget-nums">NT$${fmt(spent)} / NT$${fmt(b.budget)}</span>
+            </div>
+            <div class="budget-mini-bar">
+                <div class="budget-mini-fill" style="width:${bpct}%;background:${color}"></div>
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('budget-advice').innerHTML =
+        `• 建議日均花費：NT$${fmt(monthlyAdv)}<br>
+         • 今日已過 ${dayOfMonth}/${daysInMonth} 天（${Math.round(dayOfMonth/daysInMonth*100)}%）<br>
+         • ${pct > 80 ? '⚠️ 支出偏高，建議緊縮非必要開銷' : '✅ 預算控制良好，繼續保持'}`;
+}
+
+// ═══════════════════════════════════
+// 渲染：財務健康
+// ═══════════════════════════════════
+function renderHealth(netWorth, totalAsset, progress) {
+    const debtPct = MORTGAGE / totalAsset * 100;
+    const investPct = (totalAsset - MORTGAGE * 0 - 5372) / totalAsset * 100; // 近似
+
+    // 評分算法
+    let score = 0;
+    score += debtPct < 20 ? 25 : debtPct < 35 ? 15 : 5;
+    score += progress > 50 ? 25 : progress > 30 ? 15 : 8;
+    score += netWorth > 3000000 ? 20 : netWorth > 1000000 ? 12 : 5;
+    score += 15; // 投資分散加分
+    score = Math.min(100, Math.round(score));
+
+    const grade = score >= 85 ? '財務狀況優秀 🌟' : score >= 70 ? '財務狀況良好 ✅' : score >= 55 ? '財務待改善 ⚠️' : '需要重視 🚨';
+    const gradeColor = score >= 85 ? 'var(--g)' : score >= 70 ? 'var(--ac)' : 'var(--y)';
+
+    document.getElementById('score-num').textContent = score;
+    document.getElementById('score-grade').innerHTML = `<span style="color:${gradeColor}">${grade}</span>`;
+    document.getElementById('score-circle').style.background =
+        `conic-gradient(var(--g) ${score}%, #e2e8f0 ${score}%)`;
+
+    document.getElementById('hm-debt').textContent = debtPct.toFixed(1) + '%';
+    document.getElementById('hm-retire').textContent = parseFloat(progress).toFixed(1) + '%';
+
+    document.getElementById('ev-debt').innerHTML = debtPct < 25 ? '<span style="color:var(--g);font-weight:600">🟢 優秀</span>' : '<span style="color:var(--y);font-weight:600">🟡 尚可</span>';
+    document.getElementById('ev-retire').innerHTML = progress > 50 ? '<span style="color:var(--g);font-weight:600">🟢 良好</span>' : '<span style="color:var(--y);font-weight:600">🟡 努力中</span>';
+    document.getElementById('ev-cash').innerHTML = '<span style="color:var(--y);font-weight:600">🟡 偏低</span>';
+
+    document.getElementById('health-warn').innerHTML = `
+        ⚠️ <strong>風險提醒</strong><br>
+        投資比例偏高，現金佔比僅約 ${(5372/totalAsset*100).toFixed(1)}%。
+        建議轉職過渡期間增加現金緩衝至少 $300,000（6個月生活費）。
+    `;
+}
+
+// ═══════════════════════════════════
+// 工具函數
+// ═══════════════════════════════════
+function swPg(page) {
+    document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+    document.querySelectorAll('.bitem').forEach(b => b.classList.remove('on'));
+    document.getElementById('pg-' + page).classList.add('on');
+    document.getElementById('b-' + page).classList.add('on');
+}
+
+function fmt(n) {
+    return Number(n).toLocaleString('zh-TW');
+}
+
+function fmtW(n) {
+    n = +n;
+    if (n >= 10000000) return (n/10000000).toFixed(2) + '千萬';
+    if (n >= 1000000) return (n/1000000).toFixed(2) + '百萬';
+    if (n >= 10000) return (n/10000).toFixed(1) + '萬';
+    return fmt(n);
+}
+
+function updateTimestamp() {
+    const now = new Date();
+    document.getElementById('last-update').textContent =
+        `更新：${now.toLocaleDateString('zh-TW')} ${now.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'})}`;
+}
+</script>
 </body>
 </html>
