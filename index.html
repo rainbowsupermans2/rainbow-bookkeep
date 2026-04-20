@@ -321,12 +321,13 @@
                 <div class="form-row" style="margin:0">
                     <label>帳戶</label>
                     <select id="f-acct">
-                        <optgroup label="💳 銀行帳戶">
-                            <option>玉山台幣</option>
-                            <option>玉山日幣</option>
-                            <option>富邦美元</option>
-                            <option>LINE Bank</option>
+                        <optgroup label="🏦 銀行帳戶">
                             <option>現金</option>
+                            <option>富邦銀行</option>
+                            <option>玉山日幣</option>
+                            <option>玉山台幣</option>
+                            <option>LINE Bank</option>
+                            <option>Suica（日幣）</option>
                         </optgroup>
                         <optgroup label="💳 信用卡">
                             <option>富邦信用卡</option>
@@ -559,13 +560,17 @@ const RETIRE_TARGET = 12380000;
 const MORTGAGE = 1530000;  // 房貸餘額（可手動更新）
 
 // 預算設定（每月）
+// fixed:true = 固定支出，直接顯示預算金額；false = 從記帳記錄抓實際數字
 const BUDGETS = [
-    { name: '房貸還款', budget: 50000, icon: '🏠' },
-    { name: '生活費',   budget: 30000, icon: '🛒' },
-    { name: '投資',     budget: 20000, icon: '📈' },
-    { name: '餐飲',     budget: 15000, icon: '🍽' },
-    { name: '交通',     budget: 8000,  icon: '🚌' },
-    { name: '醫療',     budget: 5000,  icon: '💊' },
+    { name: '房貸還款', budget: 15515, icon: '🏠', fixed: true  },  // 固定 NT$15,515
+    { name: '保險費',   budget: 9494,  icon: '🛡', fixed: true  },  // 彩虹4,559 + 先生4,935（年繳分攤）
+    { name: '投資',     budget: 35000, icon: '📈', fixed: true  },  // 正常月份 NT$35,000
+    { name: '生活費',   budget: 30000, icon: '🛒', fixed: false },
+    { name: '伙食費',   budget: 15000, icon: '🍱', fixed: false },  // 含買菜+外食
+    { name: '水電費',   budget: 2000,  icon: '💡', fixed: false },
+    { name: '手機費',   budget: 1098,  icon: '📱', fixed: true  },  // 彩虹599 + 先生499
+    { name: '交通',     budget: 3000,  icon: '🚌', fixed: false },
+    { name: '醫療',     budget: 3000,  icon: '💊', fixed: false },
 ];
 
 // ═══════════════════════════════════
@@ -721,7 +726,7 @@ function setType(t) {
     if (t === '收入') {
         catSel.innerHTML = '<option>薪資</option><option>投資收益</option><option>退休金</option><option>兼職</option><option>其他</option>';
     } else {
-        catSel.innerHTML = '<option>餐飲</option><option>交通</option><option>購物</option><option>娛樂</option><option>醫療</option><option>房貸</option><option>投資</option><option>其他</option>';
+        catSel.innerHTML = '<option>伙食費</option><option>交通</option><option>購物</option><option>娛樂</option><option>醫療</option><option>房貸</option><option>投資</option><option>保險費</option><option>水電費</option><option>手機費</option><option>其他</option>';
     }
 }
 
@@ -927,22 +932,39 @@ function renderAllAsset() {
     `;
 
     // 資產配置橫條
+    // 若 Sheets 未分項儲存，以 totalAsset 做估算提示
+    const stockVal  = +(a.stock||0);
+    const fundVal   = +(a.fund||0);
+    const vtVal     = +(a.vt||0);
+    const retireVal = (+(a.husbandRetire||0)) + (+(a.wifeRetire||0));
+    const cashVal   = +(a.cash||0);
+    const sumParts  = stockVal + fundVal + vtVal + retireVal + cashVal;
+
+    // 若分項加總為 0（Sheets 只存總額），顯示說明
+    const allocBase = sumParts > 0 ? sumParts : totalAsset;
+    const noDetail  = sumParts === 0;
+
     const items = [
-        { label: '台股', val: +(a.stock||0), color: '#2d6a4f' },
-        { label: '基金', val: +(a.fund||0), color: '#3b82f6' },
-        { label: '美股VT', val: +(a.vt||0), color: '#8b5cf6' },
-        { label: '勞退', val: (+(a.husbandRetire||0))+(+(a.wifeRetire||0)), color: '#f59e0b' },
-        { label: '現金', val: +(a.cash||0), color: '#06b6d4' },
+        { label: '台股',   val: stockVal,  color: '#2d6a4f' },
+        { label: '基金',   val: fundVal,   color: '#3b82f6' },
+        { label: '美股VT', val: vtVal,     color: '#8b5cf6' },
+        { label: '勞退',   val: retireVal, color: '#f59e0b' },
+        { label: '現金',   val: cashVal,   color: '#06b6d4' },
     ];
-    document.getElementById('asset-alloc').innerHTML = items.map(it => `
-        <div class="alloc-row">
-            <div class="alloc-label">${it.label}</div>
-            <div class="alloc-bar-wrap">
-                <div class="alloc-bar" style="width:${Math.round(it.val/totalAsset*100)}%;background:${it.color}"></div>
+    document.getElementById('asset-alloc').innerHTML = (noDetail
+        ? '<div class="alert alert-info" style="font-size:13px">⚠️ Sheets 資產記錄分項（台股/基金/VT）尚未填入，<br>目前僅顯示總資產。請執行 update_assets.py 更新。</div>'
+        : items.map(it => {
+            const pct = allocBase > 0 ? Math.round(it.val / allocBase * 100) : 0;
+            return `<div class="alloc-row">
+                <div class="alloc-label">${it.label}</div>
+                <div class="alloc-bar-wrap">
+                    <div class="alloc-bar" style="width:${pct}%;background:${it.color}"></div>
+                </div>
+                <div class="alloc-pct">${pct}%</div>
             </div>
-            <div class="alloc-pct">${Math.round(it.val/totalAsset*100)}%</div>
-        </div>
-    `).join('');
+            <div style="font-size:11px;color:var(--t3);text-align:right;margin:-6px 0 8px">NT$${fmtW(it.val)}</div>`;
+          }).join('')
+    );
 
     // 同步更新負債 & 健康頁面
     renderDebt(netWorth, totalAsset);
@@ -1051,13 +1073,24 @@ function renderBudget(records) {
     const monthlyAdv = Math.round(totalBudget / daysInMonth);
 
     document.getElementById('budget-rows').innerHTML = BUDGETS.map(b => {
-        const spent = monthly.filter(r => (r.cat||r.category||'') === b.name).reduce((s,r) => s+(+r.amount||0), 0);
+        let spent;
+        if (b.fixed) {
+            // 固定支出（房貸/投資）直接顯示預算金額
+            spent = b.budget;
+        } else {
+            // 從本月記帳記錄比對類別
+            spent = monthly.filter(r => {
+                const cat = (r.cat || r.category || '');
+                return cat === b.name || cat.includes(b.name) || b.name.includes(cat);
+            }).reduce((s,r) => s+(+r.amount||0), 0);
+        }
         const bpct = Math.min(100, b.budget > 0 ? spent/b.budget*100 : 0);
-        const color = bpct > 90 ? 'var(--r)' : bpct > 70 ? 'var(--y)' : 'var(--g)';
+        const color = bpct >= 100 ? 'var(--r)' : bpct > 80 ? 'var(--y)' : 'var(--g)';
+        const fixedTag = b.fixed ? '<span style="font-size:10px;color:var(--t3);margin-left:4px">固定</span>' : '';
         return `<div class="budget-row">
             <div class="budget-row-top">
-                <span class="budget-name">${b.icon} ${b.name}</span>
-                <span class="budget-nums">NT$${fmt(spent)} / NT$${fmt(b.budget)}</span>
+                <span class="budget-name">${b.icon} ${b.name}${fixedTag}</span>
+                <span class="budget-nums" style="color:${color}">NT$${fmt(spent)} / NT$${fmt(b.budget)}</span>
             </div>
             <div class="budget-mini-bar">
                 <div class="budget-mini-fill" style="width:${bpct}%;background:${color}"></div>
