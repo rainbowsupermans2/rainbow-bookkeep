@@ -1310,16 +1310,28 @@ function fmtW(n) {
     return fmt(n);
 }
 
-// 日期格式化：處理 ISO 字串（如 2026-04-19T16:00:00.000Z）→ 只取日期部分
+// 日期格式化：處理 ISO 字串（如 2026-04-19T16:00:00.000Z）→ 台灣時區日期
 function fmtDate(raw) {
     if (!raw) return '';
     const s = String(raw);
-    // 若是 ISO 字串，取 T 之前的部分
-    const dateOnly = s.includes('T') ? s.split('T')[0] : s;
-    // 嘗試轉成 YYYY/M/D 格式
-    const m = dateOnly.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    // ISO 字串：用 Date 物件轉換為台灣時間（UTC+8）
+    if (s.includes('T')) {
+        try {
+            const d = new Date(s);
+            // toLocaleDateString 依瀏覽器時區，但用 Asia/Taipei 強制指定
+            return d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei',
+                year: 'numeric', month: 'numeric', day: 'numeric' });
+        } catch(e) {
+            // fallback：直接取 T 前的日期部分加8小時
+            const dateOnly = s.split('T')[0];
+            const m = dateOnly.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (m) return `${m[1]}/${parseInt(m[2])}/${parseInt(m[3])}`;
+        }
+    }
+    // 一般格式 YYYY-MM-DD 或 YYYY/M/D
+    const m = s.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
     if (m) return `${m[1]}/${parseInt(m[2])}/${parseInt(m[3])}`;
-    return dateOnly;
+    return s;
 }
 
 function updateTimestamp() {
