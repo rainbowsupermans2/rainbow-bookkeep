@@ -535,90 +535,86 @@
         </div>
     </div>
 
-    <!-- ⑧ 東京旅遊 5/16-5/22 -->
+    <!-- ⑧ 旅遊記帳（多專案・多幣別） -->
     <div class="pg" id="pg-tokyo">
 
+        <!-- 專案切換 -->
+        <div class="type-switch" style="margin-bottom:12px">
+            <button class="type-btn on" id="trip-btn-JP2026" onclick="switchTrip('JP2026')">🎠 東京</button>
+            <button class="type-btn" id="trip-btn-PH2026" onclick="switchTrip('PH2026')">🏝 薄荷島</button>
+        </div>
+
         <!-- 旅程標題卡 -->
-        <div class="card" style="background:linear-gradient(135deg,#c0392b,#e74c3c);color:white;text-align:center;padding:20px">
-            <div style="font-size:22px;margin-bottom:4px">🎠 東京迪士尼慶生之旅</div>
-            <div style="font-size:13px;opacity:.9">2026年5月16日 — 5月22日・帶小公主慶祝四歲生日 🎂👸</div>
-            <div style="margin-top:12px;display:flex;justify-content:center;gap:20px">
+        <div class="card" id="trip-header-card" style="color:white;text-align:center;padding:18px;background:linear-gradient(135deg,#c0392b,#e74c3c)">
+            <div style="font-size:19px;font-weight:700;margin-bottom:3px" id="trip-title">🎠 東京迪士尼慶生之旅</div>
+            <div style="font-size:12px;opacity:.9" id="trip-subtitle">2026/5/16–5/22・帶小公主慶祝四歲生日 🎂👸</div>
+            <div style="margin-top:12px;display:flex;justify-content:center;gap:16px">
                 <div>
-                    <div style="font-size:11px;opacity:.8">行程天數</div>
-                    <div style="font-size:20px;font-weight:700">7天</div>
+                    <div style="font-size:10px;opacity:.8">匯率</div>
+                    <div style="font-size:16px;font-weight:700" id="jp-rate-display">…</div>
                 </div>
                 <div>
-                    <div style="font-size:11px;opacity:.8">日圓現金匯率</div>
-                    <div style="font-size:20px;font-weight:700" id="jp-rate-display">…</div>
+                    <div style="font-size:10px;opacity:.8">已花（台幣）</div>
+                    <div style="font-size:16px;font-weight:700" id="trip-total-twd">NT$0</div>
                 </div>
                 <div>
-                    <div style="font-size:11px;opacity:.8">本次已花</div>
-                    <div style="font-size:20px;font-weight:700" id="trip-total-jpy">¥0</div>
+                    <div style="font-size:10px;opacity:.8">預算進度</div>
+                    <div style="font-size:16px;font-weight:700" id="trip-budget-pct">0%</div>
                 </div>
+            </div>
+            <!-- 預算進度條 -->
+            <div style="margin-top:10px;background:rgba(255,255,255,0.3);border-radius:4px;height:6px;overflow:hidden">
+                <div id="trip-budget-bar" style="height:100%;border-radius:4px;background:white;transition:width 0.5s;width:0%"></div>
             </div>
         </div>
 
-        <!-- 快速記帳（日幣） -->
+        <!-- 快速記帳 -->
         <div class="card">
-            <div class="ctitle">🌸 日幣記帳</div>
+            <div class="ctitle" id="trip-form-title">🌸 記帳</div>
+
+            <!-- 幣別切換 -->
+            <div id="trip-currency-btns" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
 
             <div class="form-row">
-                <label>日幣金額（¥）</label>
-                <input type="number" id="jp-amount" placeholder="例：1500"
-                       inputmode="numeric" oninput="calcJpyLive()"
+                <label id="trip-amount-label">金額</label>
+                <input type="number" id="jp-amount" placeholder="0"
+                       inputmode="decimal" oninput="calcTripLive()"
                        style="font-size:22px;font-weight:700;text-align:center">
             </div>
-            <div id="jp-convert-box" style="text-align:center;margin:-4px 0 12px;padding:10px;background:var(--jp-light);border-radius:8px;display:none">
+
+            <div id="jp-convert-box" style="text-align:center;margin:-4px 0 12px;padding:10px;border-radius:8px;display:none">
                 <div style="font-size:12px;color:var(--t3)" id="jp-rate-note"></div>
-                <div style="font-size:22px;font-weight:700;color:var(--jp)" id="jp-twd-result">NT$—</div>
+                <div style="font-size:22px;font-weight:700" id="jp-twd-result">NT$—</div>
             </div>
 
             <div class="form-row-2">
                 <div class="form-row" style="margin:0">
                     <label>類別</label>
-                    <select id="jp-cat">
-                        <option>餐飲</option><option>交通</option><option>住宿</option>
-                        <option>購物</option><option>門票景點</option><option>Suica儲值</option>
-                        <option>藥妝零食</option><option>其他</option>
-                    </select>
+                    <select id="jp-cat"></select>
                 </div>
                 <div class="form-row" style="margin:0">
                     <label>付款</label>
-                    <select id="jp-pay">
-                        <option>現金日幣</option><option>Suica</option>
-                        <option>信用卡</option><option>LINE Pay</option>
-                    </select>
+                    <select id="jp-pay"></select>
                 </div>
             </div>
 
             <div class="form-row">
                 <label>項目說明</label>
-                <input type="text" id="jp-desc" placeholder="例：築地市場海鮮丼">
+                <input type="text" id="jp-desc" placeholder="說明">
             </div>
 
             <div class="form-row">
                 <label>日期</label>
-                <select id="jp-date">
-                    <option value="2026-05-16">5/16（出發）</option>
-                    <option value="2026-05-17">5/17</option>
-                    <option value="2026-05-18">5/18</option>
-                    <option value="2026-05-19">5/19</option>
-                    <option value="2026-05-20">5/20</option>
-                    <option value="2026-05-21">5/21</option>
-                    <option value="2026-05-22">5/22（返台）</option>
-                </select>
+                <select id="jp-date"></select>
             </div>
 
-            <button class="btn-primary" id="jp-sub-btn" onclick="submitTravelRecord()"
-                    style="background:linear-gradient(135deg,#c0392b,#e74c3c)">
-                🌸 記帳
-            </button>
+            <button class="btn-primary" id="jp-sub-btn" onclick="submitTravelRecord()">🌸 記帳</button>
             <div id="jp-msg" style="display:none;margin-top:8px"></div>
         </div>
 
-        <!-- 類別統計 -->
+        <!-- 支出分類 -->
         <div class="card">
-            <div class="ctitle">📊 支出分類統計</div>
+            <div class="ctitle">📊 支出分類</div>
             <div id="trip-summary"><div class="loading"><span class="spin">⟳</span></div></div>
         </div>
 
@@ -630,8 +626,7 @@
 
         <div class="card" style="background:#fffbeb">
             <div style="font-size:12px;color:var(--t2);line-height:1.8">
-                💡 <strong>匯率說明</strong>：使用台銀公告現金買入匯率，每次進入分頁自動更新。<br>
-                每筆同時儲存：日幣金額、當下匯率、台幣換算，返台後可完整分析旅費。
+                💡 匯率使用台銀即時公告，每次進入自動更新。台幣直接記帳匯率=1，機票/住宿/地陪費用可直接以台幣記入。
             </div>
         </div>
     </div>
@@ -1285,16 +1280,16 @@ function swPg(page) {
     const btn = document.getElementById('b-' + page);
     btn.classList.add(page === 'tokyo' ? 'on-jp' : 'on');
 
-    // 東京分頁：進入時自動抓匯率＋載入記錄
+    // 旅遊分頁：進入時初始化（switchTrip 內含抓匯率＋載入記錄）
     if (page === 'tokyo') {
-        fetchJpyRate();
-        loadTravelRecords();
-        // 若在旅遊期間則選今天的日期
+        switchTrip(currentTrip || 'JP2026');
+        // 若在旅遊期間則自動選今天日期
         const today = new Date().toISOString().slice(0,10);
-        const valid = ['2026-05-16','2026-05-17','2026-05-18',
-                       '2026-05-19','2026-05-20','2026-05-21','2026-05-22'];
-        const sel = document.getElementById('jp-date');
-        if (sel && valid.includes(today)) sel.value = today;
+        const sel   = document.getElementById('jp-date');
+        if (sel) {
+            const opts = Array.from(sel.options).map(o => o.value);
+            if (opts.includes(today)) sel.value = today;
+        }
     }
 }
 
@@ -1341,174 +1336,284 @@ function updateTimestamp() {
 }
 
 // ═══════════════════════════════════════════════════════
-// 🗼 東京旅遊 - 日幣記帳模組
+// 🌏 旅遊記帳模組（多專案・多幣別・預算追蹤）
 // ═══════════════════════════════════════════════════════
 
-let jpyRate = 0;
-let travelRecords = [];
+// 專案設定
+const TRIP_PROJECTS = {
+    JP2026: {
+        name: '🎠 東京迪士尼慶生之旅',
+        subtitle: '2026/5/16–5/22・帶小公主慶祝四歲生日 🎂👸',
+        gradient: 'linear-gradient(135deg,#c0392b,#e74c3c)',
+        color: '#c0392b', light: '#fff0ef',
+        budget: 100000,   // 台幣總預算
+        currencies: ['JPY','TWD'],
+        defaultCurrency: 'JPY',
+        dates: ['2026-05-16','2026-05-17','2026-05-18','2026-05-19','2026-05-20','2026-05-21','2026-05-22'],
+        dateLabels: ['5/16 出發','5/17','5/18','5/19','5/20','5/21','5/22 返台'],
+        cats: ['餐飲','交通','住宿','購物','門票景點','Suica儲值','藥妝零食','機票','地陪費','其他'],
+        pays: ['現金日幣','Suica','信用卡','LINE Pay','台幣預付'],
+    },
+    PH2026: {
+        name: '🏝 薄荷島之旅',
+        subtitle: '日期待定・菲律賓薄荷島',
+        gradient: 'linear-gradient(135deg,#0e6494,#1a8fc1)',
+        color: '#0e6494', light: '#e8f4fc',
+        budget: 80000,
+        currencies: ['PHP','TWD','USD'],
+        defaultCurrency: 'PHP',
+        dates: [],
+        dateLabels: [],
+        cats: ['餐飲','交通','住宿','購物','門票景點','水上活動','伴手禮','機票','其他'],
+        pays: ['現金菲幣','信用卡','台幣預付'],
+    }
+};
 
-// ── 抓取台銀現金匯率（日圓） ──
-function fetchJpyRate() {
-    document.getElementById('jp-rate-display').textContent = '更新中…';
-    // 主要：台銀 rter.info API  →  TWDJPY = 1 TWD = X JPY
-    jsonp('https://tw.rter.info/capi.php?t=now&q=JPY', (err, data) => {
-        if (!err && data) {
-            // 格式: {"TWDJPY":{"Exrate":4.45,...}}
-            const key = Object.keys(data).find(k => k.includes('JPY'));
-            if (key) {
-                const exrate = parseFloat(data[key].Exrate || data[key].exrate || 0);
-                if (exrate > 0) {
-                    // exrate = 1 TWD = exrate JPY → 1 JPY = 1/exrate TWD
-                    jpyRate = +(1 / exrate).toFixed(4);
-                    document.getElementById('jp-rate-display').textContent =
-                        `¥100 = NT$${(jpyRate * 100).toFixed(2)}`;
-                    return;
-                }
-            }
-        }
-        // 備用：固定值（近期台銀現金買入約 0.2150）
-        jpyRate = 0.2150;
-        document.getElementById('jp-rate-display').textContent =
-            `¥100 ≈ NT$${(jpyRate * 100).toFixed(2)} (備用)`;
-    });
+let currentTrip     = 'JP2026';
+let currentCurrency = 'JPY';
+let tripRates       = { JPY: 0, PHP: 0, USD: 0, TWD: 1 };
+let travelRecords   = [];
+
+// 幣別符號
+const CUR_SYMBOLS = { JPY:'¥', PHP:'₱', USD:'$', TWD:'NT$' };
+
+// ── 切換專案 ──
+function switchTrip(code) {
+    currentTrip = code;
+    const proj  = TRIP_PROJECTS[code];
+
+    // 切換按鈕
+    document.querySelectorAll('[id^="trip-btn-"]').forEach(b => b.classList.remove('on'));
+    document.getElementById('trip-btn-' + code).classList.add('on');
+
+    // 標題卡
+    document.getElementById('trip-header-card').style.background = proj.gradient;
+    document.getElementById('trip-title').textContent    = proj.name;
+    document.getElementById('trip-subtitle').textContent = proj.subtitle;
+
+    // 幣別按鈕
+    const btnNames = { JPY:'🇯🇵 日幣', PHP:'🇵🇭 菲幣', USD:'🇺🇸 美元', TWD:'🇹🇼 台幣' };
+    document.getElementById('trip-currency-btns').innerHTML = proj.currencies.map(c => `
+        <button id="cur-btn-${c}" onclick="setCurrency('${c}')"
+            style="padding:7px 14px;border:2px solid ${proj.color};border-radius:20px;
+                   font-size:13px;font-weight:600;cursor:pointer;background:white;
+                   color:${proj.color};font-family:inherit;transition:all .15s">
+            ${btnNames[c]||c}
+        </button>`).join('');
+
+    // 日期選單
+    const sel = document.getElementById('jp-date');
+    sel.innerHTML = proj.dates.length
+        ? proj.dates.map((d,i) => `<option value="${d}">${proj.dateLabels[i]||d}</option>`).join('')
+        : `<option value="">日期待定</option>`;
+
+    // 下拉選單
+    document.getElementById('jp-cat').innerHTML = proj.cats.map(c=>`<option>${c}</option>`).join('');
+    document.getElementById('jp-pay').innerHTML = proj.pays.map(p=>`<option>${p}</option>`).join('');
+
+    // 記帳按鈕
+    document.getElementById('jp-sub-btn').style.background = proj.gradient;
+    document.getElementById('trip-form-title').textContent = proj.name.replace(/^../,'') + ' 記帳';
+
+    // 預設幣別 + 抓匯率 + 讀記錄
+    setCurrency(proj.defaultCurrency);
+    fetchTripRates();
+    loadTravelRecords();
 }
 
-// ── 即時換算顯示 ──
-function calcJpyLive() {
-    const jpy = parseFloat(document.getElementById('jp-amount').value);
-    const box = document.getElementById('jp-convert-box');
-    if (!jpy || jpy <= 0 || jpyRate <= 0) { box.style.display = 'none'; return; }
+// ── 切換幣別 ──
+function setCurrency(cur) {
+    currentCurrency = cur;
+    const proj = TRIP_PROJECTS[currentTrip];
+    document.querySelectorAll('[id^="cur-btn-"]').forEach(b => {
+        b.style.background = 'white';
+        b.style.color      = proj.color;
+    });
+    const ab = document.getElementById('cur-btn-' + cur);
+    if (ab) { ab.style.background = proj.color; ab.style.color = 'white'; }
 
-    const twd = Math.round(jpy * jpyRate);
-    box.style.display = 'block';
-    document.getElementById('jp-rate-note').textContent =
-        `¥${fmt(jpy)} × ${jpyRate} = `;
-    document.getElementById('jp-twd-result').textContent = `NT$${fmt(twd)}`;
+    const labels = { JPY:'日幣金額（¥）', PHP:'菲幣金額（₱）', USD:'美元金額（$）', TWD:'台幣金額（NT$）' };
+    document.getElementById('trip-amount-label').textContent = labels[cur] || '金額';
+    document.getElementById('jp-amount').value = '';
+    document.getElementById('jp-convert-box').style.display = 'none';
+    updateRateDisplay();
+}
+
+// ── 抓取多幣別匯率 ──
+function fetchTripRates() {
+    document.getElementById('jp-rate-display').textContent = '更新中…';
+    const proj = TRIP_PROJECTS[currentTrip];
+    const needed = proj.currencies.filter(c => c !== 'TWD');
+    if (!needed.length) { tripRates.TWD = 1; updateRateDisplay(); return; }
+
+    let done = 0;
+    needed.forEach(cur => {
+        jsonp(`https://tw.rter.info/capi.php?t=now&q=${cur}`, (err, data) => {
+            if (!err && data) {
+                const key = Object.keys(data).find(k => k.includes(cur));
+                if (key) {
+                    const ex = parseFloat(data[key].Exrate || data[key].exrate || 0);
+                    if (ex > 0) tripRates[cur] = +(1/ex).toFixed(4);
+                }
+            }
+            if (!tripRates[cur]) {
+                tripRates[cur] = { JPY:0.215, PHP:0.57, USD:31.5 }[cur] || 1;
+            }
+            if (++done === needed.length) { updateRateDisplay(); calcTripLive(); }
+        });
+    });
+    tripRates.TWD = 1;
+}
+
+function updateRateDisplay() {
+    const rate = tripRates[currentCurrency] || 0;
+    if (currentCurrency === 'TWD') {
+        document.getElementById('jp-rate-display').textContent = '直接台幣';
+    } else if (rate > 0) {
+        const sym = CUR_SYMBOLS[currentCurrency] || '';
+        document.getElementById('jp-rate-display').textContent = `${sym}100=NT$${(rate*100).toFixed(1)}`;
+    } else {
+        document.getElementById('jp-rate-display').textContent = '…';
+    }
+}
+
+// ── 即時換算 ──
+function calcTripLive() {
+    const amount = parseFloat(document.getElementById('jp-amount').value);
+    const box    = document.getElementById('jp-convert-box');
+    const rate   = tripRates[currentCurrency] || 0;
+    const proj   = TRIP_PROJECTS[currentTrip];
+
+    if (!amount || amount <= 0 || currentCurrency === 'TWD') { box.style.display='none'; return; }
+    if (rate <= 0) { box.style.display='none'; return; }
+
+    const twd = Math.round(amount * rate);
+    const sym = CUR_SYMBOLS[currentCurrency] || '';
+    box.style.display    = 'block';
+    box.style.background = proj.light;
+    document.getElementById('jp-rate-note').textContent         = `${sym}${fmt(amount)} × ${rate} = `;
+    document.getElementById('jp-twd-result').style.color        = proj.color;
+    document.getElementById('jp-twd-result').textContent        = `NT$${fmt(twd)}`;
 }
 
 // ── 提交旅遊記帳 ──
 function submitTravelRecord() {
-    const jpy = parseFloat(document.getElementById('jp-amount').value);
-    if (!jpy || jpy <= 0) { showMsg('jp-msg', '請輸入日幣金額', 'warning'); return; }
-    if (jpyRate <= 0)      { showMsg('jp-msg', '匯率載入中，請稍候', 'warning'); return; }
+    const amount = parseFloat(document.getElementById('jp-amount').value);
+    if (!amount || amount <= 0) { showMsg('jp-msg','請輸入金額','warning'); return; }
+    const rate = tripRates[currentCurrency] || 1;
+    if (currentCurrency !== 'TWD' && rate <= 0) { showMsg('jp-msg','匯率載入中','warning'); return; }
 
     const btn = document.getElementById('jp-sub-btn');
     btn.disabled = true; btn.textContent = '⏳ 送出中…';
 
-    const twd = Math.round(jpy * jpyRate);
-    const desc = document.getElementById('jp-desc').value ||
-                 document.getElementById('jp-cat').value;
+    const twd  = currentCurrency === 'TWD' ? amount : Math.round(amount * rate);
+    const desc = document.getElementById('jp-desc').value || document.getElementById('jp-cat').value;
 
     const payload = {
-        date:    document.getElementById('jp-date').value,
-        item:    desc,                                       // Apps Script: item
-        category:document.getElementById('jp-cat').value,
-        amountJpy: jpy,
-        rate:    jpyRate,
+        date:      document.getElementById('jp-date').value,
+        item:      desc,
+        category:  document.getElementById('jp-cat').value,
+        amount:    amount,
+        currency:  currentCurrency,
+        rate:      currentCurrency === 'TWD' ? 1 : rate,
         amountTwd: twd,
-        payment: document.getElementById('jp-pay').value,
-        note:    `¥${fmt(jpy)} × ${jpyRate} = NT$${fmt(twd)}`
+        payment:   document.getElementById('jp-pay').value,
+        project:   currentTrip,
+        note:      currentCurrency === 'TWD'
+                    ? `NT$${fmt(amount)}（台幣直接記帳）`
+                    : `${CUR_SYMBOLS[currentCurrency]||''}${fmt(amount)} × ${rate} = NT$${fmt(twd)}`
     };
 
     const dataParam = encodeURIComponent(JSON.stringify(payload));
     jsonp(`${SCRIPT_URL}?type=addTravel&data=${dataParam}`, (err, data) => {
-        btn.disabled = false; btn.textContent = '🌸 記帳';
+        btn.disabled = false;
+        btn.textContent = '🌸 記帳';
         if (!err && data && data.success) {
-            showMsg('jp-msg', `✅ NT$${fmt(twd)}（¥${fmt(jpy)}）記錄成功！`, 'success');
+            showMsg('jp-msg', `✅ NT$${fmt(twd)} 記錄成功！`, 'success');
             document.getElementById('jp-amount').value = '';
-            document.getElementById('jp-desc').value = '';
+            document.getElementById('jp-desc').value   = '';
             document.getElementById('jp-convert-box').style.display = 'none';
             setTimeout(loadTravelRecords, 800);
         } else {
-            showMsg('jp-msg', `❌ ${(data && data.error) || '送出失敗，請重試'}`, 'warning');
+            showMsg('jp-msg', `❌ ${(data&&data.error)||'送出失敗'}`, 'warning');
         }
     });
 }
 
-// ── 載入旅遊記帳記錄 ──
+// ── 載入旅遊記錄 ──
+// Apps Script 回傳欄位：0=日期,1=項目,2=類別,3=原始金額,4=幣別,5=匯率,6=台幣換算,7=付款,8=專案,9=備註
 function loadTravelRecords() {
-    jsonp(`${SCRIPT_URL}?type=getTravel`, (err, data) => {
-        if (err || !data || !data.success) {
-            renderTripSummary([]);
-            return;
-        }
-        const rows = data.data || [];
-        travelRecords = rows
+    jsonp(`${SCRIPT_URL}?type=getTravel&project=${currentTrip}`, (err, data) => {
+        if (err || !data || !data.success) { renderTripSummary([]); return; }
+        travelRecords = (data.data||[])
             .filter(r => r[0] && r[0] !== '日期')
             .map(r => ({
-                date:     String(r[0] || ''),
-                item:     String(r[1] || ''),
-                category: String(r[2] || ''),
-                amountJpy:+(r[3] || 0),
-                rate:     +(r[4] || 0),
-                amountTwd:+(r[5] || 0),
-                payment:  String(r[6] || ''),
-                note:     String(r[7] || ''),
+                date:     String(r[0]||''),
+                item:     String(r[1]||''),
+                category: String(r[2]||''),
+                amount:   +(r[3]||0),
+                currency: String(r[4]||'JPY'),
+                rate:     +(r[5]||0),
+                amountTwd:+(r[6]||0),
+                payment:  String(r[7]||''),
+                project:  String(r[8]||''),
             }))
             .filter(r => r.amountTwd > 0);
         renderTripSummary(travelRecords);
     });
 }
 
-// ── 渲染旅遊統計 ──
+// ── 渲染統計 ──
 function renderTripSummary(records) {
-    // 頁頭更新
-    const totalJpy = records.reduce((s,r) => s + r.amountJpy, 0);
-    const totalTwd = records.reduce((s,r) => s + r.amountTwd, 0);
-    document.getElementById('trip-total-jpy').textContent = `¥${fmt(Math.round(totalJpy))}`;
+    const proj      = TRIP_PROJECTS[currentTrip];
+    const totalTwd  = records.reduce((s,r) => s+r.amountTwd, 0);
+    const budgetPct = proj.budget > 0 ? Math.min(100, totalTwd/proj.budget*100) : 0;
+
+    // 更新標題卡數字
+    document.getElementById('trip-total-twd').textContent  = `NT$${fmtW(totalTwd)}`;
+    document.getElementById('trip-budget-pct').textContent = budgetPct.toFixed(1)+'%';
+    document.getElementById('trip-budget-bar').style.width = budgetPct+'%';
+    document.getElementById('trip-budget-bar').style.background =
+        budgetPct >= 90 ? '#ffd700' : 'white';
 
     // 類別統計
     const catMap = {};
     records.forEach(r => {
-        const c = r.category || '其他';
-        if (!catMap[c]) catMap[c] = { jpy: 0, twd: 0 };
-        catMap[c].jpy += r.amountJpy;
-        catMap[c].twd += r.amountTwd;
+        const c = r.category||'其他';
+        catMap[c] = (catMap[c]||0) + r.amountTwd;
     });
-    const cats = Object.entries(catMap).sort((a,b) => b[1].twd - a[1].twd);
-    const colors = ['#c0392b','#e67e22','#3498db','#27ae60','#9b59b6','#1abc9c','#f39c12','#7f8c8d'];
+    const cats   = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+    const colors = [proj.color,'#e67e22','#3498db','#27ae60','#9b59b6','#1abc9c','#f39c12','#e74c3c','#7f8c8d'];
 
-    if (!records.length) {
-        document.getElementById('trip-summary').innerHTML =
-            '<div style="text-align:center;padding:20px;color:var(--t3);font-size:14px">📷 旅程記錄從5/16開始，期待美好旅程！</div>';
-    } else {
-        document.getElementById('trip-summary').innerHTML = `
-            <div style="display:flex;justify-content:space-between;padding:10px;background:#fff0ef;border-radius:8px;margin-bottom:12px">
-                <div style="text-align:center">
-                    <div style="font-size:11px;color:var(--t3)">總消費(日幣)</div>
-                    <div style="font-size:18px;font-weight:700;color:var(--jp)">¥${fmt(Math.round(totalJpy))}</div>
-                </div>
-                <div style="text-align:center">
-                    <div style="font-size:11px;color:var(--t3)">總消費(台幣)</div>
-                    <div style="font-size:18px;font-weight:700;color:var(--jp)">NT$${fmt(totalTwd)}</div>
-                </div>
-                <div style="text-align:center">
-                    <div style="font-size:11px;color:var(--t3)">筆數</div>
-                    <div style="font-size:18px;font-weight:700">${records.length}筆</div>
-                </div>
-            </div>
-            ${cats.map(([cat, v], i) => `
-                <div class="alloc-row">
-                    <div class="alloc-label" style="font-size:12px">${cat}</div>
-                    <div class="alloc-bar-wrap">
-                        <div class="alloc-bar" style="width:${Math.round(v.twd/totalTwd*100)}%;background:${colors[i%colors.length]}"></div>
-                    </div>
-                    <div style="font-size:12px;font-weight:700;width:80px;text-align:right">NT$${fmt(v.twd)}</div>
-                </div>
-            `).join('')}
-        `;
-    }
+    document.getElementById('trip-summary').innerHTML = !records.length
+        ? `<div style="text-align:center;padding:20px;color:var(--t3);font-size:14px">✈️ 旅程開始後在這裡記帳！</div>`
+        : `<div style="padding:8px 10px;background:${proj.light};border-radius:8px;margin-bottom:12px;
+                       display:flex;justify-content:space-between">
+               <div style="text-align:center">
+                   <div style="font-size:11px;color:var(--t3)">總消費</div>
+                   <div style="font-size:17px;font-weight:700;color:${proj.color}">NT$${fmt(totalTwd)}</div>
+               </div>
+               <div style="text-align:center">
+                   <div style="font-size:11px;color:var(--t3)">預算</div>
+                   <div style="font-size:17px;font-weight:700">NT$${fmtW(proj.budget)}</div>
+               </div>
+               <div style="text-align:center">
+                   <div style="font-size:11px;color:var(--t3)">筆數</div>
+                   <div style="font-size:17px;font-weight:700">${records.length}筆</div>
+               </div>
+           </div>
+           ${cats.map(([cat,val],i) => `
+               <div class="alloc-row">
+                   <div class="alloc-label" style="font-size:12px">${cat}</div>
+                   <div class="alloc-bar-wrap">
+                       <div class="alloc-bar" style="width:${Math.round(val/totalTwd*100)}%;background:${colors[i%colors.length]}"></div>
+                   </div>
+                   <div style="font-size:12px;font-weight:700;width:80px;text-align:right">NT$${fmt(val)}</div>
+               </div>`).join('')}`;
 
     // 每日明細
     const dayMap = {};
-    records.forEach(r => {
-        if (!dayMap[r.date]) dayMap[r.date] = [];
-        dayMap[r.date].push(r);
-    });
-    const dayLabels = {
-        '2026-05-16':'5/16 出發日','2026-05-17':'5/17','2026-05-18':'5/18',
-        '2026-05-19':'5/19','2026-05-20':'5/20','2026-05-21':'5/21','2026-05-22':'5/22 返台'
-    };
+    records.forEach(r => { (dayMap[r.date]||(dayMap[r.date]=[])).push(r); });
 
     if (!Object.keys(dayMap).length) {
         document.getElementById('trip-daily').innerHTML =
@@ -1519,31 +1624,31 @@ function renderTripSummary(records) {
     document.getElementById('trip-daily').innerHTML = Object.entries(dayMap)
         .sort((a,b) => a[0].localeCompare(b[0]))
         .map(([date, dayRecs]) => {
-            const dayTwd = dayRecs.reduce((s,r) => s + r.amountTwd, 0);
-            const dayJpy = dayRecs.reduce((s,r) => s + r.amountJpy, 0);
-            return `
-                <div style="margin-bottom:12px">
-                    <div style="display:flex;justify-content:space-between;font-weight:700;font-size:14px;
-                                padding:6px 8px;background:#fff0ef;border-radius:6px;margin-bottom:6px">
-                        <span>🗓 ${dayLabels[date]||date}</span>
-                        <span style="color:var(--jp)">¥${fmt(Math.round(dayJpy))} / NT$${fmt(dayTwd)}</span>
-                    </div>
-                    ${dayRecs.map(r => `
-                        <div class="list-item">
-                            <div class="list-left">
-                                <div class="list-title">${r.item||r.category}</div>
-                                <div class="list-sub">${r.category} · ${r.payment}</div>
-                            </div>
-                            <div class="list-right">
-                                <div class="list-amount" style="color:var(--jp)">¥${fmt(Math.round(r.amountJpy))}</div>
-                                <div class="list-date">NT$${fmt(r.amountTwd)}</div>
-                            </div>
-                        </div>
-                    `).join('')}
+            const dayTwd = dayRecs.reduce((s,r) => s+r.amountTwd, 0);
+            return `<div style="margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;font-weight:700;font-size:14px;
+                            padding:6px 8px;background:${proj.light};border-radius:6px;margin-bottom:6px">
+                    <span>🗓 ${fmtDate(date)}</span>
+                    <span style="color:${proj.color}">NT$${fmt(dayTwd)}</span>
                 </div>
-            `;
+                ${dayRecs.map(r => {
+                    const sym  = CUR_SYMBOLS[r.currency]||'';
+                    const orig = r.currency !== 'TWD' ? `${sym}${fmt(Math.round(r.amount))}` : '';
+                    return `<div class="list-item">
+                        <div class="list-left">
+                            <div class="list-title">${r.item||r.category}</div>
+                            <div class="list-sub">${r.category} · ${r.payment}${orig?' · '+orig:''}</div>
+                        </div>
+                        <div class="list-right">
+                            <div class="list-amount" style="color:${proj.color}">NT$${fmt(r.amountTwd)}</div>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>`;
         }).join('');
 }
+
+
 </script>
 </body>
 </html>
