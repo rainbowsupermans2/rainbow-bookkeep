@@ -6,31 +6,32 @@
     <title>彩虹超人CFO財務管理</title>
     <style>
         :root {
-            --bg: #f8f6f0;
+            --bg: #f0f8f8;           /* 淡青白底色（圖一氛圍改為青調） */
             --card: #ffffff;
-            --border: #e2ddd4;
-            --t1: #2d3748;
-            --t2: #4a5568;
-            --t3: #718096;
-            --ac: #2d6a4f;
-            --g: #1a7a4a;
-            --r: #c0392b;
-            --y: #d97706;
-            --jp: #c0392b;      /* 日本紅 */
-            --jp-light: #fff0ef;
-            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --border: #cce8e8;       /* 帶青調的邊框 */
+            --t1: #0d3d40;           /* 深青黑（文字主色） */
+            --t2: #2a6065;           /* 中青（次要文字） */
+            --t3: #5a9099;           /* 淺青灰（輔助文字） */
+            --ac: #018790;           /* 圖二主色：深青綠 */
+            --g:  #00a896;           /* 正值/成功：亮青綠 */
+            --r:  #c0392b;           /* 負值/警示：紅（保留） */
+            --y:  #d97706;           /* 黃色警示 */
+            --jp: #b85c75;           /* 旅遊櫻花粉 */
+            --jp-light: #fdf0f3;
+            --shadow: 0 2px 12px rgba(1,135,144,0.10);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
+            background: linear-gradient(180deg, #e0f4f4 0%, #f0f8f8 30%, #f6fbfb 100%);
+            min-height: 100vh;
             color: var(--t1);
             line-height: 1.5;
             overflow-x: hidden;
         }
         .container { max-width: 420px; margin: 0 auto; position: relative; padding-bottom: 116px; }
         .header {
-            background: linear-gradient(135deg, var(--ac), var(--g));
+            background: linear-gradient(135deg, #0a5c66, #018790, #00a896);
             color: white;
             padding: 18px 16px 14px;
             text-align: center;
@@ -59,12 +60,12 @@
 
         /* Cards */
         .card {
-            background: var(--card);
-            border-radius: 12px;
+            background: rgba(255,255,255,0.92);
+            border-radius: 14px;
             padding: 18px;
             margin-bottom: 14px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(1,135,144,0.08);
+            border: 1px solid rgba(0,168,150,0.15);
         }
         .ctitle {
             font-size: 15px;
@@ -90,18 +91,18 @@
 
         /* Progress */
         .progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin: 8px 0; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--g), var(--ac)); border-radius: 5px; transition: width 0.6s ease; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #018790, #00c9b1); border-radius: 5px; transition: width 0.6s ease; }
         .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--t3); }
 
         /* Bottom nav */
         .bnav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: white;
-            border-top: 1px solid var(--border);
+            background: linear-gradient(180deg, #f6fbfb, #edf7f7);
+            border-top: 1px solid rgba(1,135,144,0.18);
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: auto auto;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 12px rgba(1,135,144,0.10);
             z-index: 200;
         }
         .bitem {
@@ -114,16 +115,16 @@
             display: flex; flex-direction: column; align-items: center; gap: 2px;
             -webkit-tap-highlight-color: transparent;
             transition: background 0.15s;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid rgba(1,135,144,0.08);
         }
         /* 第二列不需要底線 */
         .bitem:nth-child(5), .bitem:nth-child(6),
         .bitem:nth-child(7), .bitem:nth-child(8) { border-bottom: none; }
-        .bitem.on { background: #f0fff4; }
-        .bitem.on-jp { background: #fff0ef; }
+        .bitem.on { background: rgba(0,168,150,0.12); }
+        .bitem.on-jp { background: #fdf0f3; }
         .bicon { font-size: 18px; line-height: 1; }
         .blabel { font-size: 10px; color: var(--t3); font-weight: 500; }
-        .bitem.on .blabel { color: var(--g); font-weight: 700; }
+        .bitem.on .blabel { color: var(--ac); font-weight: 700; }
         .bitem.on-jp .blabel { color: var(--jp); font-weight: 700; }
 
         /* Form */
@@ -160,7 +161,7 @@
 
         /* Alerts */
         .alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid; font-size: 14px; }
-        .alert-success { background: #f0fff4; border-color: #bbf7d0; color: #166534; }
+        .alert-success { background: #e8f7f7; border-color: #a0d8d8; color: #0a5c66; }
         .alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
         .alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
         .alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
@@ -203,7 +204,7 @@
             display: flex; align-items: center; justify-content: center;
             flex-direction: column;
         }
-        .score-number { font-size: 26px; font-weight: 700; color: var(--g); }
+        .score-number { font-size: 26px; font-weight: 700; color: var(--ac); }
         .score-label { font-size: 11px; color: var(--t3); }
 
         /* Debt bar */
@@ -214,7 +215,7 @@
             margin-bottom: 14px;
             border: 1px solid;
         }
-        .status-good { background: #f0fff4; border-color: #bbf7d0; }
+        .status-good { background: #e8f7f7; border-color: #a0d8d8; }
 
         /* Budget row */
         .budget-row {
@@ -247,7 +248,7 @@
             font-size: 11px;
             font-weight: 600;
         }
-        .chip-green { background: #dcfce7; color: #166534; }
+        .chip-green { background: #d0f0f0; color: #0a5c66; }
         .chip-yellow { background: #fef9c3; color: #854d0e; }
         .chip-red { background: #fee2e2; color: #991b1b; }
 
@@ -1011,12 +1012,12 @@ function renderAllAsset() {
                 <div class="metric-value" style="color:var(--t1);font-size:16px">NT$${fmtW(totalAsset)}</div>
             </div>
             <div class="metric">
-                <div class="metric-label">淨資產</div>
-                <div class="metric-value" style="color:var(--g);font-size:16px">NT$${fmtW(netWorth)}</div>
-            </div>
-            <div class="metric">
                 <div class="metric-label">負債</div>
                 <div class="metric-value" style="color:var(--r);font-size:16px">NT$${fmtW(MORTGAGE)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">淨資產</div>
+                <div class="metric-value" style="color:var(--g);font-size:16px">NT$${fmtW(netWorth)}</div>
             </div>
         </div>
         <div class="metric-grid">
@@ -1344,9 +1345,9 @@ const TRIP_PROJECTS = {
     JP2026: {
         name: '🎠 東京迪士尼慶生之旅',
         subtitle: '2026/5/16–5/22・帶小公主慶祝四歲生日 🎂👸',
-        gradient: 'linear-gradient(135deg,#c0392b,#e74c3c)',
-        color: '#c0392b', light: '#fff0ef',
-        budget: 100000,   // 台幣總預算
+        gradient: 'linear-gradient(135deg, #c9748a, #e8a0b0, #f5c9d4)',
+        color: '#b85c75', light: '#fdf0f3',
+        budget: 100000,
         currencies: ['JPY','TWD'],
         defaultCurrency: 'JPY',
         dates: ['2026-05-16','2026-05-17','2026-05-18','2026-05-19','2026-05-20','2026-05-21','2026-05-22'],
