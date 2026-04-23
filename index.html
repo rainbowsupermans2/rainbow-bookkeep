@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -29,18 +30,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: transparent;
+            background: #e8f6f6;
             min-height: 100vh;
             color: var(--t1);
             line-height: 1.5;
             overflow-x: hidden;
         }
-        .container { max-width: 420px; margin: 0 auto; position: relative; padding-bottom: 116px; background: rgba(230,245,245,0.45); min-height: 100vh; }
+        .container { max-width: 420px; margin: 0 auto; position: relative; padding-bottom: 116px; background: linear-gradient(180deg, #d4eeee 0%, #e8f6f6 40%, #f0fafa 100%); min-height: 100vh; }
         .header {
             background: linear-gradient(135deg, #0a5c66, #018790, #00a896);
             color: white;
-            padding: 18px 16px 14px;
-            text-align: center;
+            padding: 10px 18px 10px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -60,630 +60,629 @@
         }
         .last-update { font-size: 10px; opacity: 0.7; text-align: right; margin-top: 4px; }
 
-        /* Pages */
-        .pg { display: none; padding: 16px; min-height: calc(100vh - 140px); }
-        .pg.on { display: block; }
+```
+    /* Pages */
+    .pg { display: none; padding: 16px; min-height: calc(100vh - 140px); }
+    .pg.on { display: block; }
 
-        /* Cards */
-        .card {
-            background: rgba(255,255,255,0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 14px;
-            box-shadow: 0 2px 16px rgba(1,135,144,0.10);
-            border: 1px solid rgba(255,255,255,0.60);
-        }
-        .ctitle {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--t1);
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    /* Cards */
+    .card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 6px rgba(1,135,144,0.08), 0 0 1px rgba(0,0,0,0.04);
+        border: none;
+    }
+    .ctitle {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--t1);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-        /* Metrics */
-        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-        .metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-        .metric {
-            text-align: center;
-            padding: 14px 10px;
-            background: #f8fafc;
-            border-radius: 8px;
-        }
-        .metric-label { font-size: 11px; color: var(--t3); margin-bottom: 4px; font-weight: 500; }
-        .metric-value { font-size: 18px; font-weight: 700; }
+    /* Metrics */
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .metric {
+        text-align: center;
+        padding: 14px 10px;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+    .metric-label { font-size: 11px; color: var(--t3); margin-bottom: 4px; font-weight: 500; }
+    .metric-value { font-size: 18px; font-weight: 700; }
 
-        /* Progress */
-        .progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin: 8px 0; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #018790, #00c9b1); border-radius: 5px; transition: width 0.6s ease; }
-        .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--t3); }
+    /* Progress */
+    .progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin: 8px 0; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #018790, #00c9b1); border-radius: 5px; transition: width 0.6s ease; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--t3); }
 
-        /* Bottom nav */
-        .bnav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.96);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(1,135,144,0.12);
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: auto auto;
-            box-shadow: 0 -4px 20px rgba(1,135,144,0.08);
-            z-index: 200;
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-        }
-        .bitem {
-            padding: 7px 2px 9px;
-            text-align: center;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-family: inherit;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            -webkit-tap-highlight-color: transparent;
-            transition: all 0.18s ease;
-            border-bottom: 1px solid rgba(1,135,144,0.06);
-            position: relative;
-        }
-        .bitem:nth-child(5), .bitem:nth-child(6),
-        .bitem:nth-child(7), .bitem:nth-child(8) { border-bottom: none; }
-        .bitem.on { background: none; }
-        .bitem.on-jp { background: none; }
-        /* active indicator dot */
-        .bitem.on::after {
-            content: '';
-            position: absolute;
-            bottom: 3px;
-            left: 50%; transform: translateX(-50%);
-            width: 4px; height: 4px;
-            border-radius: 50%;
-            background: var(--ac);
-        }
-        .bitem.on-jp::after {
-            content: '';
-            position: absolute;
-            bottom: 3px;
-            left: 50%; transform: translateX(-50%);
-            width: 4px; height: 4px;
-            border-radius: 50%;
-            background: var(--jp);
-        }
-        .bicon-wrap {
-            width: 44px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 12px;
-            transition: all 0.18s ease;
-        }
-        .bitem.on  .bicon-wrap { background: rgba(1,135,144,0.12); }
-        .bitem.on-jp .bicon-wrap { background: rgba(184,92,117,0.12); }
-        .bicon-wrap svg {
-            width: 22px; height: 22px;
-            stroke: var(--t3);
-            color: var(--t3);
-            fill: none;
-            stroke-width: 1.6;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: stroke 0.18s ease, color 0.18s ease;
-        }
-        .bitem.on  .bicon-wrap svg { stroke: var(--ac); color: var(--ac); }
-        .bitem.on-jp .bicon-wrap svg { stroke: var(--jp); color: var(--jp); }
-        .blabel { font-size: 13px; color: var(--t3); font-weight: 500; letter-spacing: 0.2px; }
-        .bitem.on .blabel { color: var(--ac); font-weight: 700; }
-        .bitem.on-jp .blabel { color: var(--jp); font-weight: 700; }
+    /* Bottom nav */
+    .bnav {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(1,135,144,0.12);
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: auto auto;
+        box-shadow: 0 -4px 20px rgba(1,135,144,0.08);
+        z-index: 200;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .bitem {
+        padding: 7px 2px 9px;
+        text-align: center;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        -webkit-tap-highlight-color: transparent;
+        transition: all 0.18s ease;
+        border-bottom: 1px solid rgba(1,135,144,0.06);
+        position: relative;
+    }
+    .bitem:nth-child(5), .bitem:nth-child(6),
+    .bitem:nth-child(7), .bitem:nth-child(8) { border-bottom: none; }
+    .bitem.on { background: none; }
+    .bitem.on-jp { background: none; }
+    /* active indicator dot */
+    .bitem.on::after {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        left: 50%; transform: translateX(-50%);
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        background: var(--ac);
+    }
+    .bitem.on-jp::after {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        left: 50%; transform: translateX(-50%);
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        background: var(--jp);
+    }
+    .bicon-wrap {
+        width: 44px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 12px;
+        transition: all 0.18s ease;
+    }
+    .bitem.on  .bicon-wrap { background: rgba(1,135,144,0.12); }
+    .bitem.on-jp .bicon-wrap { background: rgba(184,92,117,0.12); }
+    .bicon-wrap svg {
+        width: 22px; height: 22px;
+        stroke: var(--t3);
+        color: var(--t3);
+        fill: none;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: stroke 0.18s ease, color 0.18s ease;
+    }
+    .bitem.on  .bicon-wrap svg { stroke: var(--ac); color: var(--ac); }
+    .bitem.on-jp .bicon-wrap svg { stroke: var(--jp); color: var(--jp); }
+    .blabel { font-size: 13px; color: var(--t3); font-weight: 500; letter-spacing: 0.2px; }
+    .bitem.on .blabel { color: var(--ac); font-weight: 700; }
+    .bitem.on-jp .blabel { color: var(--jp); font-weight: 700; }
 
-        /* Form */
-        .form-row { margin-bottom: 12px; }
-        .form-row label { display: block; font-size: 12px; color: var(--t2); font-weight: 600; margin-bottom: 4px; }
-        .form-row input, .form-row select, .form-row textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid var(--border);
-            border-radius: 8px;
-            font-size: 15px;
-            font-family: inherit;
-            color: var(--t1);
-            background: white;
-            transition: border-color 0.2s;
-        }
-        .form-row input:focus, .form-row select:focus { outline: none; border-color: var(--ac); }
-        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        .btn-primary {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--ac), var(--g));
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .btn-primary:active { opacity: 0.8; }
-        .btn-primary:disabled { opacity: 0.5; }
+    /* Form */
+    .form-row { margin-bottom: 12px; }
+    .form-row label { display: block; font-size: 12px; color: var(--t2); font-weight: 600; margin-bottom: 4px; }
+    .form-row input, .form-row select, .form-row textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-size: 15px;
+        font-family: inherit;
+        color: var(--t1);
+        background: white;
+        transition: border-color 0.2s;
+    }
+    .form-row input:focus, .form-row select:focus { outline: none; border-color: var(--ac); }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--ac), var(--g));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .btn-primary:active { opacity: 0.8; }
+    .btn-primary:disabled { opacity: 0.5; }
 
-        /* Alerts */
-        .alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid; font-size: 14px; }
-        .alert-success { background: #e8f7f7; border-color: #a0d8d8; color: #0a5c66; }
-        .alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
-        .alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
-        .alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+    /* Alerts */
+    .alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid; font-size: 14px; }
+    .alert-success { background: #e8f7f7; border-color: #a0d8d8; color: #0a5c66; }
+    .alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+    .alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
 
-        /* Lists */
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .list-item:last-child { border-bottom: none; }
-        .list-left { display: flex; flex-direction: column; }
-        .list-title { font-size: 17px; font-weight: 600; color: var(--t1); }
-        .list-sub { font-size: 14px; color: var(--t3); margin-top: 2px; }
-        .list-right { text-align: right; }
-        .list-amount { font-size: 18px; font-weight: 700; }
-        .list-date { font-size: 13px; color: var(--t3); margin-top: 2px; }
+    /* Lists */
+    .list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .list-left { display: flex; flex-direction: column; }
+    .list-title { font-size: 17px; font-weight: 600; color: var(--t1); }
+    .list-sub { font-size: 14px; color: var(--t3); margin-top: 2px; }
+    .list-right { text-align: right; }
+    .list-amount { font-size: 18px; font-weight: 700; }
+    .list-date { font-size: 13px; color: var(--t3); margin-top: 2px; }
 
-        /* Health Score */
-        .health-score {
-            text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #f0fff4, #e6fffa);
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-        .score-circle {
-            width: 110px; height: 110px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 12px;
-            position: relative;
-        }
-        .score-inner {
-            width: 82px; height: 82px;
-            background: white;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            flex-direction: column;
-        }
-        .score-number { font-size: 26px; font-weight: 700; color: var(--ac); }
-        .score-label { font-size: 11px; color: var(--t3); }
+    /* Health Score */
+    .health-score {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f0fff4, #e6fffa);
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+    .score-circle {
+        width: 110px; height: 110px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 12px;
+        position: relative;
+    }
+    .score-inner {
+        width: 82px; height: 82px;
+        background: white;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        flex-direction: column;
+    }
+    .score-number { font-size: 26px; font-weight: 700; color: var(--ac); }
+    .score-label { font-size: 11px; color: var(--t3); }
 
-        /* Debt bar */
-        .debt-status {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 14px;
-            border-radius: 8px;
-            margin-bottom: 14px;
-            border: 1px solid;
-        }
-        .status-good { background: #e8f7f7; border-color: #a0d8d8; }
+    /* Debt bar */
+    .debt-status {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 14px;
+        border: 1px solid;
+    }
+    .status-good { background: #e8f7f7; border-color: #a0d8d8; }
 
-        /* Budget row */
-        .budget-row {
-            padding: 11px 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .budget-row:last-child { border-bottom: none; }
-        .budget-row-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .budget-name { font-size: 14px; font-weight: 600; }
-        .budget-nums { font-size: 13px; color: var(--t2); }
-        .budget-mini-bar { width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
-        .budget-mini-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+    /* Budget row */
+    .budget-row {
+        padding: 11px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .budget-row:last-child { border-bottom: none; }
+    .budget-row-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .budget-name { font-size: 14px; font-weight: 600; }
+    .budget-nums { font-size: 13px; color: var(--t2); }
+    .budget-mini-bar { width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .budget-mini-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
 
-        /* Loading */
-        .loading {
-            display: flex; align-items: center; justify-content: center;
-            padding: 30px;
-            color: var(--t3);
-            font-size: 14px;
-            gap: 8px;
-        }
-        .spin { animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+    /* Loading */
+    .loading {
+        display: flex; align-items: center; justify-content: center;
+        padding: 30px;
+        color: var(--t3);
+        font-size: 14px;
+        gap: 8px;
+    }
+    .spin { animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Tag chips */
-        .chip {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .chip-green { background: #d0f0f0; color: #0a5c66; }
-        .chip-yellow { background: #fef9c3; color: #854d0e; }
-        .chip-red { background: #fee2e2; color: #991b1b; }
+    /* Tag chips */
+    .chip {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .chip-green { background: #d0f0f0; color: #0a5c66; }
+    .chip-yellow { background: #fef9c3; color: #854d0e; }
+    .chip-red { background: #fee2e2; color: #991b1b; }
 
-        /* Canvas chart wrapper */
-        .chart-wrap { width: 100%; overflow: hidden; border-radius: 8px; }
+    /* Canvas chart wrapper */
+    .chart-wrap { width: 100%; overflow: hidden; border-radius: 8px; }
 
-        /* Type switch */
-        .type-switch {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 0;
-            background: #f1f5f9;
-            border-radius: 8px;
-            padding: 3px;
-            margin-bottom: 14px;
-        }
-        .type-btn {
-            padding: 8px;
-            border: none; background: none;
-            border-radius: 6px;
-            font-size: 14px; font-weight: 600;
-            font-family: inherit;
-            color: var(--t3);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .type-btn.on {
-            background: white;
-            color: var(--t1);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-        }
+    /* Type switch */
+    .type-switch {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 0;
+        background: #f1f5f9;
+        border-radius: 8px;
+        padding: 3px;
+        margin-bottom: 14px;
+    }
+    .type-btn {
+        padding: 8px;
+        border: none; background: none;
+        border-radius: 6px;
+        font-size: 14px; font-weight: 600;
+        font-family: inherit;
+        color: var(--t3);
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .type-btn.on {
+        background: white;
+        color: var(--t1);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
 
-        /* Asset allocation bars */
-        .alloc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .alloc-label { font-size: 12px; color: var(--t2); width: 60px; flex-shrink: 0; }
-        .alloc-bar-wrap { flex: 1; height: 14px; background: #e2e8f0; border-radius: 7px; overflow: hidden; }
-        .alloc-bar { height: 100%; border-radius: 7px; transition: width 0.5s; }
-        .alloc-pct { font-size: 12px; font-weight: 700; color: var(--t1); width: 36px; text-align: right; }
+    /* Asset allocation bars */
+    .alloc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .alloc-label { font-size: 12px; color: var(--t2); width: 60px; flex-shrink: 0; }
+    .alloc-bar-wrap { flex: 1; height: 14px; background: #e2e8f0; border-radius: 7px; overflow: hidden; }
+    .alloc-bar { height: 100%; border-radius: 7px; transition: width 0.5s; }
+    .alloc-pct { font-size: 12px; font-weight: 700; color: var(--t1); width: 36px; text-align: right; }
 
-        @media (max-width: 380px) {
-            .bicon { font-size: 15px; }
-            .blabel { font-size: 8px; }
-            .metric-value { font-size: 16px; }
-        }
-    </style>
+    @media (max-width: 380px) {
+        .bicon { font-size: 15px; }
+        .blabel { font-size: 8px; }
+        .metric-value { font-size: 16px; }
+    }
+</style>
+```
+
 </head>
 <body>
 <div class="container">
     <header class="header">
         <div class="header-top">
-            <div style="font-size:10px;opacity:.7;width:32px"></div>
-            <div>
-                <div class="logo">彩虹超人CFO 💎</div>
-                <div class="tagline">專業級財務管理平台</div>
-            </div>
+            <div style="font-size:13px;opacity:.85;font-weight:500" id="header-date"></div>
             <button class="refresh-btn" onclick="loadAll()" title="重新整理">↻</button>
         </div>
-        <div class="last-update" id="last-update">數據載入中…</div>
     </header>
 
-    <!-- ① 記帳 -->
-    <div class="pg on" id="pg-record">
-        <div class="card">
-            <div class="ctitle">📝 快速記帳</div>
-            <div class="type-switch">
-                <button class="type-btn on" id="tb-out" onclick="setType('支出')">💸 支出</button>
-                <button class="type-btn" id="tb-in" onclick="setType('收入')">💰 收入</button>
-            </div>
-            <div class="form-row">
-                <label>金額（元）</label>
-                <input type="number" id="f-amount" placeholder="0" inputmode="decimal">
-            </div>
-            <div class="form-row-2">
-                <div class="form-row" style="margin:0">
-                    <label>類別</label>
-                    <select id="f-cat">
-                        <option>餐飲</option><option>交通</option><option>購物</option>
-                        <option>娛樂</option><option>醫療</option><option>房貸</option>
-                        <option>投資</option><option>薪資</option><option>其他</option>
-                    </select>
-                </div>
-                <div class="form-row" style="margin:0">
-                    <label>帳戶</label>
-                    <select id="f-acct">
-                        <optgroup label="🏦 銀行帳戶">
-                            <option>現金</option>
-                            <option>富邦銀行</option>
-                            <option>玉山日幣</option>
-                            <option>玉山台幣</option>
-                            <option>LINE Bank</option>
-                            <option>第一銀行</option>
-                            <option>Suica（日幣）</option>
-                        </optgroup>
-                        <optgroup label="💳 信用卡">
-                            <option>富邦信用卡</option>
-                            <option>中信信用卡</option>
-                            <option>玉山熊本熊卡</option>
-                            <option>LINE Bank聯邦聯名卡</option>
-                        </optgroup>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row">
-                <label>說明（選填）</label>
-                <input type="text" id="f-desc" placeholder="記帳備註">
-            </div>
-            <div class="form-row">
-                <label>日期</label>
-                <input type="date" id="f-date">
-            </div>
-            <button class="btn-primary" id="sub-btn" onclick="submitRecord()">✔ 記帳</button>
-            <div id="record-msg" style="margin-top:10px;display:none;"></div>
+```
+<!-- ① 記帳 -->
+<div class="pg on" id="pg-record">
+    <div class="card">
+        <div class="ctitle">📝 快速記帳</div>
+        <div class="type-switch">
+            <button class="type-btn on" id="tb-out" onclick="setType('支出')">💸 支出</button>
+            <button class="type-btn" id="tb-in" onclick="setType('收入')">💰 收入</button>
         </div>
-
-        <div class="card">
-            <div class="ctitle">📋 最近記錄</div>
-            <div id="recent-records"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
+        <div class="form-row">
+            <label>金額（元）</label>
+            <input type="number" id="f-amount" placeholder="0" inputmode="decimal">
         </div>
+        <div class="form-row-2">
+            <div class="form-row" style="margin:0">
+                <label>類別</label>
+                <select id="f-cat">
+                    <option>餐飲</option><option>交通</option><option>購物</option>
+                    <option>娛樂</option><option>醫療</option><option>房貸</option>
+                    <option>投資</option><option>薪資</option><option>其他</option>
+                </select>
+            </div>
+            <div class="form-row" style="margin:0">
+                <label>帳戶</label>
+                <select id="f-acct">
+                    <optgroup label="🏦 銀行帳戶">
+                        <option>現金</option>
+                        <option>富邦銀行</option>
+                        <option>玉山日幣</option>
+                        <option>玉山台幣</option>
+                        <option>LINE Bank</option>
+                        <option>第一銀行</option>
+                        <option>Suica（日幣）</option>
+                    </optgroup>
+                    <optgroup label="💳 信用卡">
+                        <option>富邦信用卡</option>
+                        <option>中信信用卡</option>
+                        <option>玉山熊本熊卡</option>
+                        <option>LINE Bank聯邦聯名卡</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <label>說明（選填）</label>
+            <input type="text" id="f-desc" placeholder="記帳備註">
+        </div>
+        <div class="form-row">
+            <label>日期</label>
+            <input type="date" id="f-date">
+        </div>
+        <button class="btn-primary" id="sub-btn" onclick="submitRecord()">✔ 記帳</button>
+        <div id="record-msg" style="margin-top:10px;display:none;"></div>
     </div>
 
-    <!-- ② 收支 -->
-    <div class="pg" id="pg-expense">
-        <div id="expense-summary">
-            <div class="card">
-                <div class="ctitle">📊 本月收支概況</div>
-                <div id="expense-metrics"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
-            </div>
-            <div class="card">
-                <div class="ctitle">🏷 支出分類</div>
-                <div id="expense-cats"><div class="loading"><span class="spin">⟳</span></div></div>
-            </div>
+    <div class="card">
+        <div class="ctitle">📋 最近記錄</div>
+        <div id="recent-records"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
+    </div>
+</div>
+
+<!-- ② 收支 -->
+<div class="pg" id="pg-expense">
+    <div id="expense-summary">
+        <div class="card">
+            <div class="ctitle">📊 本月收支概況</div>
+            <div id="expense-metrics"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
+        </div>
+        <div class="card">
+            <div class="ctitle">🏷 支出分類</div>
+            <div id="expense-cats"><div class="loading"><span class="spin">⟳</span></div></div>
         </div>
     </div>
+</div>
 
-    <!-- ③ 資產 -->
-    <div class="pg" id="pg-asset">
-        <div class="card">
-            <div class="ctitle">💰 總資產</div>
-            <div id="asset-total">
-                <div class="loading"><span class="spin">⟳</span> 載入中…</div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="ctitle">🎯 退休目標進度</div>
-            <div id="retire-progress">
-                <div class="loading"><span class="spin">⟳</span></div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="ctitle">📂 資產配置</div>
-            <div id="asset-alloc">
-                <div class="loading"><span class="spin">⟳</span></div>
-            </div>
+<!-- ③ 資產 -->
+<div class="pg" id="pg-asset">
+    <div class="card">
+        <div class="ctitle">💰 總資產</div>
+        <div id="asset-total">
+            <div class="loading"><span class="spin">⟳</span> 載入中…</div>
         </div>
     </div>
-
-    <!-- ④ 趨勢 -->
-    <div class="pg" id="pg-trend">
-        <div class="card">
-            <div class="ctitle">📈 資產成長趨勢</div>
-            <div id="trend-chart">
-                <div class="loading"><span class="spin">⟳</span> 載入中…</div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="ctitle">📊 各期資產明細</div>
-            <div id="trend-table"><div class="loading"><span class="spin">⟳</span></div></div>
+    <div class="card">
+        <div class="ctitle">🎯 退休目標進度</div>
+        <div id="retire-progress">
+            <div class="loading"><span class="spin">⟳</span></div>
         </div>
     </div>
-
-    <!-- ⑤ 負債 -->
-    <div class="pg" id="pg-debt">
-        <div class="card">
-            <div class="ctitle">💳 負債概況</div>
-            <div class="debt-status status-good" id="debt-ratio-card">
-                <div>
-                    <div style="font-weight:600">負債比例</div>
-                    <div style="font-size:12px;color:var(--t3)">房貸餘額 vs 總資產</div>
-                </div>
-                <div style="text-align:right">
-                    <div style="font-size:26px;font-weight:700;color:var(--g)" id="debt-pct">—</div>
-                    <div style="font-size:12px;color:var(--g)" id="debt-status-label">計算中</div>
-                </div>
-            </div>
-            <div class="metric-grid">
-                <div class="metric">
-                    <div class="metric-label">房貸餘額</div>
-                    <div class="metric-value" style="color:var(--r)" id="debt-balance">NT$1,530,000</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">負債/資產比</div>
-                    <div class="metric-value" id="debt-ratio2" style="color:var(--t2)">—</div>
-                </div>
-            </div>
-            <div class="alert alert-success" id="debt-advice">
-                • 負債比例屬健康範圍<br>
-                • 維持良好現金流管理<br>
-                • 可考慮部分提前還款降息
-            </div>
-        </div>
-        <div class="card" style="background:#f8fafc">
-            <div style="font-weight:600;margin-bottom:10px">💡 CFO還款建議</div>
-            <div style="font-size:14px;color:var(--t2);line-height:1.8">
-                • 目前雙薪期間：積極還款最划算<br>
-                • 2026年6月彩虹待業後：轉保守策略<br>
-                • 先生2027年退休後：以勞退月領$25,850覆蓋<br>
-                • 建議保留6個月生活費緊急備用金
-            </div>
+    <div class="card">
+        <div class="ctitle">📂 資產配置</div>
+        <div id="asset-alloc">
+            <div class="loading"><span class="spin">⟳</span></div>
         </div>
     </div>
+</div>
 
-    <!-- ⑥ 預算 -->
-    <div class="pg" id="pg-budget">
-        <div class="card">
-            <div class="ctitle">📋 本月預算執行</div>
-            <div id="budget-alert-area"></div>
-            <div id="budget-rows">
-                <div class="loading"><span class="spin">⟳</span> 載入中…</div>
-            </div>
-        </div>
-        <div class="card" style="background:#fffbeb">
-            <div style="font-weight:600;margin-bottom:8px">📊 CFO本月建議</div>
-            <div id="budget-advice" style="font-size:14px;color:var(--t2);line-height:1.8">
-                • 重點控制餐飲與購物變動支出<br>
-                • 每週五檢視預算執行狀況<br>
-                • 超支項目優先削減非必要費用
-            </div>
+<!-- ④ 趨勢 -->
+<div class="pg" id="pg-trend">
+    <div class="card">
+        <div class="ctitle">📈 資產成長趨勢</div>
+        <div id="trend-chart">
+            <div class="loading"><span class="spin">⟳</span> 載入中…</div>
         </div>
     </div>
+    <div class="card">
+        <div class="ctitle">📊 各期資產明細</div>
+        <div id="trend-table"><div class="loading"><span class="spin">⟳</span></div></div>
+    </div>
+</div>
 
-    <!-- ⑦ 財務健康 -->
-    <div class="pg" id="pg-health">
-        <div class="card">
-            <div class="ctitle">🏥 CFO財務健康評分</div>
-            <div class="health-score">
-                <div class="score-circle" id="score-circle">
-                    <div class="score-inner">
-                        <div class="score-number" id="score-num">—</div>
-                        <div class="score-label">分</div>
-                    </div>
-                </div>
-                <div style="font-size:16px;font-weight:600" id="score-grade">評估中…</div>
-                <div style="font-size:13px;color:var(--t2);margin-top:4px">CFO級專業評估</div>
+<!-- ⑤ 負債 -->
+<div class="pg" id="pg-debt">
+    <div class="card">
+        <div class="ctitle">💳 負債概況</div>
+        <div class="debt-status status-good" id="debt-ratio-card">
+            <div>
+                <div style="font-weight:600">負債比例</div>
+                <div style="font-size:12px;color:var(--t3)">房貸餘額 vs 總資產</div>
             </div>
-            <div class="metric-grid" id="health-metrics">
-                <div class="metric">
-                    <div class="metric-label">負債比例</div>
-                    <div class="metric-value" id="hm-debt" style="color:var(--g)">—</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">退休進度</div>
-                    <div class="metric-value" id="hm-retire" style="color:var(--ac)">—</div>
-                </div>
+            <div style="text-align:right">
+                <div style="font-size:26px;font-weight:700;color:var(--g)" id="debt-pct">—</div>
+                <div style="font-size:12px;color:var(--g)" id="debt-status-label">計算中</div>
             </div>
-            <div style="margin:16px 0">
-                <div style="font-weight:600;margin-bottom:12px">🎯 各項評估</div>
-                <div class="list-item" style="padding:10px 0">
-                    <span style="font-size:14px">資產負債結構</span>
-                    <span id="ev-debt">⏳</span>
-                </div>
-                <div class="list-item" style="padding:10px 0">
-                    <span style="font-size:14px">退休準備度</span>
-                    <span id="ev-retire">⏳</span>
-                </div>
-                <div class="list-item" style="padding:10px 0">
-                    <span style="font-size:14px">投資分散度</span>
-                    <span id="ev-invest">🟡 中高風險</span>
-                </div>
-                <div class="list-item" style="padding:10px 0">
-                    <span style="font-size:14px">現金流動性</span>
-                    <span id="ev-cash">⏳</span>
-                </div>
+        </div>
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-label">房貸餘額</div>
+                <div class="metric-value" style="color:var(--r)" id="debt-balance">NT$1,530,000</div>
             </div>
-            <div class="alert alert-warning" id="health-warn">
-                ⚠️ 正在計算風險指標…
+            <div class="metric">
+                <div class="metric-label">負債/資產比</div>
+                <div class="metric-value" id="debt-ratio2" style="color:var(--t2)">—</div>
             </div>
-            <div class="card" style="background:#f0fff4;margin-top:4px">
-                <div style="font-weight:600;margin-bottom:8px">💡 本月行動清單</div>
-                <div style="font-size:14px;color:var(--t2);line-height:1.8" id="health-action">
-                    • 每月執行 analyze_portfolio.py<br>
-                    • 評估投資組合是否需再平衡<br>
-                    • 保持定期定額安聯日本 USD300<br>
-                    • 確認下月記帳數據完整
-                </div>
-            </div>
+        </div>
+        <div class="alert alert-success" id="debt-advice">
+            • 負債比例屬健康範圍<br>
+            • 維持良好現金流管理<br>
+            • 可考慮部分提前還款降息
         </div>
     </div>
-
-    <!-- ⑧ 旅遊記帳（多專案・多幣別） -->
-    <div class="pg" id="pg-tokyo">
-
-        <!-- 專案切換 -->
-        <div class="type-switch" style="margin-bottom:12px">
-            <button class="type-btn on" id="trip-btn-JP2026" onclick="switchTrip('JP2026')">🎠 東京</button>
-            <button class="type-btn" id="trip-btn-PH2026" onclick="switchTrip('PH2026')">🏝 薄荷島</button>
+    <div class="card" style="background:#f8fafc">
+        <div style="font-weight:600;margin-bottom:10px">💡 CFO還款建議</div>
+        <div style="font-size:14px;color:var(--t2);line-height:1.8">
+            • 目前雙薪期間：積極還款最划算<br>
+            • 2026年6月彩虹待業後：轉保守策略<br>
+            • 先生2027年退休後：以勞退月領$25,850覆蓋<br>
+            • 建議保留6個月生活費緊急備用金
         </div>
+    </div>
+</div>
 
-        <!-- 旅程標題卡 -->
-        <div class="card" id="trip-header-card" style="color:white;text-align:center;padding:18px;background:linear-gradient(135deg,#c0392b,#e74c3c)">
-            <div style="font-size:19px;font-weight:700;margin-bottom:3px" id="trip-title">🎠 東京迪士尼慶生之旅</div>
-            <div style="font-size:12px;opacity:.9" id="trip-subtitle">2026/5/16–5/22・帶小公主慶祝四歲生日 🎂👸</div>
-            <div style="margin-top:12px;display:flex;justify-content:center;gap:16px">
-                <div>
-                    <div style="font-size:10px;opacity:.8">匯率</div>
-                    <div style="font-size:16px;font-weight:700" id="jp-rate-display">…</div>
-                </div>
-                <div>
-                    <div style="font-size:10px;opacity:.8">已花（台幣）</div>
-                    <div style="font-size:16px;font-weight:700" id="trip-total-twd">NT$0</div>
-                </div>
-                <div>
-                    <div style="font-size:10px;opacity:.8">預算進度</div>
-                    <div style="font-size:16px;font-weight:700" id="trip-budget-pct">0%</div>
-                </div>
-            </div>
-            <!-- 預算進度條 -->
-            <div style="margin-top:10px;background:rgba(255,255,255,0.3);border-radius:4px;height:6px;overflow:hidden">
-                <div id="trip-budget-bar" style="height:100%;border-radius:4px;background:white;transition:width 0.5s;width:0%"></div>
-            </div>
+<!-- ⑥ 預算 -->
+<div class="pg" id="pg-budget">
+    <div class="card">
+        <div class="ctitle">📋 本月預算執行</div>
+        <div id="budget-alert-area"></div>
+        <div id="budget-rows">
+            <div class="loading"><span class="spin">⟳</span> 載入中…</div>
         </div>
+    </div>
+    <div class="card" style="background:#fffbeb">
+        <div style="font-weight:600;margin-bottom:8px">📊 CFO本月建議</div>
+        <div id="budget-advice" style="font-size:14px;color:var(--t2);line-height:1.8">
+            • 重點控制餐飲與購物變動支出<br>
+            • 每週五檢視預算執行狀況<br>
+            • 超支項目優先削減非必要費用
+        </div>
+    </div>
+</div>
 
-        <!-- 快速記帳 -->
-        <div class="card">
-            <div class="ctitle" id="trip-form-title">🌸 記帳</div>
-
-            <!-- 幣別切換 -->
-            <div id="trip-currency-btns" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
-
-            <div class="form-row">
-                <label id="trip-amount-label">金額</label>
-                <input type="number" id="jp-amount" placeholder="0"
-                       inputmode="decimal" oninput="calcTripLive()"
-                       style="font-size:22px;font-weight:700;text-align:center">
-            </div>
-
-            <div id="jp-convert-box" style="text-align:center;margin:-4px 0 12px;padding:10px;border-radius:8px;display:none">
-                <div style="font-size:12px;color:var(--t3)" id="jp-rate-note"></div>
-                <div style="font-size:22px;font-weight:700" id="jp-twd-result">NT$—</div>
-            </div>
-
-            <div class="form-row-2">
-                <div class="form-row" style="margin:0">
-                    <label>類別</label>
-                    <select id="jp-cat"></select>
-                </div>
-                <div class="form-row" style="margin:0">
-                    <label>付款</label>
-                    <select id="jp-pay"></select>
+<!-- ⑦ 財務健康 -->
+<div class="pg" id="pg-health">
+    <div class="card">
+        <div class="ctitle">🏥 CFO財務健康評分</div>
+        <div class="health-score">
+            <div class="score-circle" id="score-circle">
+                <div class="score-inner">
+                    <div class="score-number" id="score-num">—</div>
+                    <div class="score-label">分</div>
                 </div>
             </div>
-
-            <div class="form-row">
-                <label>項目說明</label>
-                <input type="text" id="jp-desc" placeholder="說明">
+            <div style="font-size:16px;font-weight:600" id="score-grade">評估中…</div>
+            <div style="font-size:13px;color:var(--t2);margin-top:4px">CFO級專業評估</div>
+        </div>
+        <div class="metric-grid" id="health-metrics">
+            <div class="metric">
+                <div class="metric-label">負債比例</div>
+                <div class="metric-value" id="hm-debt" style="color:var(--g)">—</div>
             </div>
-
-            <div class="form-row">
-                <label>日期</label>
-                <select id="jp-date"></select>
+            <div class="metric">
+                <div class="metric-label">退休進度</div>
+                <div class="metric-value" id="hm-retire" style="color:var(--ac)">—</div>
             </div>
-
-            <button class="btn-primary" id="jp-sub-btn" onclick="submitTravelRecord()">🌸 記帳</button>
-            <div id="jp-msg" style="display:none;margin-top:8px"></div>
         </div>
-
-        <!-- 支出分類 -->
-        <div class="card">
-            <div class="ctitle">📊 支出分類</div>
-            <div id="trip-summary"><div class="loading"><span class="spin">⟳</span></div></div>
+        <div style="margin:16px 0">
+            <div style="font-weight:600;margin-bottom:12px">🎯 各項評估</div>
+            <div class="list-item" style="padding:10px 0">
+                <span style="font-size:14px">資產負債結構</span>
+                <span id="ev-debt">⏳</span>
+            </div>
+            <div class="list-item" style="padding:10px 0">
+                <span style="font-size:14px">退休準備度</span>
+                <span id="ev-retire">⏳</span>
+            </div>
+            <div class="list-item" style="padding:10px 0">
+                <span style="font-size:14px">投資分散度</span>
+                <span id="ev-invest">🟡 中高風險</span>
+            </div>
+            <div class="list-item" style="padding:10px 0">
+                <span style="font-size:14px">現金流動性</span>
+                <span id="ev-cash">⏳</span>
+            </div>
         </div>
-
-        <!-- 每日明細 -->
-        <div class="card">
-            <div class="ctitle">📅 每日明細</div>
-            <div id="trip-daily"><div class="loading"><span class="spin">⟳</span></div></div>
+        <div class="alert alert-warning" id="health-warn">
+            ⚠️ 正在計算風險指標…
         </div>
-
-        <div class="card" style="background:#fffbeb">
-            <div style="font-size:12px;color:var(--t2);line-height:1.8">
-                💡 匯率使用台銀即時公告，每次進入自動更新。台幣直接記帳匯率=1，機票/住宿/地陪費用可直接以台幣記入。
+        <div class="card" style="background:#f0fff4;margin-top:4px">
+            <div style="font-weight:600;margin-bottom:8px">💡 本月行動清單</div>
+            <div style="font-size:14px;color:var(--t2);line-height:1.8" id="health-action">
+                • 每月執行 analyze_portfolio.py<br>
+                • 評估投資組合是否需再平衡<br>
+                • 保持定期定額安聯日本 USD300<br>
+                • 確認下月記帳數據完整
             </div>
         </div>
     </div>
+</div>
+
+<!-- ⑧ 旅遊記帳（多專案・多幣別） -->
+<div class="pg" id="pg-tokyo">
+
+    <!-- 專案切換 -->
+    <div class="type-switch" style="margin-bottom:12px">
+        <button class="type-btn on" id="trip-btn-JP2026" onclick="switchTrip('JP2026')">🎠 東京</button>
+        <button class="type-btn" id="trip-btn-PH2026" onclick="switchTrip('PH2026')">🏝 薄荷島</button>
+    </div>
+
+    <!-- 旅程標題卡 -->
+    <div class="card" id="trip-header-card" style="color:white;text-align:center;padding:18px;background:linear-gradient(135deg,#c0392b,#e74c3c)">
+        <div style="font-size:19px;font-weight:700;margin-bottom:3px" id="trip-title">🎠 東京迪士尼慶生之旅</div>
+        <div style="font-size:12px;opacity:.9" id="trip-subtitle">2026/5/16–5/22・帶小公主慶祝四歲生日 🎂👸</div>
+        <div style="margin-top:12px;display:flex;justify-content:center;gap:16px">
+            <div>
+                <div style="font-size:10px;opacity:.8">匯率</div>
+                <div style="font-size:16px;font-weight:700" id="jp-rate-display">…</div>
+            </div>
+            <div>
+                <div style="font-size:10px;opacity:.8">已花（台幣）</div>
+                <div style="font-size:16px;font-weight:700" id="trip-total-twd">NT$0</div>
+            </div>
+            <div>
+                <div style="font-size:10px;opacity:.8">預算進度</div>
+                <div style="font-size:16px;font-weight:700" id="trip-budget-pct">0%</div>
+            </div>
+        </div>
+        <!-- 預算進度條 -->
+        <div style="margin-top:10px;background:rgba(255,255,255,0.3);border-radius:4px;height:6px;overflow:hidden">
+            <div id="trip-budget-bar" style="height:100%;border-radius:4px;background:white;transition:width 0.5s;width:0%"></div>
+        </div>
+    </div>
+
+    <!-- 快速記帳 -->
+    <div class="card">
+        <div class="ctitle" id="trip-form-title">🌸 記帳</div>
+
+        <!-- 幣別切換 -->
+        <div id="trip-currency-btns" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
+
+        <div class="form-row">
+            <label id="trip-amount-label">金額</label>
+            <input type="number" id="jp-amount" placeholder="0"
+                   inputmode="decimal" oninput="calcTripLive()"
+                   style="font-size:22px;font-weight:700;text-align:center">
+        </div>
+
+        <div id="jp-convert-box" style="text-align:center;margin:-4px 0 12px;padding:10px;border-radius:8px;display:none">
+            <div style="font-size:12px;color:var(--t3)" id="jp-rate-note"></div>
+            <div style="font-size:22px;font-weight:700" id="jp-twd-result">NT$—</div>
+        </div>
+
+        <div class="form-row-2">
+            <div class="form-row" style="margin:0">
+                <label>類別</label>
+                <select id="jp-cat"></select>
+            </div>
+            <div class="form-row" style="margin:0">
+                <label>付款</label>
+                <select id="jp-pay"></select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>項目說明</label>
+            <input type="text" id="jp-desc" placeholder="說明">
+        </div>
+
+        <div class="form-row">
+            <label>日期</label>
+            <select id="jp-date"></select>
+        </div>
+
+        <button class="btn-primary" id="jp-sub-btn" onclick="submitTravelRecord()">🌸 記帳</button>
+        <div id="jp-msg" style="display:none;margin-top:8px"></div>
+    </div>
+
+    <!-- 支出分類 -->
+    <div class="card">
+        <div class="ctitle">📊 支出分類</div>
+        <div id="trip-summary"><div class="loading"><span class="spin">⟳</span></div></div>
+    </div>
+
+    <!-- 每日明細 -->
+    <div class="card">
+        <div class="ctitle">📅 每日明細</div>
+        <div id="trip-daily"><div class="loading"><span class="spin">⟳</span></div></div>
+    </div>
+
+    <div class="card" style="background:#fffbeb">
+        <div style="font-size:12px;color:var(--t2);line-height:1.8">
+            💡 匯率使用台銀即時公告，每次進入自動更新。台幣直接記帳匯率=1，機票/住宿/地陪費用可直接以台幣記入。
+        </div>
+    </div>
+</div>
+```
 
 </div>
 
 <!-- 底部導覽 -->
+
 <nav class="bnav">
     <!-- 記帳：鋼筆寫入 -->
     <button class="bitem on" id="b-record" onclick="swPg('record')">
@@ -765,11 +764,12 @@ let currentType = '支出';
 document.addEventListener('DOMContentLoaded', () => {
     // 設定今天日期
     document.getElementById('f-date').valueAsDate = new Date();
+    updateTimestamp(); // 立即顯示日期
     loadAll();
 });
 
 function loadAll() {
-    document.getElementById('last-update').textContent = '數據更新中…';
+    
     loadAssets();
     loadRecords();
 }
@@ -866,7 +866,7 @@ function loadAssetsFallback() {
     };
     gAssetHistory = [gAssets];
     renderAllAsset();
-    document.getElementById('last-update').textContent = '⚠️ 離線數據 4/19（Sheets連線失敗）';
+    
 }
 
 // ═══════════════════════════════════
@@ -1397,8 +1397,14 @@ function fmtDate(raw) {
 
 function updateTimestamp() {
     const now = new Date();
-    document.getElementById('last-update').textContent =
-        `更新：${now.toLocaleDateString('zh-TW')} ${now.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'})}`;
+    const dateStr = now.toLocaleDateString('zh-TW', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+    const timeStr = now.toLocaleTimeString('zh-TW', {
+        hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    const dateEl = document.getElementById('header-date');
+    if (dateEl) dateEl.textContent = `更新時間：${dateStr} ${timeStr}`;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1716,5 +1722,6 @@ function renderTripSummary(records) {
 
 
 </script>
+
 </body>
 </html>
