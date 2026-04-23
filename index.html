@@ -13,17 +13,17 @@
     <link rel="icon" type="image/png" href="icon.png">
     <style>
         :root {
-            --bg: #f0f8f8;
+            --bg: #f0f8f8;           /* 淡青白底色（圖一氛圍改為青調） */
             --card: #ffffff;
-            --border: #cce8e8;
-            --t1: #0d3d40;
-            --t2: #2a6065;
-            --t3: #5a9099;
-            --ac: #018790;
-            --g:  #00a896;
-            --r:  #c0392b;
-            --y:  #d97706;
-            --jp: #b85c75;
+            --border: #cce8e8;       /* 帶青調的邊框 */
+            --t1: #0d3d40;           /* 深青黑（文字主色） */
+            --t2: #2a6065;           /* 中青（次要文字） */
+            --t3: #5a9099;           /* 淺青灰（輔助文字） */
+            --ac: #018790;           /* 圖二主色：深青綠 */
+            --g:  #00a896;           /* 正值/成功：亮青綠 */
+            --r:  #c0392b;           /* 負值/警示：紅（保留） */
+            --y:  #d97706;           /* 黃色警示 */
+            --jp: #b85c75;           /* 旅遊櫻花粉 */
             --jp-light: #fdf0f3;
             --shadow: 0 2px 12px rgba(1,135,144,0.10);
         }
@@ -60,273 +60,289 @@
         }
         .last-update { font-size: 10px; opacity: 0.7; text-align: right; margin-top: 4px; }
 
-```
-.pg { display: none; padding: 16px; min-height: calc(100vh - 140px); }
-.pg.on { display: block; }
+    /* Pages */
+    .pg { display: none; padding: 16px; min-height: calc(100vh - 140px); }
+    .pg.on { display: block; }
 
-.card {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 6px rgba(1,135,144,0.08), 0 0 1px rgba(0,0,0,0.04);
-    border: none;
-}
-.ctitle {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--t1);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+    /* Cards */
+    .card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 6px rgba(1,135,144,0.08), 0 0 1px rgba(0,0,0,0.04);
+        border: none;
+    }
+    .ctitle {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--t1);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-.metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-.metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.metric {
-    text-align: center;
-    padding: 14px 10px;
-    background: #f8fafc;
-    border-radius: 8px;
-}
-.metric-label { font-size: 11px; color: var(--t3); margin-bottom: 4px; font-weight: 500; }
-.metric-value { font-size: 18px; font-weight: 700; }
+    /* Metrics */
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .metric {
+        text-align: center;
+        padding: 14px 10px;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+    .metric-label { font-size: 11px; color: var(--t3); margin-bottom: 4px; font-weight: 500; }
+    .metric-value { font-size: 18px; font-weight: 700; }
 
-.progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin: 8px 0; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, #018790, #00c9b1); border-radius: 5px; transition: width 0.6s ease; }
-.progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--t3); }
+    /* Progress */
+    .progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin: 8px 0; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #018790, #00c9b1); border-radius: 5px; transition: width 0.6s ease; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--t3); }
 
-.bnav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.96);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(1,135,144,0.12);
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: auto auto;
-    box-shadow: 0 -4px 20px rgba(1,135,144,0.08);
-    z-index: 200;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-.bnav.hidden {
-    transform: translateY(100%);
-}
-.bitem {
-    padding: 7px 2px 9px;
-    text-align: center;
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-family: inherit;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    -webkit-tap-highlight-color: transparent;
-    transition: all 0.18s ease;
-    border-bottom: 1px solid rgba(1,135,144,0.06);
-    position: relative;
-}
-.bitem:nth-child(5), .bitem:nth-child(6),
-.bitem:nth-child(7), .bitem:nth-child(8) { border-bottom: none; }
-.bitem.on { background: none; }
-.bitem.on-jp { background: none; }
-.bitem.on::after {
-    content: '';
-    position: absolute;
-    bottom: 3px;
-    left: 50%; transform: translateX(-50%);
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: var(--ac);
-}
-.bitem.on-jp::after {
-    content: '';
-    position: absolute;
-    bottom: 3px;
-    left: 50%; transform: translateX(-50%);
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: var(--jp);
-}
-.bicon-wrap {
-    width: 44px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 12px;
-    transition: all 0.18s ease;
-}
-.bitem.on  .bicon-wrap { background: rgba(1,135,144,0.12); }
-.bitem.on-jp .bicon-wrap { background: rgba(184,92,117,0.12); }
-.bicon-wrap svg {
-    width: 22px; height: 22px;
-    stroke: var(--t3);
-    color: var(--t3);
-    fill: none;
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transition: stroke 0.18s ease, color 0.18s ease;
-}
-.bitem.on  .bicon-wrap svg { stroke: var(--ac); color: var(--ac); }
-.bitem.on-jp .bicon-wrap svg { stroke: var(--jp); color: var(--jp); }
-.blabel { font-size: 13px; color: var(--t3); font-weight: 500; letter-spacing: 0.2px; }
-.bitem.on .blabel { color: var(--ac); font-weight: 700; }
-.bitem.on-jp .blabel { color: var(--jp); font-weight: 700; }
+    /* Bottom nav */
+    .bnav {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(1,135,144,0.12);
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: auto auto;
+        box-shadow: 0 -4px 20px rgba(1,135,144,0.08);
+        z-index: 200;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .bnav.hidden {
+        transform: translateY(100%);
+    }
+    .bitem {
+        padding: 7px 2px 9px;
+        text-align: center;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        -webkit-tap-highlight-color: transparent;
+        transition: all 0.18s ease;
+        border-bottom: 1px solid rgba(1,135,144,0.06);
+        position: relative;
+    }
+    .bitem:nth-child(5), .bitem:nth-child(6),
+    .bitem:nth-child(7), .bitem:nth-child(8) { border-bottom: none; }
+    .bitem.on { background: none; }
+    .bitem.on-jp { background: none; }
+    /* active indicator dot */
+    .bitem.on::after {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        left: 50%; transform: translateX(-50%);
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        background: var(--ac);
+    }
+    .bitem.on-jp::after {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        left: 50%; transform: translateX(-50%);
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        background: var(--jp);
+    }
+    .bicon-wrap {
+        width: 44px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 12px;
+        transition: all 0.18s ease;
+    }
+    .bitem.on  .bicon-wrap { background: rgba(1,135,144,0.12); }
+    .bitem.on-jp .bicon-wrap { background: rgba(184,92,117,0.12); }
+    .bicon-wrap svg {
+        width: 22px; height: 22px;
+        stroke: var(--t3);
+        color: var(--t3);
+        fill: none;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: stroke 0.18s ease, color 0.18s ease;
+    }
+    .bitem.on  .bicon-wrap svg { stroke: var(--ac); color: var(--ac); }
+    .bitem.on-jp .bicon-wrap svg { stroke: var(--jp); color: var(--jp); }
+    .blabel { font-size: 13px; color: var(--t3); font-weight: 500; letter-spacing: 0.2px; }
+    .bitem.on .blabel { color: var(--ac); font-weight: 700; }
+    .bitem.on-jp .blabel { color: var(--jp); font-weight: 700; }
 
-.form-row { margin-bottom: 12px; }
-.form-row label { display: block; font-size: 12px; color: var(--t2); font-weight: 600; margin-bottom: 4px; }
-.form-row input, .form-row select, .form-row textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--t1);
-    background: white;
-    transition: border-color 0.2s;
-}
-.form-row input:focus, .form-row select:focus { outline: none; border-color: var(--ac); }
-.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.btn-primary {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--ac), var(--g));
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-.btn-primary:active { opacity: 0.8; }
-.btn-primary:disabled { opacity: 0.5; }
+    /* Form */
+    .form-row { margin-bottom: 12px; }
+    .form-row label { display: block; font-size: 12px; color: var(--t2); font-weight: 600; margin-bottom: 4px; }
+    .form-row input, .form-row select, .form-row textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-size: 15px;
+        font-family: inherit;
+        color: var(--t1);
+        background: white;
+        transition: border-color 0.2s;
+    }
+    .form-row input:focus, .form-row select:focus { outline: none; border-color: var(--ac); }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--ac), var(--g));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .btn-primary:active { opacity: 0.8; }
+    .btn-primary:disabled { opacity: 0.5; }
 
-.alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid; font-size: 14px; }
-.alert-success { background: #e8f7f7; border-color: #a0d8d8; color: #0a5c66; }
-.alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
-.alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
-.alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+    /* Alerts */
+    .alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid; font-size: 14px; }
+    .alert-success { background: #e8f7f7; border-color: #a0d8d8; color: #0a5c66; }
+    .alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+    .alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
 
-.list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 0;
-    border-bottom: 1px solid #f1f5f9;
-}
-.list-item:last-child { border-bottom: none; }
-.list-left { display: flex; flex-direction: column; }
-.list-title { font-size: 17px; font-weight: 600; color: var(--t1); }
-.list-sub { font-size: 14px; color: var(--t3); margin-top: 2px; }
-.list-right { text-align: right; }
-.list-amount { font-size: 18px; font-weight: 700; }
-.list-date { font-size: 13px; color: var(--t3); margin-top: 2px; }
+    /* Lists */
+    .list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .list-left { display: flex; flex-direction: column; }
+    .list-title { font-size: 17px; font-weight: 600; color: var(--t1); }
+    .list-sub { font-size: 14px; color: var(--t3); margin-top: 2px; }
+    .list-right { text-align: right; }
+    .list-amount { font-size: 18px; font-weight: 700; }
+    .list-date { font-size: 13px; color: var(--t3); margin-top: 2px; }
 
-.health-score {
-    text-align: center;
-    padding: 20px;
-    background: linear-gradient(135deg, #f0fff4, #e6fffa);
-    border-radius: 12px;
-    margin-bottom: 16px;
-}
-.score-circle {
-    width: 110px; height: 110px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 12px;
-    position: relative;
-}
-.score-inner {
-    width: 82px; height: 82px;
-    background: white;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column;
-}
-.score-number { font-size: 26px; font-weight: 700; color: var(--ac); }
-.score-label { font-size: 11px; color: var(--t3); }
+    /* Health Score */
+    .health-score {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f0fff4, #e6fffa);
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+    .score-circle {
+        width: 110px; height: 110px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 12px;
+        position: relative;
+    }
+    .score-inner {
+        width: 82px; height: 82px;
+        background: white;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        flex-direction: column;
+    }
+    .score-number { font-size: 26px; font-weight: 700; color: var(--ac); }
+    .score-label { font-size: 11px; color: var(--t3); }
 
-.debt-status {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px;
-    border-radius: 8px;
-    margin-bottom: 14px;
-    border: 1px solid;
-}
-.status-good { background: #e8f7f7; border-color: #a0d8d8; }
+    /* Debt bar */
+    .debt-status {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 14px;
+        border: 1px solid;
+    }
+    .status-good { background: #e8f7f7; border-color: #a0d8d8; }
 
-.budget-row {
-    padding: 11px 0;
-    border-bottom: 1px solid #f1f5f9;
-}
-.budget-row:last-child { border-bottom: none; }
-.budget-row-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
-.budget-name { font-size: 14px; font-weight: 600; }
-.budget-nums { font-size: 13px; color: var(--t2); }
-.budget-mini-bar { width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
-.budget-mini-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+    /* Budget row */
+    .budget-row {
+        padding: 11px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .budget-row:last-child { border-bottom: none; }
+    .budget-row-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .budget-name { font-size: 14px; font-weight: 600; }
+    .budget-nums { font-size: 13px; color: var(--t2); }
+    .budget-mini-bar { width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .budget-mini-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
 
-.loading {
-    display: flex; align-items: center; justify-content: center;
-    padding: 30px;
-    color: var(--t3);
-    font-size: 14px;
-    gap: 8px;
-}
-.spin { animation: spin 1s linear infinite; display: inline-block; }
-@keyframes spin { to { transform: rotate(360deg); } }
+    /* Loading */
+    .loading {
+        display: flex; align-items: center; justify-content: center;
+        padding: 30px;
+        color: var(--t3);
+        font-size: 14px;
+        gap: 8px;
+    }
+    .spin { animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-.chip {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-}
-.chip-green { background: #d0f0f0; color: #0a5c66; }
-.chip-yellow { background: #fef9c3; color: #854d0e; }
-.chip-red { background: #fee2e2; color: #991b1b; }
+    /* Tag chips */
+    .chip {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .chip-green { background: #d0f0f0; color: #0a5c66; }
+    .chip-yellow { background: #fef9c3; color: #854d0e; }
+    .chip-red { background: #fee2e2; color: #991b1b; }
 
-.chart-wrap { width: 100%; overflow: hidden; border-radius: 8px; }
+    /* Canvas chart wrapper */
+    .chart-wrap { width: 100%; overflow: hidden; border-radius: 8px; }
 
-.type-switch {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 0;
-    background: #f1f5f9;
-    border-radius: 8px;
-    padding: 3px;
-    margin-bottom: 14px;
-}
-.type-btn {
-    padding: 8px;
-    border: none; background: none;
-    border-radius: 6px;
-    font-size: 14px; font-weight: 600;
-    font-family: inherit;
-    color: var(--t3);
-    cursor: pointer;
-    transition: all 0.15s;
-}
-.type-btn.on {
-    background: white;
-    color: var(--t1);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-}
+    /* Type switch */
+    .type-switch {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 0;
+        background: #f1f5f9;
+        border-radius: 8px;
+        padding: 3px;
+        margin-bottom: 14px;
+    }
+    .type-btn {
+        padding: 8px;
+        border: none; background: none;
+        border-radius: 6px;
+        font-size: 14px; font-weight: 600;
+        font-family: inherit;
+        color: var(--t3);
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .type-btn.on {
+        background: white;
+        color: var(--t1);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
 
-.alloc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.alloc-label { font-size: 12px; color: var(--t2); width: 60px; flex-shrink: 0; }
-.alloc-bar-wrap { flex: 1; height: 14px; background: #e2e8f0; border-radius: 7px; overflow: hidden; }
-.alloc-bar { height: 100%; border-radius: 7px; transition: width 0.5s; }
-.alloc-pct { font-size: 12px; font-weight: 700; color: var(--t1); width: 36px; text-align: right; }
+    /* Asset allocation bars */
+    .alloc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .alloc-label { font-size: 12px; color: var(--t2); width: 60px; flex-shrink: 0; }
+    .alloc-bar-wrap { flex: 1; height: 14px; background: #e2e8f0; border-radius: 7px; overflow: hidden; }
+    .alloc-bar { height: 100%; border-radius: 7px; transition: width 0.5s; }
+    .alloc-pct { font-size: 12px; font-weight: 700; color: var(--t1); width: 36px; text-align: right; }
 
-@media (max-width: 380px) {
-    .bicon { font-size: 15px; }
-    .blabel { font-size: 8px; }
-    .metric-value { font-size: 16px; }
-}
+    @media (max-width: 380px) {
+        .bicon { font-size: 15px; }
+        .blabel { font-size: 8px; }
+        .metric-value { font-size: 16px; }
+    }
 </style>
 ```
 
@@ -569,13 +585,16 @@
     </div>
 </div>
 
-<!-- ⑧ 旅遊記帳 -->
+<!-- ⑧ 旅遊記帳（多專案・多幣別） -->
 <div class="pg" id="pg-tokyo">
+
+    <!-- 專案切換 -->
     <div class="type-switch" style="margin-bottom:12px">
         <button class="type-btn on" id="trip-btn-JP2026" onclick="switchTrip('JP2026')">🎠 東京</button>
         <button class="type-btn" id="trip-btn-PH2026" onclick="switchTrip('PH2026')">🏝 薄荷島</button>
     </div>
 
+    <!-- 旅程標題卡 -->
     <div class="card" id="trip-header-card" style="color:white;text-align:center;padding:18px;background:linear-gradient(135deg,#c0392b,#e74c3c)">
         <div style="font-size:19px;font-weight:700;margin-bottom:3px" id="trip-title">🎠 東京迪士尼慶生之旅</div>
         <div style="font-size:12px;opacity:.9" id="trip-subtitle">2026/5/16–5/22・帶小公主慶祝四歲生日 🎂👸</div>
@@ -593,24 +612,31 @@
                 <div style="font-size:16px;font-weight:700" id="trip-budget-pct">0%</div>
             </div>
         </div>
+        <!-- 預算進度條 -->
         <div style="margin-top:10px;background:rgba(255,255,255,0.3);border-radius:4px;height:6px;overflow:hidden">
             <div id="trip-budget-bar" style="height:100%;border-radius:4px;background:white;transition:width 0.5s;width:0%"></div>
         </div>
     </div>
 
+    <!-- 快速記帳 -->
     <div class="card">
         <div class="ctitle" id="trip-form-title">🌸 記帳</div>
+
+        <!-- 幣別切換 -->
         <div id="trip-currency-btns" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
+
         <div class="form-row">
             <label id="trip-amount-label">金額</label>
             <input type="number" id="jp-amount" placeholder="0"
                    inputmode="decimal" oninput="calcTripLive()"
                    style="font-size:22px;font-weight:700;text-align:center">
         </div>
+
         <div id="jp-convert-box" style="text-align:center;margin:-4px 0 12px;padding:10px;border-radius:8px;display:none">
             <div style="font-size:12px;color:var(--t3)" id="jp-rate-note"></div>
             <div style="font-size:22px;font-weight:700" id="jp-twd-result">NT$—</div>
         </div>
+
         <div class="form-row-2">
             <div class="form-row" style="margin:0">
                 <label>類別</label>
@@ -621,23 +647,28 @@
                 <select id="jp-pay"></select>
             </div>
         </div>
+
         <div class="form-row">
             <label>項目說明</label>
             <input type="text" id="jp-desc" placeholder="說明">
         </div>
+
         <div class="form-row">
             <label>日期</label>
             <select id="jp-date"></select>
         </div>
+
         <button class="btn-primary" id="jp-sub-btn" onclick="submitTravelRecord()">🌸 記帳</button>
         <div id="jp-msg" style="display:none;margin-top:8px"></div>
     </div>
 
+    <!-- 支出分類 -->
     <div class="card">
         <div class="ctitle">📊 支出分類</div>
         <div id="trip-summary"><div class="loading"><span class="spin">⟳</span></div></div>
     </div>
 
+    <!-- 每日明細 -->
     <div class="card">
         <div class="ctitle">📅 每日明細</div>
         <div id="trip-daily"><div class="loading"><span class="spin">⟳</span></div></div>
@@ -656,34 +687,42 @@
 <!-- 底部導覽 -->
 
 <nav class="bnav">
+    <!-- 記帳：鋼筆寫入 -->
     <button class="bitem on" id="b-record" onclick="swPg('record')">
         <div class="bicon-wrap"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
         <span class="blabel">記帳</span>
     </button>
+    <!-- 收支：雙向箭頭柱狀圖 -->
     <button class="bitem" id="b-expense" onclick="swPg('expense')">
         <div class="bicon-wrap"><svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="4"/><polyline points="6 10 12 4 18 10"/><line x1="6" y1="20" x2="18" y2="20"/><line x1="6" y1="16" x2="18" y2="16" stroke-opacity="0.4"/></svg></div>
         <span class="blabel">收支</span>
     </button>
+    <!-- 資產：錢包 -->
     <button class="bitem" id="b-asset" onclick="swPg('asset')">
         <div class="bicon-wrap"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" fill="currentColor" stroke="none"/><path d="M22 11V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v4"/></svg></div>
         <span class="blabel">資產</span>
     </button>
+    <!-- 趨勢：折線向上 -->
     <button class="bitem" id="b-trend" onclick="swPg('trend')">
         <div class="bicon-wrap"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
         <span class="blabel">趨勢</span>
     </button>
+    <!-- 負債：信用卡 -->
     <button class="bitem" id="b-debt" onclick="swPg('debt')">
         <div class="bicon-wrap"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg></div>
         <span class="blabel">負債</span>
     </button>
+    <!-- 預算：儀表板圓弧 -->
     <button class="bitem" id="b-budget" onclick="swPg('budget')">
         <div class="bicon-wrap"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 7.38 16.75"/><path d="M4.62 18.75A10 10 0 0 1 12 2"/><path d="M12 12 8 8"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/></svg></div>
         <span class="blabel">預算</span>
     </button>
+    <!-- 健康：心跳波形 -->
     <button class="bitem" id="b-health" onclick="swPg('health')">
         <div class="bicon-wrap"><svg viewBox="0 0 24 24"><polyline points="2 12 6 12 8 6 11 18 13 9 15 14 17 12 22 12"/></svg></div>
         <span class="blabel">健康</span>
     </button>
+    <!-- 旅遊：飛機 -->
     <button class="bitem" id="b-tokyo" onclick="swPg('tokyo')">
         <div class="bicon-wrap"><svg viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 4s-2 1-3.5 2.5L9 8.2l-8-1.8L2 8l6 3-1 3 2 1 1-2 3 1z"/></svg></div>
         <span class="blabel">旅遊</span>
@@ -691,15 +730,20 @@
 </nav>
 
 <script>
+// ═══════════════════════════════════
+// 設定區（修改這裡）
+// ═══════════════════════════════════
 const SCRIPT_ID = 'AKfycbxVk1nwWyEXmLrZ6rpc5JBgx_Sp6A6m1YSpwAcAGS9gtxKu9kpW2TIqH-hSFWrIfQE';
 const SCRIPT_URL = `https://script.google.com/macros/s/${SCRIPT_ID}/exec`;
 const RETIRE_TARGET = 12380000;
-const MORTGAGE = 1528295;
+const MORTGAGE = 1528295;  // 房貸餘額（來自Sheets 2026/4/20）
 
+// 預算設定（每月）
+// fixed:true = 固定支出，直接顯示預算金額；false = 從記帳記錄抓實際數字
 const BUDGETS = [
     { name: '房貸還款', budget: 15515, icon: '🏠', fixed: true  },
     { name: '保險費',   budget: 9494,  icon: '🛡', fixed: true  },
-    { name: '健身房',   budget: 2376,  icon: '🏋', fixed: true  },
+    { name: '健身房',   budget: 2376,  icon: '🏋', fixed: true  },  // 聯邦聯名卡 1,188×2，到11月
     { name: '投資',     budget: 35000, icon: '📈', fixed: true  },
     { name: '生活費',   budget: 30000, icon: '🛒', fixed: false },
     { name: '伙食費',   budget: 15000, icon: '🍱', fixed: false },
@@ -709,16 +753,24 @@ const BUDGETS = [
     { name: '醫療',     budget: 3000,  icon: '💊', fixed: false },
 ];
 
-let gAssets = null;
-let gAssetHistory = [];
-let gRecords = [];
+// ═══════════════════════════════════
+// 全域狀態
+// ═══════════════════════════════════
+let gAssets = null;     // 最新資產列
+let gAssetHistory = []; // 歷史資產資料
+let gRecords = [];      // 記帳記錄
 let currentType = '支出';
 
+// ═══════════════════════════════════
+// 初始化
+// ═══════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+    // 設定今天日期
     document.getElementById('f-date').valueAsDate = new Date();
-    updateTimestamp();
+    updateTimestamp(); // 立即顯示日期
     loadAll();
 
+    // ── 導覽列捲動自動隱藏 ──
     const bnav = document.querySelector('.bnav');
     let lastY = 0;
     let ticking = false;
@@ -729,19 +781,29 @@ document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(() => {
                 const currentY = window.scrollY;
                 const diff = currentY - lastY;
+
+                // 往下捲超過 8px → 隱藏
                 if (diff > 8 && currentY > 60) {
                     bnav.classList.add('hidden');
-                } else if (diff < -4) {
+                }
+                // 往上捲超過 4px → 顯示
+                else if (diff < -4) {
                     bnav.classList.remove('hidden');
+                    // 3秒後無操作再隱藏（如果在頁面中間）
                     clearTimeout(hideTimer);
                     if (currentY > 200) {
-                        hideTimer = setTimeout(() => { bnav.classList.add('hidden'); }, 3000);
+                        hideTimer = setTimeout(() => {
+                            bnav.classList.add('hidden');
+                        }, 3000);
                     }
                 }
+
+                // 捲到頂部 → 永遠顯示
                 if (currentY < 20) {
                     bnav.classList.remove('hidden');
                     clearTimeout(hideTimer);
                 }
+
                 lastY = currentY;
                 ticking = false;
             });
@@ -749,6 +811,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, { passive: true });
 
+    // 點擊導覽列後重置計時器
     bnav.addEventListener('click', () => {
         clearTimeout(hideTimer);
         bnav.classList.remove('hidden');
@@ -756,10 +819,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadAll() {
+    
     loadAssets();
     loadRecords();
 }
 
+// ═══════════════════════════════════
+// JSONP 工具
+// ═══════════════════════════════════
 function jsonp(url, cb) {
     const id = 'cb_' + Date.now();
     const s = document.createElement('script');
@@ -777,7 +844,13 @@ function jsonp(url, cb) {
     document.body.appendChild(s);
 }
 
+// ═══════════════════════════════════
+// 讀取資產歷史（來自 Google Sheets 資產記錄分頁）
+// 資產記錄欄位：A=日期,B=台股,C=VT,D=基金,E=現金,
+//              F=超人勞退,G=彩虹勞退,H=總額,I=淨值,J=進度%,K=距目標
+// ═══════════════════════════════════
 function parseAssetRow(row) {
+    // row 是陣列：[日期,台股,VT,基金,現金,超人勞退,彩虹勞退,總額,淨值,進度%,距目標]
     return {
         date:         String(row[0] || ''),
         stock:        +row[1] || 0,
@@ -795,45 +868,61 @@ function parseAssetRow(row) {
 
 function loadAssets() {
     jsonp(`${SCRIPT_URL}?type=history`, (err, data) => {
-        if (err || !data || !data.success) { loadAssetsFallback(); return; }
+        if (err || !data || !data.success) {
+            loadAssetsFallback();
+            return;
+        }
         const rows = data.data || [];
+        // 跳過標題列
         const dataRows = rows.filter(r => r[0] && r[0] !== '日期' && r[0] !== '日期 ');
         if (!dataRows.length) { loadAssetsFallback(); return; }
+
         gAssetHistory = dataRows.map(parseAssetRow).filter(r => r.total > 0);
+
+        // ⚠️ 找最後一筆「完整有效」資料：台股/VT/基金至少有兩項 > 0
+        // 避免 analyze_portfolio.py 寫入不完整資料時顯示錯誤
         const validRows = gAssetHistory.filter(r => {
             const hasStock = r.stock > 0;
             const hasVT    = r.vt > 0;
             const hasFund  = r.fund > 0;
             return [hasStock, hasVT, hasFund].filter(Boolean).length >= 2;
         });
+
         if (validRows.length) {
-            gAssets = validRows[validRows.length - 1];
+            gAssets = validRows[validRows.length - 1]; // 最新完整列
         } else {
-            gAssets = gAssetHistory[gAssetHistory.length - 1];
+            gAssets = gAssetHistory[gAssetHistory.length - 1]; // fallback 最新列
         }
+
         renderAllAsset();
         updateTimestamp();
     });
 }
 
+// fallback：使用 Sheets 最近一筆正確數據（2026/4/19）
 function loadAssetsFallback() {
     gAssets = {
         date: '2026/4/19',
-        stock:         3257162,
-        vt:             257282,
-        fund:          2654183,
-        cash:           600000,
-        husbandRetire:  876792,
-        wifeRetire:     431850,
+        stock:         3257162,  // 台股市值（帳戶一2,853,570 + 帳戶二403,592）
+        vt:             257282,  // VT 54.67269股
+        fund:          2654183,  // 鉅亨五支基金合計
+        cash:           600000,  // 現金定存
+        husbandRetire:  876792,  // 先生勞退專戶
+        wifeRetire:     431850,  // 彩虹勞退專戶
         total:         8077269,
-        netWorth:      6536390,
+        netWorth:      6536390,  // 總額 - 房貸
         progress:          52.8,
         distToTarget:  5843610,
     };
     gAssetHistory = [gAssets];
     renderAllAsset();
+    
 }
 
+// ═══════════════════════════════════
+// 讀取記帳記錄
+// 收支記帳欄位：A=日期,B=類型,C=類別,D=說明,E=金額,F=帳戶,G=專案
+// ═══════════════════════════════════
 function parseRecordRow(row) {
     return {
         date:    String(row[0] || ''),
@@ -855,20 +944,26 @@ function loadRecords() {
             return;
         }
         const rows = data.data || [];
+        // 跳過標題列
         const dataRows = rows.filter(r => r[0] && r[0] !== '日期' && r[1] !== '類型');
         gRecords = dataRows.map(parseRecordRow)
                            .filter(r => r.amount > 0)
-                           .reverse();
+                           .reverse(); // 最新的在前
         renderRecentRecords(gRecords);
         renderExpense(gRecords);
         renderBudget(gRecords);
     });
 }
 
+// ═══════════════════════════════════
+// 記帳提交
+// ═══════════════════════════════════
 function setType(t) {
     currentType = t;
     document.getElementById('tb-out').classList.toggle('on', t === '支出');
     document.getElementById('tb-in').classList.toggle('on', t === '收入');
+
+    // 切換類別選項
     const catSel = document.getElementById('f-cat');
     if (t === '收入') {
         catSel.innerHTML = '<option>薪資</option><option>投資收益</option><option>退休金</option><option>兼職</option><option>其他</option>';
@@ -879,24 +974,33 @@ function setType(t) {
 
 function submitRecord() {
     const amt = parseFloat(document.getElementById('f-amount').value);
-    if (!amt || amt <= 0) { showMsg('record-msg', '請輸入有效金額', 'warning'); return; }
+    if (!amt || amt <= 0) {
+        showMsg('record-msg', '請輸入有效金額', 'warning'); return;
+    }
     const btn = document.getElementById('sub-btn');
     btn.disabled = true;
     btn.textContent = '⏳ 送出中…';
+
+    // Apps Script 用 GET + type=add + data=JSON（不是 POST）
     const payload = {
         date:     document.getElementById('f-date').value,
         type:     currentType,
-        category: document.getElementById('f-cat').value,
+        category: document.getElementById('f-cat').value,   // Apps Script 用 category
         desc:     document.getElementById('f-desc').value || document.getElementById('f-cat').value,
         amount:   amt,
         account:  document.getElementById('f-acct').value,
         project:  '一般'
     };
+
     const dataParam = encodeURIComponent(JSON.stringify(payload));
     jsonp(`${SCRIPT_URL}?type=add&data=${dataParam}`, (err, data) => {
         btn.disabled = false;
         btn.textContent = '✔ 記帳';
-        if (err) { showMsg('record-msg', '❌ 送出失敗，請重試', 'warning'); return; }
+
+        if (err) {
+            showMsg('record-msg', `❌ 送出失敗，請重試`, 'warning');
+            return;
+        }
         if (data && data.success) {
             showMsg('record-msg', `✅ 記帳成功！${payload.category} NT$${fmt(amt)}`, 'success');
             document.getElementById('f-amount').value = '';
@@ -915,6 +1019,9 @@ function showMsg(id, msg, type) {
     setTimeout(() => { el.style.display = 'none'; }, 3500);
 }
 
+// ═══════════════════════════════════
+// 渲染：最近記錄
+// ═══════════════════════════════════
 function renderRecentRecords(records) {
     const el = document.getElementById('recent-records');
     if (!records.length) {
@@ -939,13 +1046,18 @@ function renderRecentRecords(records) {
     el.innerHTML = rows;
 }
 
+// ═══════════════════════════════════
+// 渲染：收支分析
+// ═══════════════════════════════════
 function renderExpense(records) {
     const now = new Date();
     const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     const monthly = records.filter(r => (r.date || '').startsWith(thisMonth));
+
     const income = monthly.filter(r => r.type === '收入').reduce((s,r) => s + (+r.amount||0), 0);
     const expense = monthly.filter(r => r.type === '支出').reduce((s,r) => s + (+r.amount||0), 0);
     const balance = income - expense;
+
     document.getElementById('expense-metrics').innerHTML = `
         <div class="metric-grid">
             <div class="metric">
@@ -971,6 +1083,8 @@ function renderExpense(records) {
             <div class="progress-fill" style="width:${income>0?Math.min(100,expense/income*100):0}%;background:${expense>income?'var(--r)':''}"></div>
         </div>
     `;
+
+    // 類別圓餅（橫條）
     const catMap = {};
     monthly.filter(r=>r.type==='支出').forEach(r => {
         const c = r.cat || r.category || '其他';
@@ -993,9 +1107,14 @@ function renderExpense(records) {
     }
 }
 
+// ═══════════════════════════════════
+// 渲染：資產頁面
+// ═══════════════════════════════════
 function renderAllAsset() {
     if (!gAssets) return;
     const a = gAssets;
+
+    // 計算淨資產
     const totalAsset = a.total || (+(a.stock||0) + +(a.vt||0) + +(a.fund||0) + +(a.cash||0) + +(a.husbandRetire||0) + +(a.wifeRetire||0));
     const netWorth = a.netWorth || (totalAsset - MORTGAGE);
     const progress = a.progress || (netWorth / RETIRE_TARGET * 100);
@@ -1054,12 +1173,16 @@ function renderAllAsset() {
         </div>
     `;
 
+    // 資產配置橫條
+    // 若 Sheets 未分項儲存，以 totalAsset 做估算提示
     const stockVal  = +(a.stock||0);
     const fundVal   = +(a.fund||0);
     const vtVal     = +(a.vt||0);
     const retireVal = (+(a.husbandRetire||0)) + (+(a.wifeRetire||0));
     const cashVal   = +(a.cash||0);
     const sumParts  = stockVal + fundVal + vtVal + retireVal + cashVal;
+
+    // 若分項加總為 0（Sheets 只存總額），顯示說明
     const allocBase = sumParts > 0 ? sumParts : totalAsset;
     const noDetail  = sumParts === 0;
 
@@ -1085,28 +1208,37 @@ function renderAllAsset() {
           }).join('')
     );
 
+    // 同步更新負債 & 健康頁面
     renderDebt(netWorth, totalAsset);
     renderHealth(netWorth, totalAsset, progress);
     renderTrend();
 }
 
+// ═══════════════════════════════════
+// 渲染：趨勢
+// ═══════════════════════════════════
 function renderTrend() {
     const hist = gAssetHistory;
     if (!hist.length) {
         document.getElementById('trend-chart').innerHTML = '<div style="text-align:center;padding:20px;color:var(--t3)">資產歷史數據不足</div>';
         return;
     }
+
+    // 繪製 Canvas 折線圖
     const w = 360, h = 180;
     const vals = hist.map(r => +(r.netWorth || r.total || 0));
     const dates = hist.map(r => r.date || '');
     const minV = Math.min(...vals) * 0.95;
     const maxV = Math.max(...vals) * 1.02;
+
     const pts = vals.map((v, i) => ({
         x: 30 + (i / Math.max(vals.length-1,1)) * (w - 50),
         y: h - 30 - ((v - minV) / (maxV - minV)) * (h - 50)
     }));
+
     const pathD = pts.map((p,i) => `${i===0?'M':'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
     const fillD = pathD + ` L ${pts[pts.length-1].x.toFixed(1)} ${(h-30)} L 30 ${(h-30)} Z`;
+
     document.getElementById('trend-chart').innerHTML = `
         <div class="chart-wrap">
             <svg width="100%" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
@@ -1129,6 +1261,8 @@ function renderTrend() {
         </div>
         <div style="text-align:center;font-size:12px;color:var(--t3);margin-top:4px">淨資產成長軌跡</div>
     `;
+
+    // 歷史表格
     const tableRows = [...hist].reverse().slice(0, 6).map(r => {
         const nw = +(r.netWorth || r.total || 0);
         return `<div class="list-item">
@@ -1144,6 +1278,9 @@ function renderTrend() {
     document.getElementById('trend-table').innerHTML = tableRows || '<div style="color:var(--t3);text-align:center;padding:16px">暫無歷史數據</div>';
 }
 
+// ═══════════════════════════════════
+// 渲染：負債
+// ═══════════════════════════════════
 function renderDebt(netWorth, totalAsset) {
     const pct = (MORTGAGE / totalAsset * 100).toFixed(1);
     document.getElementById('debt-pct').textContent = pct + '%';
@@ -1153,27 +1290,37 @@ function renderDebt(netWorth, totalAsset) {
     document.getElementById('debt-status-label').textContent = good ? '🟢 健康水準' : '🟡 注意';
 }
 
+// ═══════════════════════════════════
+// 渲染：預算
+// ═══════════════════════════════════
 function renderBudget(records) {
     const now = new Date();
     const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     const monthly = records.filter(r => r.type === '支出' && (r.date||'').startsWith(thisMonth));
+
+    // 合計支出
     const totalBudget = BUDGETS.reduce((s,b) => s+b.budget, 0);
     const totalSpent = monthly.reduce((s,r) => s+(+r.amount||0), 0);
     const pct = totalBudget > 0 ? Math.round(totalSpent/totalBudget*100) : 0;
+
     document.getElementById('budget-alert-area').innerHTML = `
         <div class="alert ${pct > 80 ? 'alert-warning' : 'alert-success'}" style="margin-bottom:14px">
             <strong>${now.getMonth()+1}月預算執行</strong><br>
             總支出 NT$${fmt(totalSpent)} / 預算 NT$${fmt(totalBudget)}（${pct}%）
         </div>
     `;
+
     const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
     const dayOfMonth = now.getDate();
     const monthlyAdv = Math.round(totalBudget / daysInMonth);
+
     document.getElementById('budget-rows').innerHTML = BUDGETS.map(b => {
         let spent;
         if (b.fixed) {
+            // 固定支出（房貸/投資）直接顯示預算金額
             spent = b.budget;
         } else {
+            // 從本月記帳記錄比對類別
             spent = monthly.filter(r => {
                 const cat = (r.cat || r.category || '');
                 return cat === b.name || cat.includes(b.name) || b.name.includes(cat);
@@ -1192,31 +1339,43 @@ function renderBudget(records) {
             </div>
         </div>`;
     }).join('');
+
     document.getElementById('budget-advice').innerHTML =
         `• 建議日均花費：NT$${fmt(monthlyAdv)}<br>
          • 今日已過 ${dayOfMonth}/${daysInMonth} 天（${Math.round(dayOfMonth/daysInMonth*100)}%）<br>
          • ${pct > 80 ? '⚠️ 支出偏高，建議緊縮非必要開銷' : '✅ 預算控制良好，繼續保持'}`;
 }
 
+// ═══════════════════════════════════
+// 渲染：財務健康
+// ═══════════════════════════════════
 function renderHealth(netWorth, totalAsset, progress) {
     const debtPct = MORTGAGE / totalAsset * 100;
+    const investPct = (totalAsset - MORTGAGE * 0 - 5372) / totalAsset * 100; // 近似
+
+    // 評分算法
     let score = 0;
     score += debtPct < 20 ? 25 : debtPct < 35 ? 15 : 5;
     score += progress > 50 ? 25 : progress > 30 ? 15 : 8;
     score += netWorth > 3000000 ? 20 : netWorth > 1000000 ? 12 : 5;
-    score += 15;
+    score += 15; // 投資分散加分
     score = Math.min(100, Math.round(score));
+
     const grade = score >= 85 ? '財務狀況優秀 🌟' : score >= 70 ? '財務狀況良好 ✅' : score >= 55 ? '財務待改善 ⚠️' : '需要重視 🚨';
     const gradeColor = score >= 85 ? 'var(--g)' : score >= 70 ? 'var(--ac)' : 'var(--y)';
+
     document.getElementById('score-num').textContent = score;
     document.getElementById('score-grade').innerHTML = `<span style="color:${gradeColor}">${grade}</span>`;
     document.getElementById('score-circle').style.background =
         `conic-gradient(var(--g) ${score}%, #e2e8f0 ${score}%)`;
+
     document.getElementById('hm-debt').textContent = debtPct.toFixed(1) + '%';
     document.getElementById('hm-retire').textContent = parseFloat(progress).toFixed(1) + '%';
+
     document.getElementById('ev-debt').innerHTML = debtPct < 25 ? '<span style="color:var(--g);font-weight:600">🟢 優秀</span>' : '<span style="color:var(--y);font-weight:600">🟡 尚可</span>';
     document.getElementById('ev-retire').innerHTML = progress > 50 ? '<span style="color:var(--g);font-weight:600">🟢 良好</span>' : '<span style="color:var(--y);font-weight:600">🟡 努力中</span>';
     document.getElementById('ev-cash').innerHTML = '<span style="color:var(--y);font-weight:600">🟡 偏低</span>';
+
     document.getElementById('health-warn').innerHTML = `
         ⚠️ <strong>風險提醒</strong><br>
         投資比例偏高，現金佔比僅約 ${(5372/totalAsset*100).toFixed(1)}%。
@@ -1224,6 +1383,9 @@ function renderHealth(netWorth, totalAsset, progress) {
     `;
 }
 
+// ═══════════════════════════════════
+// 工具函數
+// ═══════════════════════════════════
 function swPg(page) {
     document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
     document.querySelectorAll('.bitem').forEach(b => {
@@ -1233,8 +1395,11 @@ function swPg(page) {
     document.getElementById('pg-' + page).classList.add('on');
     const btn = document.getElementById('b-' + page);
     btn.classList.add(page === 'tokyo' ? 'on-jp' : 'on');
+
+    // 旅遊分頁：進入時初始化（switchTrip 內含抓匯率＋載入記錄）
     if (page === 'tokyo') {
         switchTrip(currentTrip || 'JP2026');
+        // 若在旅遊期間則自動選今天日期
         const today = new Date().toISOString().slice(0,10);
         const sel   = document.getElementById('jp-date');
         if (sel) {
@@ -1244,7 +1409,9 @@ function swPg(page) {
     }
 }
 
-function fmt(n) { return Number(n).toLocaleString('zh-TW'); }
+function fmt(n) {
+    return Number(n).toLocaleString('zh-TW');
+}
 
 function fmtW(n) {
     n = +n;
@@ -1254,20 +1421,25 @@ function fmtW(n) {
     return fmt(n);
 }
 
+// 日期格式化：處理 ISO 字串（如 2026-04-19T16:00:00.000Z）→ 台灣時區日期
 function fmtDate(raw) {
     if (!raw) return '';
     const s = String(raw);
+    // ISO 字串：用 Date 物件轉換為台灣時間（UTC+8）
     if (s.includes('T')) {
         try {
             const d = new Date(s);
+            // toLocaleDateString 依瀏覽器時區，但用 Asia/Taipei 強制指定
             return d.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei',
                 year: 'numeric', month: 'numeric', day: 'numeric' });
         } catch(e) {
+            // fallback：直接取 T 前的日期部分加8小時
             const dateOnly = s.split('T')[0];
             const m = dateOnly.match(/^(\d{4})-(\d{2})-(\d{2})/);
             if (m) return `${m[1]}/${parseInt(m[2])}/${parseInt(m[3])}`;
         }
     }
+    // 一般格式 YYYY-MM-DD 或 YYYY/M/D
     const m = s.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
     if (m) return `${m[1]}/${parseInt(m[2])}/${parseInt(m[3])}`;
     return s;
@@ -1275,15 +1447,21 @@ function fmtDate(raw) {
 
 function updateTimestamp() {
     const now = new Date();
-    const dateStr = now.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
-    const timeStr = now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const dateStr = now.toLocaleDateString('zh-TW', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+    const timeStr = now.toLocaleTimeString('zh-TW', {
+        hour: '2-digit', minute: '2-digit', hour12: false
+    });
     const dateEl = document.getElementById('header-date');
     if (dateEl) dateEl.textContent = `更新時間：${dateStr} ${timeStr}`;
 }
 
 // ═══════════════════════════════════════════════════════
-// 旅遊記帳模組
+// 🌏 旅遊記帳模組（多專案・多幣別・預算追蹤）
 // ═══════════════════════════════════════════════════════
+
+// 專案設定
 const TRIP_PROJECTS = {
     JP2026: {
         name: '🎠 東京迪士尼慶生之旅',
@@ -1317,16 +1495,25 @@ let currentTrip     = 'JP2026';
 let currentCurrency = 'JPY';
 let tripRates       = { JPY: 0, PHP: 0, USD: 0, TWD: 1 };
 let travelRecords   = [];
+
+// 幣別符號
 const CUR_SYMBOLS = { JPY:'¥', PHP:'₱', USD:'$', TWD:'NT$' };
 
+// ── 切換專案 ──
 function switchTrip(code) {
     currentTrip = code;
     const proj  = TRIP_PROJECTS[code];
+
+    // 切換按鈕
     document.querySelectorAll('[id^="trip-btn-"]').forEach(b => b.classList.remove('on'));
     document.getElementById('trip-btn-' + code).classList.add('on');
+
+    // 標題卡
     document.getElementById('trip-header-card').style.background = proj.gradient;
     document.getElementById('trip-title').textContent    = proj.name;
     document.getElementById('trip-subtitle').textContent = proj.subtitle;
+
+    // 幣別按鈕
     const btnNames = { JPY:'🇯🇵 日幣', PHP:'🇵🇭 菲幣', USD:'🇺🇸 美元', TWD:'🇹🇼 台幣' };
     document.getElementById('trip-currency-btns').innerHTML = proj.currencies.map(c => `
         <button id="cur-btn-${c}" onclick="setCurrency('${c}')"
@@ -1335,19 +1522,28 @@ function switchTrip(code) {
                    color:${proj.color};font-family:inherit;transition:all .15s">
             ${btnNames[c]||c}
         </button>`).join('');
+
+    // 日期選單
     const sel = document.getElementById('jp-date');
     sel.innerHTML = proj.dates.length
         ? proj.dates.map((d,i) => `<option value="${d}">${proj.dateLabels[i]||d}</option>`).join('')
         : `<option value="">日期待定</option>`;
+
+    // 下拉選單
     document.getElementById('jp-cat').innerHTML = proj.cats.map(c=>`<option>${c}</option>`).join('');
     document.getElementById('jp-pay').innerHTML = proj.pays.map(p=>`<option>${p}</option>`).join('');
+
+    // 記帳按鈕
     document.getElementById('jp-sub-btn').style.background = proj.gradient;
     document.getElementById('trip-form-title').textContent = proj.name.replace(/^../,'') + ' 記帳';
+
+    // 預設幣別 + 抓匯率 + 讀記錄
     setCurrency(proj.defaultCurrency);
     fetchTripRates();
     loadTravelRecords();
 }
 
+// ── 切換幣別 ──
 function setCurrency(cur) {
     currentCurrency = cur;
     const proj = TRIP_PROJECTS[currentTrip];
@@ -1357,6 +1553,7 @@ function setCurrency(cur) {
     });
     const ab = document.getElementById('cur-btn-' + cur);
     if (ab) { ab.style.background = proj.color; ab.style.color = 'white'; }
+
     const labels = { JPY:'日幣金額（¥）', PHP:'菲幣金額（₱）', USD:'美元金額（$）', TWD:'台幣金額（NT$）' };
     document.getElementById('trip-amount-label').textContent = labels[cur] || '金額';
     document.getElementById('jp-amount').value = '';
@@ -1364,11 +1561,13 @@ function setCurrency(cur) {
     updateRateDisplay();
 }
 
+// ── 抓取多幣別匯率 ──
 function fetchTripRates() {
     document.getElementById('jp-rate-display').textContent = '更新中…';
     const proj = TRIP_PROJECTS[currentTrip];
     const needed = proj.currencies.filter(c => c !== 'TWD');
     if (!needed.length) { tripRates.TWD = 1; updateRateDisplay(); return; }
+
     let done = 0;
     needed.forEach(cur => {
         jsonp(`https://tw.rter.info/capi.php?t=now&q=${cur}`, (err, data) => {
@@ -1400,13 +1599,16 @@ function updateRateDisplay() {
     }
 }
 
+// ── 即時換算 ──
 function calcTripLive() {
     const amount = parseFloat(document.getElementById('jp-amount').value);
     const box    = document.getElementById('jp-convert-box');
     const rate   = tripRates[currentCurrency] || 0;
     const proj   = TRIP_PROJECTS[currentTrip];
+
     if (!amount || amount <= 0 || currentCurrency === 'TWD') { box.style.display='none'; return; }
     if (rate <= 0) { box.style.display='none'; return; }
+
     const twd = Math.round(amount * rate);
     const sym = CUR_SYMBOLS[currentCurrency] || '';
     box.style.display    = 'block';
@@ -1416,15 +1618,19 @@ function calcTripLive() {
     document.getElementById('jp-twd-result').textContent        = `NT$${fmt(twd)}`;
 }
 
+// ── 提交旅遊記帳 ──
 function submitTravelRecord() {
     const amount = parseFloat(document.getElementById('jp-amount').value);
     if (!amount || amount <= 0) { showMsg('jp-msg','請輸入金額','warning'); return; }
     const rate = tripRates[currentCurrency] || 1;
     if (currentCurrency !== 'TWD' && rate <= 0) { showMsg('jp-msg','匯率載入中','warning'); return; }
+
     const btn = document.getElementById('jp-sub-btn');
     btn.disabled = true; btn.textContent = '⏳ 送出中…';
+
     const twd  = currentCurrency === 'TWD' ? amount : Math.round(amount * rate);
     const desc = document.getElementById('jp-desc').value || document.getElementById('jp-cat').value;
+
     const payload = {
         date:      document.getElementById('jp-date').value,
         item:      desc,
@@ -1439,6 +1645,7 @@ function submitTravelRecord() {
                     ? `NT$${fmt(amount)}（台幣直接記帳）`
                     : `${CUR_SYMBOLS[currentCurrency]||''}${fmt(amount)} × ${rate} = NT$${fmt(twd)}`
     };
+
     const dataParam = encodeURIComponent(JSON.stringify(payload));
     jsonp(`${SCRIPT_URL}?type=addTravel&data=${dataParam}`, (err, data) => {
         btn.disabled = false;
@@ -1455,6 +1662,8 @@ function submitTravelRecord() {
     });
 }
 
+// ── 載入旅遊記錄 ──
+// Apps Script 回傳欄位：0=日期,1=項目,2=類別,3=原始金額,4=幣別,5=匯率,6=台幣換算,7=付款,8=專案,9=備註
 function loadTravelRecords() {
     jsonp(`${SCRIPT_URL}?type=getTravel&project=${currentTrip}`, (err, data) => {
         if (err || !data || !data.success) { renderTripSummary([]); return; }
@@ -1476,14 +1685,20 @@ function loadTravelRecords() {
     });
 }
 
+// ── 渲染統計 ──
 function renderTripSummary(records) {
     const proj      = TRIP_PROJECTS[currentTrip];
     const totalTwd  = records.reduce((s,r) => s+r.amountTwd, 0);
     const budgetPct = proj.budget > 0 ? Math.min(100, totalTwd/proj.budget*100) : 0;
+
+    // 更新標題卡數字
     document.getElementById('trip-total-twd').textContent  = `NT$${fmtW(totalTwd)}`;
     document.getElementById('trip-budget-pct').textContent = budgetPct.toFixed(1)+'%';
     document.getElementById('trip-budget-bar').style.width = budgetPct+'%';
-    document.getElementById('trip-budget-bar').style.background = budgetPct >= 90 ? '#ffd700' : 'white';
+    document.getElementById('trip-budget-bar').style.background =
+        budgetPct >= 90 ? '#ffd700' : 'white';
+
+    // 類別統計
     const catMap = {};
     records.forEach(r => {
         const c = r.category||'其他';
@@ -1491,6 +1706,7 @@ function renderTripSummary(records) {
     });
     const cats   = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
     const colors = [proj.color,'#e67e22','#3498db','#27ae60','#9b59b6','#1abc9c','#f39c12','#e74c3c','#7f8c8d'];
+
     document.getElementById('trip-summary').innerHTML = !records.length
         ? `<div style="text-align:center;padding:20px;color:var(--t3);font-size:14px">✈️ 旅程開始後在這裡記帳！</div>`
         : `<div style="padding:8px 10px;background:${proj.light};border-radius:8px;margin-bottom:12px;
@@ -1517,13 +1733,16 @@ function renderTripSummary(records) {
                    <div style="font-size:12px;font-weight:700;width:80px;text-align:right">NT$${fmt(val)}</div>
                </div>`).join('')}`;
 
+    // 每日明細
     const dayMap = {};
     records.forEach(r => { (dayMap[r.date]||(dayMap[r.date]=[])).push(r); });
+
     if (!Object.keys(dayMap).length) {
         document.getElementById('trip-daily').innerHTML =
             '<div style="text-align:center;padding:16px;color:var(--t3);font-size:14px">尚無記錄</div>';
         return;
     }
+
     document.getElementById('trip-daily').innerHTML = Object.entries(dayMap)
         .sort((a,b) => a[0].localeCompare(b[0]))
         .map(([date, dayRecs]) => {
@@ -1550,6 +1769,8 @@ function renderTripSummary(records) {
             </div>`;
         }).join('');
 }
+
+
 </script>
 
 </body>
