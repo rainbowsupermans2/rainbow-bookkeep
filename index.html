@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="彩虹CFO">
     <title>彩虹超人CFO財務管理</title>
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
     <style>
         :root {
             --bg: #f0f8f8;           /* 淡青白底色（圖一氛圍改為青調） */
@@ -23,13 +29,13 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, #e0f4f4 0%, #f0f8f8 30%, #f6fbfb 100%);
+            background: transparent;
             min-height: 100vh;
             color: var(--t1);
             line-height: 1.5;
             overflow-x: hidden;
         }
-        .container { max-width: 420px; margin: 0 auto; position: relative; padding-bottom: 116px; }
+        .container { max-width: 420px; margin: 0 auto; position: relative; padding-bottom: 116px; background: rgba(230,245,245,0.45); min-height: 100vh; }
         .header {
             background: linear-gradient(135deg, #0a5c66, #018790, #00a896);
             color: white;
@@ -60,12 +66,14 @@
 
         /* Cards */
         .card {
-            background: rgba(255,255,255,0.92);
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-radius: 14px;
             padding: 18px;
             margin-bottom: 14px;
-            box-shadow: 0 2px 12px rgba(1,135,144,0.08);
-            border: 1px solid rgba(0,168,150,0.15);
+            box-shadow: 0 2px 16px rgba(1,135,144,0.10);
+            border: 1px solid rgba(255,255,255,0.60);
         }
         .ctitle {
             font-size: 15px;
