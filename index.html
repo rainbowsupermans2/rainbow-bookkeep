@@ -983,7 +983,8 @@ function submitRecord() {
         date:     document.getElementById('f-date').value,
         type:     currentType,
         category: document.getElementById('f-cat').value,   // Apps Script 用 category
-        desc:     document.getElementById('f-desc').value || document.getElementById('f-cat').value,
+        item:     document.getElementById('f-desc').value || '',
+        desc:     document.getElementById('f-desc').value || '',
         amount:   amt,
         account:  document.getElementById('f-acct').value,
         project:  '一般'
