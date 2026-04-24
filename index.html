@@ -371,9 +371,10 @@
             <div class="form-row" style="margin:0">
                 <label>類別</label>
                 <select id="f-cat">
-                    <option>餐飲</option><option>交通</option><option>購物</option>
-                    <option>娛樂</option><option>醫療</option><option>房貸</option>
-                    <option>投資</option><option>薪資</option><option>其他</option>
+                    <option>餐飲</option><option>生活雜支</option><option>交通</option>
+                    <option>醫療保健</option><option>娛樂休閒</option><option>學習成長</option>
+                    <option>水電費</option><option>房貸</option><option>保險費</option>
+                    <option>健身房</option><option>手機費</option><option>投資</option><option>其他</option>
                 </select>
             </div>
             <div class="form-row" style="margin:0">
@@ -738,16 +739,20 @@ const MORTGAGE = 1528295;  // 房貸餘額（來自Sheets 2026/4/20）
 // 預算設定（每月）
 // fixed:true = 固定支出，直接顯示預算金額；false = 從記帳記錄抓實際數字
 const BUDGETS = [
-    { name: '房貸還款', budget: 15515, icon: '🏠', fixed: true  },
+    // ── 固定支出 ──
+    { name: '房貸',     budget: 15515, icon: '🏠', fixed: true  },
     { name: '保險費',   budget: 9494,  icon: '🛡', fixed: true  },
     { name: '健身房',   budget: 2376,  icon: '🏋', fixed: true  },  // 聯邦聯名卡 1,188×2，到11月
-    { name: '投資',     budget: 35000, icon: '📈', fixed: true  },
-    { name: '生活費',   budget: 30000, icon: '🛒', fixed: false },
-    { name: '餐飲',     budget: 15000, icon: '🍱', fixed: false },
-    { name: '水電費',   budget: 2000,  icon: '💡', fixed: false },
     { name: '手機費',   budget: 1098,  icon: '📱', fixed: true  },
+    { name: '投資',     budget: 35000, icon: '📈', fixed: true  },
+    // ── 變動支出 ──
+    { name: '餐飲',     budget: 15000, icon: '🍱', fixed: false },
+    { name: '生活雜支', budget: 20000, icon: '🛒', fixed: false },
     { name: '交通',     budget: 3000,  icon: '🚌', fixed: false },
-    { name: '醫療',     budget: 3000,  icon: '💊', fixed: false },
+    { name: '醫療保健', budget: 3000,  icon: '💊', fixed: false },
+    { name: '娛樂休閒', budget: 5000,  icon: '🎬', fixed: false },
+    { name: '學習成長', budget: 5000,  icon: '📚', fixed: false },
+    { name: '水電費',   budget: 2000,  icon: '💡', fixed: false },
 ];
 
 // ═══════════════════════════════════
@@ -965,7 +970,7 @@ function setType(t) {
     if (t === '收入') {
         catSel.innerHTML = '<option>薪資</option><option>投資收益</option><option>退休金</option><option>兼職</option><option>其他</option>';
     } else {
-        catSel.innerHTML = '<option>餐飲</option><option>交通</option><option>購物</option><option>娛樂</option><option>醫療</option><option>房貸</option><option>投資</option><option>保險費</option><option>水電費</option><option>手機費</option><option>其他</option>';
+        catSel.innerHTML = '<option>餐飲</option><option>生活雜支</option><option>交通</option><option>醫療保健</option><option>娛樂休閒</option><option>學習成長</option><option>水電費</option><option>房貸</option><option>保險費</option><option>健身房</option><option>手機費</option><option>投資</option><option>其他</option>';
     }
 }
 
