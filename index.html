@@ -743,7 +743,7 @@ const BUDGETS = [
     { name: '健身房',   budget: 2376,  icon: '🏋', fixed: true  },  // 聯邦聯名卡 1,188×2，到11月
     { name: '投資',     budget: 35000, icon: '📈', fixed: true  },
     { name: '生活費',   budget: 30000, icon: '🛒', fixed: false },
-    { name: '伙食費',   budget: 15000, icon: '🍱', fixed: false },
+    { name: '餐飲',     budget: 15000, icon: '🍱', fixed: false },
     { name: '水電費',   budget: 2000,  icon: '💡', fixed: false },
     { name: '手機費',   budget: 1098,  icon: '📱', fixed: true  },
     { name: '交通',     budget: 3000,  icon: '🚌', fixed: false },
@@ -965,7 +965,7 @@ function setType(t) {
     if (t === '收入') {
         catSel.innerHTML = '<option>薪資</option><option>投資收益</option><option>退休金</option><option>兼職</option><option>其他</option>';
     } else {
-        catSel.innerHTML = '<option>伙食費</option><option>交通</option><option>購物</option><option>娛樂</option><option>醫療</option><option>房貸</option><option>投資</option><option>保險費</option><option>水電費</option><option>手機費</option><option>其他</option>';
+        catSel.innerHTML = '<option>餐飲</option><option>交通</option><option>購物</option><option>娛樂</option><option>醫療</option><option>房貸</option><option>投資</option><option>保險費</option><option>水電費</option><option>手機費</option><option>其他</option>';
     }
 }
 
