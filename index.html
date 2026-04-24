@@ -519,7 +519,7 @@
     <div class="card" style="background:#fffbeb">
         <div style="font-weight:600;margin-bottom:8px">📊 CFO本月建議</div>
         <div id="budget-advice" style="font-size:14px;color:var(--t2);line-height:1.8">
-            • 重點控制餐飲與購物變動支出<br>
+            • 重點控制餐飲與生活雜支等變動支出<br>
             • 每週五檢視預算執行狀況<br>
             • 超支項目優先削減非必要費用
         </div>
@@ -1094,7 +1094,7 @@ function renderExpense(records) {
         catMap[c] = (catMap[c]||0) + (+r.amount||0);
     });
     const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-    const colors = ['#2d6a4f','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16'];
+    const colors = ['#018790','#00a896','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16','#0e6494','#c9748a','#e8a0b0','#3b82f6','#f97316','#64748b'];
     if (!cats.length) {
         document.getElementById('expense-cats').innerHTML = '<div style="text-align:center;padding:16px;color:var(--t3);font-size:14px">本月尚無支出記錄</div>';
     } else {
