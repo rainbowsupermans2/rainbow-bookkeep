@@ -340,8 +340,8 @@
 .alloc-pct { font-size: 12px; font-weight: 700; color: var(--t1); width: 36px; text-align: right; }
 
 @media (max-width: 380px) {
-    .bicon-wrap svg { width: 20px; height: 20px; }
-    .blabel { font-size: 11px; }
+    .bicon { font-size: 15px; }
+    .blabel { font-size: 8px; }
     .metric-value { font-size: 16px; }
 }
 ```
@@ -375,10 +375,9 @@
             <div class="form-row" style="margin:0">
                 <label>類別</label>
                 <select id="f-cat">
-                    <option>餐飲</option><option>生活雜支</option><option>交通</option>
-                    <option>醫療保健</option><option>娛樂休閒</option><option>學習成長</option>
-                    <option>水電費</option><option>房貸</option><option>保險費</option>
-                    <option>健身房</option><option>手機費</option><option>投資</option><option>其他</option>
+                    <option>餐飲</option><option>交通</option><option>購物</option>
+                    <option>娛樂</option><option>醫療</option><option>房貸</option>
+                    <option>投資</option><option>薪資</option><option>其他</option>
                 </select>
             </div>
             <div class="form-row" style="margin:0">
@@ -531,7 +530,7 @@
     <div class="card" style="background:#fffbeb">
         <div style="font-weight:600;margin-bottom:8px">📊 CFO本月建議</div>
         <div id="budget-advice" style="font-size:14px;color:var(--t2);line-height:1.8">
-            • 重點控制餐飲與生活雜支等變動支出<br>
+            • 重點控制餐飲與購物變動支出<br>
             • 每週五檢視預算執行狀況<br>
             • 超支項目優先削減非必要費用
         </div>
@@ -630,126 +629,6 @@
     <div style="margin-top:10px;background:rgba(255,255,255,0.3);border-radius:4px;height:6px;overflow:hidden">
         <div id="trip-budget-bar" style="height:100%;border-radius:4px;background:white;transition:width 0.5s;width:0%"></div>
     </div>
-</div>
-
-<!-- 日幣備用金追蹤（JP2026專用）-->
-<div class="card" id="jp-reserve-card" style="display:none">
-    <div class="ctitle">💴 日幣備用金</div>
-    <div style="font-size:12px;color:var(--t3);margin-bottom:10px">可支配日幣明細（不含已確認地陪費）</div>
-
-    <!-- 各帳戶明細 -->
-    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:13px">
-            <span style="color:var(--t2)">🏦 玉山日幣帳</span>
-            <span style="font-weight:600">¥23,597</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:13px">
-            <span style="color:var(--t2)">💵 實體現金</span>
-            <span style="font-weight:600">¥58,062</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:13px">
-            <span style="color:var(--t2)">🚃 彩虹 Suica</span>
-            <span style="font-weight:600">¥5,206</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:13px">
-            <span style="color:var(--t2)">🚃 先生 Suica</span>
-            <span style="font-weight:600">¥6,914</span>
-        </div>
-        <div style="height:1px;background:var(--border);margin:4px 0"></div>
-        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
-            <span>可支配合計</span>
-            <span style="color:var(--ac)">¥93,779</span>
-        </div>
-    </div>
-
-    <!-- 總體已花/剩餘 -->
-    <div style="background:var(--bg);border-radius:10px;padding:10px;margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
-            <span style="color:var(--t2)">已花日幣（可支配）</span>
-            <span id="jp-used-jpy" style="color:var(--r);font-weight:600">¥0</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
-            <span>剩餘可支配</span>
-            <span id="jp-remain-jpy" style="color:var(--g)">¥93,779</span>
-        </div>
-        <div style="margin-top:8px;background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden">
-            <div id="jp-reserve-bar" style="height:100%;border-radius:4px;background:var(--ac);transition:width 0.5s;width:0%"></div>
-        </div>
-        <div style="text-align:right;font-size:11px;color:var(--t3);margin-top:4px" id="jp-used-pct">已使用 0%</div>
-    </div>
-
-    <!-- 各帳戶即時餘額 -->
-    <div style="font-size:12px;color:var(--t3);margin-bottom:8px;font-weight:600">各帳戶即時餘額</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <!-- 玉山日幣帳 -->
-        <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
-            <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🏦 玉山日幣</div>
-            <div style="font-size:13px;font-weight:700" id="yushan-remain">¥23,597</div>
-            <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="yushan-used">¥0</span></div>
-            <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
-                <div id="yushan-bar" style="height:100%;border-radius:3px;background:#018790;transition:width 0.5s;width:0%"></div>
-            </div>
-        </div>
-        <!-- 實體現金 -->
-        <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
-            <div style="font-size:11px;color:var(--t3);margin-bottom:4px">💵 實體現金</div>
-            <div style="font-size:13px;font-weight:700" id="cash-remain">¥58,062</div>
-            <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="cash-used">¥0</span></div>
-            <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
-                <div id="cash-bar" style="height:100%;border-radius:3px;background:#f59e0b;transition:width 0.5s;width:0%"></div>
-            </div>
-        </div>
-        <!-- 彩虹Suica -->
-        <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
-            <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🚃 彩虹Suica</div>
-            <div style="font-size:13px;font-weight:700" id="suica-rainbow-remain">¥5,206</div>
-            <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="suica-rainbow-used">¥0</span></div>
-            <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
-                <div id="suica-rainbow-bar" style="height:100%;border-radius:3px;background:#b85c75;transition:width 0.5s;width:0%"></div>
-            </div>
-        </div>
-        <!-- 先生Suica -->
-        <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
-            <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🚃 先生Suica</div>
-            <div style="font-size:13px;font-weight:700" id="suica-husband-remain">¥6,914</div>
-            <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="suica-husband-used">¥0</span></div>
-            <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
-                <div id="suica-husband-bar" style="height:100%;border-radius:3px;background:#018790;transition:width 0.5s;width:0%"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 地陪費（確認費用，獨立顯示）-->
-    <div style="background:#fff8e6;border:1px solid #f59e0b33;border-radius:10px;padding:10px">
-        <div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:8px">🧭 Kimi 地陪費（已確認，獨立計算）</div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-            <span style="color:var(--t2)">✅ 台幣訂金已付</span>
-            <span style="color:#92400e;font-weight:600">NT$2,400</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-            <span style="color:var(--t2)">⏳ 日幣尾款（現場付現）</span>
-            <span style="color:var(--r);font-weight:600">¥42,000</span>
-        </div>
-        <div style="font-size:10px;color:var(--t3);margin-top:6px">
-            💡 記帳時選付款「Kimi地陪現金」，不影響備用金統計
-        </div>
-    </div>
-    <!-- 動態計算已花/剩餘 -->
-    <div style="background:var(--bg);border-radius:10px;padding:10px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
-            <span style="color:var(--t2)">已花日幣</span>
-            <span id="jp-used-jpy" style="color:var(--r);font-weight:600">¥0</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
-            <span>剩餘日幣</span>
-            <span id="jp-remain-jpy" style="color:var(--g)">¥141,779</span>
-        </div>
-        <div style="margin-top:8px;background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden">
-            <div id="jp-reserve-bar" style="height:100%;border-radius:4px;background:var(--ac);transition:width 0.5s;width:0%"></div>
-        </div>
-        <div style="text-align:right;font-size:11px;color:var(--t3);margin-top:4px" id="jp-used-pct">已使用 0%</div>
-    </div>
-
 </div>
 
 <!-- 快速記帳 -->
@@ -876,18 +755,16 @@ const MORTGAGE = 1528295;  // 房貸餘額（來自Sheets 2026/4/20）
 // 預算設定（每月）
 // fixed:true = 固定支出，直接顯示預算金額；false = 從記帳記錄抓實際數字
 const BUDGETS = [
-    { name: '餐飲',     budget: 15000, icon: '🍱', fixed: false },
-    { name: '生活雜支', budget: 20000, icon: '🛒', fixed: false },
-    { name: '交通',     budget: 3000,  icon: '🚌', fixed: false },
-    { name: '娛樂休閒', budget: 5000,  icon: '🎬', fixed: false },
-    { name: '學習成長', budget: 5000,  icon: '📚', fixed: false },
-    { name: '醫療保健', budget: 3000,  icon: '💊', fixed: false },
-    { name: '水電費',   budget: 2000,  icon: '💡', fixed: false },
-    { name: '房貸',     budget: 15515, icon: '🏠', fixed: true  },
+    { name: '房貸還款', budget: 15515, icon: '🏠', fixed: true  },
     { name: '保險費',   budget: 9494,  icon: '🛡', fixed: true  },
-    { name: '健身房',   budget: 2376,  icon: '🏋', fixed: true  },
-    { name: '手機費',   budget: 1098,  icon: '📱', fixed: true  },
+    { name: '健身房',   budget: 2376,  icon: '🏋', fixed: true  },  // 聯邦聯名卡 1,188×2，到11月
     { name: '投資',     budget: 35000, icon: '📈', fixed: true  },
+    { name: '生活費',   budget: 30000, icon: '🛒', fixed: false },
+    { name: '伙食費',   budget: 15000, icon: '🍱', fixed: false },
+    { name: '水電費',   budget: 2000,  icon: '💡', fixed: false },
+    { name: '手機費',   budget: 1098,  icon: '📱', fixed: true  },
+    { name: '交通',     budget: 3000,  icon: '🚌', fixed: false },
+    { name: '醫療',     budget: 3000,  icon: '💊', fixed: false },
 ];
 
 // ═══════════════════════════════════
@@ -1105,7 +982,7 @@ function setType(t) {
     if (t === '收入') {
         catSel.innerHTML = '<option>薪資</option><option>投資收益</option><option>退休金</option><option>兼職</option><option>其他</option>';
     } else {
-        catSel.innerHTML = '<option>餐飲</option><option>生活雜支</option><option>交通</option><option>醫療保健</option><option>娛樂休閒</option><option>學習成長</option><option>水電費</option><option>房貸</option><option>保險費</option><option>健身房</option><option>手機費</option><option>投資</option><option>其他</option>';
+        catSel.innerHTML = '<option>伙食費</option><option>交通</option><option>購物</option><option>娛樂</option><option>醫療</option><option>房貸</option><option>投資</option><option>保險費</option><option>水電費</option><option>手機費</option><option>其他</option>';
     }
 }
 
@@ -1123,8 +1000,7 @@ function submitRecord() {
         date:     document.getElementById('f-date').value,
         type:     currentType,
         category: document.getElementById('f-cat').value,   // Apps Script 用 category
-        item:     document.getElementById('f-desc').value || '',
-        desc:     document.getElementById('f-desc').value || '',
+        desc:     document.getElementById('f-desc').value || document.getElementById('f-cat').value,
         amount:   amt,
         account:  document.getElementById('f-acct').value,
         project:  '一般'
@@ -1229,7 +1105,7 @@ function renderExpense(records) {
         catMap[c] = (catMap[c]||0) + (+r.amount||0);
     });
     const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-    const colors = ['#018790','#00a896','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16','#0e6494','#c9748a','#e8a0b0','#3b82f6','#f97316','#64748b'];
+    const colors = ['#2d6a4f','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16'];
     if (!cats.length) {
         document.getElementById('expense-cats').innerHTML = '<div style="text-align:center;padding:16px;color:var(--t3);font-size:14px">本月尚無支出記錄</div>';
     } else {
@@ -1612,7 +1488,7 @@ const TRIP_PROJECTS = {
         dates: ['2026-05-16','2026-05-17','2026-05-18','2026-05-19','2026-05-20','2026-05-21','2026-05-22'],
         dateLabels: ['5/16 出發','5/17','5/18','5/19','5/20','5/21','5/22 返台'],
         cats: ['餐飲','交通','住宿','購物','門票景點','Suica儲值','藥妝零食','機票','地陪費','其他'],
-        pays: ['現金日幣','玉山日幣','彩虹Suica','先生Suica','熊本熊卡','富邦JCB','LINE Pay','台幣預付','Kimi地陪現金'],
+        pays: ['現金日幣','Suica','信用卡','LINE Pay','台幣預付'],
     },
     PH2026: {
         name: '🏝 薄荷島之旅',
@@ -1650,10 +1526,6 @@ function switchTrip(code) {
     document.getElementById('trip-header-card').style.background = proj.gradient;
     document.getElementById('trip-title').textContent    = proj.name;
     document.getElementById('trip-subtitle').textContent = proj.subtitle;
-
-    // 日幣備用金卡片（只在 JP2026 顯示）
-    const reserveCard = document.getElementById('jp-reserve-card');
-    if (reserveCard) reserveCard.style.display = (code === 'JP2026') ? 'block' : 'none';
 
     // 幣別按鈕
     const btnNames = { JPY:'🇯🇵 日幣', PHP:'🇵🇭 菲幣', USD:'🇺🇸 美元', TWD:'🇹🇼 台幣' };
@@ -1839,49 +1711,6 @@ function renderTripSummary(records) {
     document.getElementById('trip-budget-bar').style.width = budgetPct+'%';
     document.getElementById('trip-budget-bar').style.background =
         budgetPct >= 90 ? '#ffd700' : 'white';
-
-    // ── 日幣備用金追蹤（JP2026 專用）──
-    if (currentTrip === 'JP2026') {
-        const RESERVE = { total: 93779, yushan: 23597, cash: 58062, suicaR: 5206, suicaH: 6914 };
-
-        const jpy = r => r.currency === 'JPY';
-        // 排除 Kimi地陪現金（獨立管理，不計入可支配備用金）
-        const notKimi = r => r.payment !== 'Kimi地陪現金';
-        const pay = (r, ...names) => names.some(n => r.payment === n);
-
-        const usedYushan  = records.filter(r => jpy(r) && notKimi(r) && pay(r,'玉山日幣')).reduce((s,r)=>s+(+r.amount||0),0);
-        const usedCash    = records.filter(r => jpy(r) && notKimi(r) && pay(r,'現金日幣')).reduce((s,r)=>s+(+r.amount||0),0);
-        const usedSuicaR  = records.filter(r => jpy(r) && notKimi(r) && pay(r,'彩虹Suica','彩虹 Suica')).reduce((s,r)=>s+(+r.amount||0),0);
-        const usedSuicaH  = records.filter(r => jpy(r) && notKimi(r) && pay(r,'先生Suica','先生 Suica')).reduce((s,r)=>s+(+r.amount||0),0);
-        const usedTotal   = usedYushan + usedCash + usedSuicaR + usedSuicaH;
-        const remainTotal = RESERVE.total - usedTotal;
-        const pctTotal    = Math.min(100, usedTotal / RESERVE.total * 100);
-
-        const q = id => document.getElementById(id);
-        if (!q('jp-used-jpy')) return;
-
-        // 總體
-        q('jp-used-jpy').textContent   = `¥${fmt(usedTotal)}`;
-        q('jp-remain-jpy').textContent = `¥${fmt(remainTotal)}`;
-        q('jp-remain-jpy').style.color = remainTotal < 5000 ? 'var(--r)' : 'var(--g)';
-        q('jp-reserve-bar').style.width      = pctTotal + '%';
-        q('jp-reserve-bar').style.background = pctTotal >= 80 ? 'var(--r)' : 'var(--ac)';
-        q('jp-used-pct').textContent         = `已使用 ${pctTotal.toFixed(1)}%`;
-
-        // 各帳戶
-        const setCard = (remainId, usedId, barId, init, used) => {
-            const remain = init - used;
-            const pct    = Math.min(100, used / init * 100);
-            q(remainId).textContent = `¥${fmt(Math.max(0, remain))}`;
-            q(remainId).style.color = remain < 500 ? 'var(--r)' : 'var(--ac)';
-            q(usedId).textContent   = `¥${fmt(used)}`;
-            q(barId).style.width    = pct + '%';
-        };
-        setCard('yushan-remain',       'yushan-used',       'yushan-bar',       RESERVE.yushan, usedYushan);
-        setCard('cash-remain',         'cash-used',         'cash-bar',         RESERVE.cash,   usedCash);
-        setCard('suica-rainbow-remain','suica-rainbow-used','suica-rainbow-bar', RESERVE.suicaR, usedSuicaR);
-        setCard('suica-husband-remain','suica-husband-used','suica-husband-bar', RESERVE.suicaH, usedSuicaH);
-    }
 
     // 類別統計
     const catMap = {};
