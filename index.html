@@ -60,290 +60,289 @@
         }
         .last-update { font-size: 10px; opacity: 0.7; text-align: right; margin-top: 4px; }
 
-/* Pages */
-.pg { display: none; padding: 16px; min-height: calc(100vh - 140px); }
-.pg.on { display: block; }
+    /* Pages */
+    .pg { display: none; padding: 16px; min-height: calc(100vh - 140px); }
+    .pg.on { display: block; }
 
-/* Cards */
-.card {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 6px rgba(1,135,144,0.08), 0 0 1px rgba(0,0,0,0.04);
-    border: none;
-}
-.ctitle {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--t1);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+    /* Cards */
+    .card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 6px rgba(1,135,144,0.08), 0 0 1px rgba(0,0,0,0.04);
+        border: none;
+    }
+    .ctitle {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--t1);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-/* Metrics */
-.metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-.metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.metric {
-    text-align: center;
-    padding: 14px 10px;
-    background: #f8fafc;
-    border-radius: 8px;
-}
-.metric-label { font-size: 11px; color: var(--t3); margin-bottom: 4px; font-weight: 500; }
-.metric-value { font-size: 18px; font-weight: 700; }
+    /* Metrics */
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .metric {
+        text-align: center;
+        padding: 14px 10px;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+    .metric-label { font-size: 11px; color: var(--t3); margin-bottom: 4px; font-weight: 500; }
+    .metric-value { font-size: 18px; font-weight: 700; }
 
-/* Progress */
-.progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin: 8px 0; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, #018790, #00c9b1); border-radius: 5px; transition: width 0.6s ease; }
-.progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--t3); }
+    /* Progress */
+    .progress-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin: 8px 0; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #018790, #00c9b1); border-radius: 5px; transition: width 0.6s ease; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--t3); }
 
-/* Bottom nav */
-.bnav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.96);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(1,135,144,0.12);
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: auto auto;
-    box-shadow: 0 -4px 20px rgba(1,135,144,0.08);
-    z-index: 200;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-.bnav.hidden {
-    transform: translateY(100%);
-}
-.bitem {
-    padding: 7px 2px 9px;
-    text-align: center;
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-family: inherit;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    -webkit-tap-highlight-color: transparent;
-    transition: all 0.18s ease;
-    border-bottom: 1px solid rgba(1,135,144,0.06);
-    position: relative;
-}
-.bitem:nth-child(5), .bitem:nth-child(6),
-.bitem:nth-child(7), .bitem:nth-child(8) { border-bottom: none; }
-.bitem.on { background: none; }
-.bitem.on-jp { background: none; }
-/* active indicator dot */
-.bitem.on::after {
-    content: '';
-    position: absolute;
-    bottom: 3px;
-    left: 50%; transform: translateX(-50%);
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: var(--ac);
-}
-.bitem.on-jp::after {
-    content: '';
-    position: absolute;
-    bottom: 3px;
-    left: 50%; transform: translateX(-50%);
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: var(--jp);
-}
-.bicon-wrap {
-    width: 44px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 12px;
-    transition: all 0.18s ease;
-}
-.bitem.on  .bicon-wrap { background: rgba(1,135,144,0.12); }
-.bitem.on-jp .bicon-wrap { background: rgba(184,92,117,0.12); }
-.bicon-wrap svg {
-    width: 22px; height: 22px;
-    stroke: var(--t3);
-    color: var(--t3);
-    fill: none;
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transition: stroke 0.18s ease, color 0.18s ease;
-}
-.bitem.on  .bicon-wrap svg { stroke: var(--ac); color: var(--ac); }
-.bitem.on-jp .bicon-wrap svg { stroke: var(--jp); color: var(--jp); }
-.blabel { font-size: 13px; color: var(--t3); font-weight: 500; letter-spacing: 0.2px; }
-.bitem.on .blabel { color: var(--ac); font-weight: 700; }
-.bitem.on-jp .blabel { color: var(--jp); font-weight: 700; }
+    /* Bottom nav */
+    .bnav {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(1,135,144,0.12);
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: auto auto;
+        box-shadow: 0 -4px 20px rgba(1,135,144,0.08);
+        z-index: 200;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .bnav.hidden {
+        transform: translateY(100%);
+    }
+    .bitem {
+        padding: 7px 2px 9px;
+        text-align: center;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        -webkit-tap-highlight-color: transparent;
+        transition: all 0.18s ease;
+        border-bottom: 1px solid rgba(1,135,144,0.06);
+        position: relative;
+    }
+    .bitem:nth-child(5), .bitem:nth-child(6),
+    .bitem:nth-child(7), .bitem:nth-child(8) { border-bottom: none; }
+    .bitem.on { background: none; }
+    .bitem.on-jp { background: none; }
+    /* active indicator dot */
+    .bitem.on::after {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        left: 50%; transform: translateX(-50%);
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        background: var(--ac);
+    }
+    .bitem.on-jp::after {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        left: 50%; transform: translateX(-50%);
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        background: var(--jp);
+    }
+    .bicon-wrap {
+        width: 44px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 12px;
+        transition: all 0.18s ease;
+    }
+    .bitem.on  .bicon-wrap { background: rgba(1,135,144,0.12); }
+    .bitem.on-jp .bicon-wrap { background: rgba(184,92,117,0.12); }
+    .bicon-wrap svg {
+        width: 22px; height: 22px;
+        stroke: var(--t3);
+        color: var(--t3);
+        fill: none;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: stroke 0.18s ease, color 0.18s ease;
+    }
+    .bitem.on  .bicon-wrap svg { stroke: var(--ac); color: var(--ac); }
+    .bitem.on-jp .bicon-wrap svg { stroke: var(--jp); color: var(--jp); }
+    .blabel { font-size: 13px; color: var(--t3); font-weight: 500; letter-spacing: 0.2px; }
+    .bitem.on .blabel { color: var(--ac); font-weight: 700; }
+    .bitem.on-jp .blabel { color: var(--jp); font-weight: 700; }
 
-/* Form */
-.form-row { margin-bottom: 12px; }
-.form-row label { display: block; font-size: 12px; color: var(--t2); font-weight: 600; margin-bottom: 4px; }
-.form-row input, .form-row select, .form-row textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--t1);
-    background: white;
-    transition: border-color 0.2s;
-}
-.form-row input:focus, .form-row select:focus { outline: none; border-color: var(--ac); }
-.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.btn-primary {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--ac), var(--g));
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-.btn-primary:active { opacity: 0.8; }
-.btn-primary:disabled { opacity: 0.5; }
+    /* Form */
+    .form-row { margin-bottom: 12px; }
+    .form-row label { display: block; font-size: 12px; color: var(--t2); font-weight: 600; margin-bottom: 4px; }
+    .form-row input, .form-row select, .form-row textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-size: 15px;
+        font-family: inherit;
+        color: var(--t1);
+        background: white;
+        transition: border-color 0.2s;
+    }
+    .form-row input:focus, .form-row select:focus { outline: none; border-color: var(--ac); }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--ac), var(--g));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .btn-primary:active { opacity: 0.8; }
+    .btn-primary:disabled { opacity: 0.5; }
 
-/* Alerts */
-.alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid; font-size: 14px; }
-.alert-success { background: #e8f7f7; border-color: #a0d8d8; color: #0a5c66; }
-.alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
-.alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
-.alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+    /* Alerts */
+    .alert { padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid; font-size: 14px; }
+    .alert-success { background: #e8f7f7; border-color: #a0d8d8; color: #0a5c66; }
+    .alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+    .alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
 
-/* Lists */
-.list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 0;
-    border-bottom: 1px solid #f1f5f9;
-}
-.list-item:last-child { border-bottom: none; }
-.list-left { display: flex; flex-direction: column; }
-.list-title { font-size: 17px; font-weight: 600; color: var(--t1); }
-.list-sub { font-size: 14px; color: var(--t3); margin-top: 2px; }
-.list-right { text-align: right; }
-.list-amount { font-size: 18px; font-weight: 700; }
-.list-date { font-size: 13px; color: var(--t3); margin-top: 2px; }
+    /* Lists */
+    .list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .list-left { display: flex; flex-direction: column; }
+    .list-title { font-size: 17px; font-weight: 600; color: var(--t1); }
+    .list-sub { font-size: 14px; color: var(--t3); margin-top: 2px; }
+    .list-right { text-align: right; }
+    .list-amount { font-size: 18px; font-weight: 700; }
+    .list-date { font-size: 13px; color: var(--t3); margin-top: 2px; }
 
-/* Health Score */
-.health-score {
-    text-align: center;
-    padding: 20px;
-    background: linear-gradient(135deg, #f0fff4, #e6fffa);
-    border-radius: 12px;
-    margin-bottom: 16px;
-}
-.score-circle {
-    width: 110px; height: 110px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 12px;
-    position: relative;
-}
-.score-inner {
-    width: 82px; height: 82px;
-    background: white;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column;
-}
-.score-number { font-size: 26px; font-weight: 700; color: var(--ac); }
-.score-label { font-size: 11px; color: var(--t3); }
+    /* Health Score */
+    .health-score {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f0fff4, #e6fffa);
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+    .score-circle {
+        width: 110px; height: 110px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 12px;
+        position: relative;
+    }
+    .score-inner {
+        width: 82px; height: 82px;
+        background: white;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        flex-direction: column;
+    }
+    .score-number { font-size: 26px; font-weight: 700; color: var(--ac); }
+    .score-label { font-size: 11px; color: var(--t3); }
 
-/* Debt bar */
-.debt-status {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px;
-    border-radius: 8px;
-    margin-bottom: 14px;
-    border: 1px solid;
-}
-.status-good { background: #e8f7f7; border-color: #a0d8d8; }
+    /* Debt bar */
+    .debt-status {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 14px;
+        border: 1px solid;
+    }
+    .status-good { background: #e8f7f7; border-color: #a0d8d8; }
 
-/* Budget row */
-.budget-row {
-    padding: 11px 0;
-    border-bottom: 1px solid #f1f5f9;
-}
-.budget-row:last-child { border-bottom: none; }
-.budget-row-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
-.budget-name { font-size: 14px; font-weight: 600; }
-.budget-nums { font-size: 13px; color: var(--t2); }
-.budget-mini-bar { width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
-.budget-mini-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+    /* Budget row */
+    .budget-row {
+        padding: 11px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .budget-row:last-child { border-bottom: none; }
+    .budget-row-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .budget-name { font-size: 14px; font-weight: 600; }
+    .budget-nums { font-size: 13px; color: var(--t2); }
+    .budget-mini-bar { width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .budget-mini-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
 
-/* Loading */
-.loading {
-    display: flex; align-items: center; justify-content: center;
-    padding: 30px;
-    color: var(--t3);
-    font-size: 14px;
-    gap: 8px;
-}
-.spin { animation: spin 1s linear infinite; display: inline-block; }
-@keyframes spin { to { transform: rotate(360deg); } }
+    /* Loading */
+    .loading {
+        display: flex; align-items: center; justify-content: center;
+        padding: 30px;
+        color: var(--t3);
+        font-size: 14px;
+        gap: 8px;
+    }
+    .spin { animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Tag chips */
-.chip {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-}
-.chip-green { background: #d0f0f0; color: #0a5c66; }
-.chip-yellow { background: #fef9c3; color: #854d0e; }
-.chip-red { background: #fee2e2; color: #991b1b; }
+    /* Tag chips */
+    .chip {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .chip-green { background: #d0f0f0; color: #0a5c66; }
+    .chip-yellow { background: #fef9c3; color: #854d0e; }
+    .chip-red { background: #fee2e2; color: #991b1b; }
 
-/* Canvas chart wrapper */
-.chart-wrap { width: 100%; overflow: hidden; border-radius: 8px; }
+    /* Canvas chart wrapper */
+    .chart-wrap { width: 100%; overflow: hidden; border-radius: 8px; }
 
-/* Type switch */
-.type-switch {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 0;
-    background: #f1f5f9;
-    border-radius: 8px;
-    padding: 3px;
-    margin-bottom: 14px;
-}
-.type-btn {
-    padding: 8px;
-    border: none; background: none;
-    border-radius: 6px;
-    font-size: 14px; font-weight: 600;
-    font-family: inherit;
-    color: var(--t3);
-    cursor: pointer;
-    transition: all 0.15s;
-}
-.type-btn.on {
-    background: white;
-    color: var(--t1);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-}
+    /* Type switch */
+    .type-switch {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 0;
+        background: #f1f5f9;
+        border-radius: 8px;
+        padding: 3px;
+        margin-bottom: 14px;
+    }
+    .type-btn {
+        padding: 8px;
+        border: none; background: none;
+        border-radius: 6px;
+        font-size: 14px; font-weight: 600;
+        font-family: inherit;
+        color: var(--t3);
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .type-btn.on {
+        background: white;
+        color: var(--t1);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
 
-/* Asset allocation bars */
-.alloc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.alloc-label { font-size: 12px; color: var(--t2); width: 60px; flex-shrink: 0; }
-.alloc-bar-wrap { flex: 1; height: 14px; background: #e2e8f0; border-radius: 7px; overflow: hidden; }
-.alloc-bar { height: 100%; border-radius: 7px; transition: width 0.5s; }
-.alloc-pct { font-size: 12px; font-weight: 700; color: var(--t1); width: 36px; text-align: right; }
+    /* Asset allocation bars */
+    .alloc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .alloc-label { font-size: 12px; color: var(--t2); width: 60px; flex-shrink: 0; }
+    .alloc-bar-wrap { flex: 1; height: 14px; background: #e2e8f0; border-radius: 7px; overflow: hidden; }
+    .alloc-bar { height: 100%; border-radius: 7px; transition: width 0.5s; }
+    .alloc-pct { font-size: 12px; font-weight: 700; color: var(--t1); width: 36px; text-align: right; }
 
-@media (max-width: 380px) {
-    .bicon { font-size: 15px; }
-    .blabel { font-size: 8px; }
-    .metric-value { font-size: 16px; }
-}
-
+    @media (max-width: 380px) {
+        .bicon-wrap svg { width: 20px; height: 20px; }
+        .blabel { font-size: 11px; }
+        .metric-value { font-size: 16px; }
+    }
 </style>
 
 </head>
@@ -357,7 +356,6 @@
     </header>
 
 <!-- ① 記帳 -->
-
 <div class="pg on" id="pg-record">
     <div class="card">
         <div class="ctitle">📝 快速記帳</div>
@@ -374,7 +372,7 @@
                 <label>類別</label>
                 <select id="f-cat">
                     <option>餐飲</option><option>生活雜支</option><option>交通</option>
-                    <option>娛樂休閒</option><option>學習成長</option><option>醫療保健</option>
+                    <option>醫療保健</option><option>娛樂休閒</option><option>學習成長</option>
                     <option>水電費</option><option>房貸</option><option>保險費</option>
                     <option>健身房</option><option>手機費</option><option>投資</option><option>其他</option>
                 </select>
@@ -412,15 +410,13 @@
         <div id="record-msg" style="margin-top:10px;display:none;"></div>
     </div>
 
-<div class="card">
-    <div class="ctitle">📋 最近記錄</div>
-    <div id="recent-records"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
-</div>
-
+    <div class="card">
+        <div class="ctitle">📋 最近記錄</div>
+        <div id="recent-records"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
+    </div>
 </div>
 
 <!-- ② 收支 -->
-
 <div class="pg" id="pg-expense">
     <div id="expense-summary">
         <div class="card">
@@ -435,7 +431,6 @@
 </div>
 
 <!-- ③ 資產 -->
-
 <div class="pg" id="pg-asset">
     <div class="card">
         <div class="ctitle">💰 總資產</div>
@@ -458,7 +453,6 @@
 </div>
 
 <!-- ④ 趨勢 -->
-
 <div class="pg" id="pg-trend">
     <div class="card">
         <div class="ctitle">📈 資產成長趨勢</div>
@@ -473,7 +467,6 @@
 </div>
 
 <!-- ⑤ 負債 -->
-
 <div class="pg" id="pg-debt">
     <div class="card">
         <div class="ctitle">💳 負債概況</div>
@@ -515,7 +508,6 @@
 </div>
 
 <!-- ⑥ 預算 -->
-
 <div class="pg" id="pg-budget">
     <div class="card">
         <div class="ctitle">📋 本月預算執行</div>
@@ -527,7 +519,7 @@
     <div class="card" style="background:#fffbeb">
         <div style="font-weight:600;margin-bottom:8px">📊 CFO本月建議</div>
         <div id="budget-advice" style="font-size:14px;color:var(--t2);line-height:1.8">
-            • 重點控制餐飲與購物變動支出<br>
+            • 重點控制餐飲與生活雜支等變動支出<br>
             • 每週五檢視預算執行狀況<br>
             • 超支項目優先削減非必要費用
         </div>
@@ -535,7 +527,6 @@
 </div>
 
 <!-- ⑦ 財務健康 -->
-
 <div class="pg" id="pg-health">
     <div class="card">
         <div class="ctitle">🏥 CFO財務健康評分</div>
@@ -594,101 +585,219 @@
 </div>
 
 <!-- ⑧ 旅遊記帳（多專案・多幣別） -->
-
 <div class="pg" id="pg-tokyo">
 
-<!-- 專案切換 -->
-<div class="type-switch" style="margin-bottom:12px">
-    <button class="type-btn on" id="trip-btn-JP2026" onclick="switchTrip('JP2026')">🎠 東京</button>
-    <button class="type-btn" id="trip-btn-PH2026" onclick="switchTrip('PH2026')">🏝 薄荷島</button>
-</div>
-
-<!-- 旅程標題卡 -->
-<div class="card" id="trip-header-card" style="color:white;text-align:center;padding:18px;background:linear-gradient(135deg,#c0392b,#e74c3c)">
-    <div style="font-size:19px;font-weight:700;margin-bottom:3px" id="trip-title">🎠 東京迪士尼慶生之旅</div>
-    <div style="font-size:12px;opacity:.9" id="trip-subtitle">2026/5/16–5/22・帶小公主慶祝四歲生日 🎂👸</div>
-    <div style="margin-top:12px;display:flex;justify-content:center;gap:16px">
-        <div>
-            <div style="font-size:10px;opacity:.8">匯率</div>
-            <div style="font-size:16px;font-weight:700" id="jp-rate-display">…</div>
-        </div>
-        <div>
-            <div style="font-size:10px;opacity:.8">已花（台幣）</div>
-            <div style="font-size:16px;font-weight:700" id="trip-total-twd">NT$0</div>
-        </div>
-        <div>
-            <div style="font-size:10px;opacity:.8">預算進度</div>
-            <div style="font-size:16px;font-weight:700" id="trip-budget-pct">0%</div>
-        </div>
-    </div>
-    <!-- 預算進度條 -->
-    <div style="margin-top:10px;background:rgba(255,255,255,0.3);border-radius:4px;height:6px;overflow:hidden">
-        <div id="trip-budget-bar" style="height:100%;border-radius:4px;background:white;transition:width 0.5s;width:0%"></div>
-    </div>
-</div>
-
-<!-- 快速記帳 -->
-<div class="card">
-    <div class="ctitle" id="trip-form-title">🌸 記帳</div>
-
-    <!-- 幣別切換 -->
-    <div id="trip-currency-btns" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
-
-    <div class="form-row">
-        <label id="trip-amount-label">金額</label>
-        <input type="number" id="jp-amount" placeholder="0"
-               inputmode="decimal" oninput="calcTripLive()"
-               style="font-size:22px;font-weight:700;text-align:center">
+    <!-- 專案切換 -->
+    <div class="type-switch" style="margin-bottom:12px">
+        <button class="type-btn on" id="trip-btn-JP2026" onclick="switchTrip('JP2026')">🎠 東京</button>
+        <button class="type-btn" id="trip-btn-PH2026" onclick="switchTrip('PH2026')">🏝 薄荷島</button>
     </div>
 
-    <div id="jp-convert-box" style="text-align:center;margin:-4px 0 12px;padding:10px;border-radius:8px;display:none">
-        <div style="font-size:12px;color:var(--t3)" id="jp-rate-note"></div>
-        <div style="font-size:22px;font-weight:700" id="jp-twd-result">NT$—</div>
-    </div>
-
-    <div class="form-row-2">
-        <div class="form-row" style="margin:0">
-            <label>類別</label>
-            <select id="jp-cat"></select>
+    <!-- 旅程標題卡 -->
+    <div class="card" id="trip-header-card" style="color:white;text-align:center;padding:18px;background:linear-gradient(135deg,#c0392b,#e74c3c)">
+        <div style="font-size:19px;font-weight:700;margin-bottom:3px" id="trip-title">🎠 東京迪士尼慶生之旅</div>
+        <div style="font-size:12px;opacity:.9" id="trip-subtitle">2026/5/16–5/22・帶小公主慶祝四歲生日 🎂👸</div>
+        <div style="margin-top:12px;display:flex;justify-content:center;gap:16px">
+            <div>
+                <div style="font-size:10px;opacity:.8">匯率</div>
+                <div style="font-size:16px;font-weight:700" id="jp-rate-display">…</div>
+            </div>
+            <div>
+                <div style="font-size:10px;opacity:.8">已花（台幣）</div>
+                <div style="font-size:16px;font-weight:700" id="trip-total-twd">NT$0</div>
+            </div>
+            <div>
+                <div style="font-size:10px;opacity:.8">預算進度</div>
+                <div style="font-size:16px;font-weight:700" id="trip-budget-pct">0%</div>
+            </div>
         </div>
-        <div class="form-row" style="margin:0">
-            <label>付款</label>
-            <select id="jp-pay"></select>
+        <!-- 預算進度條 -->
+        <div style="margin-top:10px;background:rgba(255,255,255,0.3);border-radius:4px;height:6px;overflow:hidden">
+            <div id="trip-budget-bar" style="height:100%;border-radius:4px;background:white;transition:width 0.5s;width:0%"></div>
         </div>
     </div>
 
-    <div class="form-row">
-        <label>項目說明</label>
-        <input type="text" id="jp-desc" placeholder="說明">
+    <!-- 日幣備用金追蹤（JP2026專用）-->
+    <div class="card" id="jp-reserve-card" style="display:none">
+        <div class="ctitle">💴 日幣備用金</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:10px">可支配日幣明細（不含已確認地陪費）</div>
+
+        <!-- 各帳戶明細 -->
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:var(--t2)">🏦 玉山日幣帳</span>
+                <span style="font-weight:600">¥23,597</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:var(--t2)">💵 實體現金</span>
+                <span style="font-weight:600">¥58,062</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:var(--t2)">🚃 彩虹 Suica</span>
+                <span style="font-weight:600">¥5,206</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:var(--t2)">🚃 先生 Suica</span>
+                <span style="font-weight:600">¥6,914</span>
+            </div>
+            <div style="height:1px;background:var(--border);margin:4px 0"></div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
+                <span>可支配合計</span>
+                <span style="color:var(--ac)">¥93,779</span>
+            </div>
+        </div>
+
+        <!-- 總體已花/剩餘 -->
+        <div style="background:var(--bg);border-radius:10px;padding:10px;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+                <span style="color:var(--t2)">已花日幣（可支配）</span>
+                <span id="jp-used-jpy" style="color:var(--r);font-weight:600">¥0</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
+                <span>剩餘可支配</span>
+                <span id="jp-remain-jpy" style="color:var(--g)">¥93,779</span>
+            </div>
+            <div style="margin-top:8px;background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden">
+                <div id="jp-reserve-bar" style="height:100%;border-radius:4px;background:var(--ac);transition:width 0.5s;width:0%"></div>
+            </div>
+            <div style="text-align:right;font-size:11px;color:var(--t3);margin-top:4px" id="jp-used-pct">已使用 0%</div>
+        </div>
+
+        <!-- 各帳戶即時餘額 -->
+        <div style="font-size:12px;color:var(--t3);margin-bottom:8px;font-weight:600">各帳戶即時餘額</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <!-- 玉山日幣帳 -->
+            <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
+                <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🏦 玉山日幣</div>
+                <div style="font-size:13px;font-weight:700" id="yushan-remain">¥23,597</div>
+                <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="yushan-used">¥0</span></div>
+                <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
+                    <div id="yushan-bar" style="height:100%;border-radius:3px;background:#018790;transition:width 0.5s;width:0%"></div>
+                </div>
+            </div>
+            <!-- 實體現金 -->
+            <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
+                <div style="font-size:11px;color:var(--t3);margin-bottom:4px">💵 實體現金</div>
+                <div style="font-size:13px;font-weight:700" id="cash-remain">¥58,062</div>
+                <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="cash-used">¥0</span></div>
+                <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
+                    <div id="cash-bar" style="height:100%;border-radius:3px;background:#f59e0b;transition:width 0.5s;width:0%"></div>
+                </div>
+            </div>
+            <!-- 彩虹Suica -->
+            <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
+                <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🚃 彩虹Suica</div>
+                <div style="font-size:13px;font-weight:700" id="suica-rainbow-remain">¥5,206</div>
+                <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="suica-rainbow-used">¥0</span></div>
+                <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
+                    <div id="suica-rainbow-bar" style="height:100%;border-radius:3px;background:#b85c75;transition:width 0.5s;width:0%"></div>
+                </div>
+            </div>
+            <!-- 先生Suica -->
+            <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
+                <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🚃 先生Suica</div>
+                <div style="font-size:13px;font-weight:700" id="suica-husband-remain">¥6,914</div>
+                <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="suica-husband-used">¥0</span></div>
+                <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
+                    <div id="suica-husband-bar" style="height:100%;border-radius:3px;background:#018790;transition:width 0.5s;width:0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 地陪費（確認費用，獨立顯示）-->
+        <div style="background:#fff8e6;border:1px solid #f59e0b33;border-radius:10px;padding:10px">
+            <div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:8px">🧭 Kimi 地陪費（已確認，獨立計算）</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                <span style="color:var(--t2)">✅ 台幣訂金已付</span>
+                <span style="color:#92400e;font-weight:600">NT$2,400</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                <span style="color:var(--t2)">⏳ 日幣尾款（現場付現）</span>
+                <span style="color:var(--r);font-weight:600">¥42,000</span>
+            </div>
+            <div style="font-size:10px;color:var(--t3);margin-top:6px">
+                💡 記帳時選付款「Kimi地陪現金」，不影響備用金統計
+            </div>
+        </div>
+        <!-- 動態計算已花/剩餘 -->
+        <div style="background:var(--bg);border-radius:10px;padding:10px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+                <span style="color:var(--t2)">已花日幣</span>
+                <span id="jp-used-jpy" style="color:var(--r);font-weight:600">¥0</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
+                <span>剩餘日幣</span>
+                <span id="jp-remain-jpy" style="color:var(--g)">¥141,779</span>
+            </div>
+            <div style="margin-top:8px;background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden">
+                <div id="jp-reserve-bar" style="height:100%;border-radius:4px;background:var(--ac);transition:width 0.5s;width:0%"></div>
+            </div>
+            <div style="text-align:right;font-size:11px;color:var(--t3);margin-top:4px" id="jp-used-pct">已使用 0%</div>
+        </div>
+
     </div>
 
-    <div class="form-row">
-        <label>日期</label>
-        <select id="jp-date"></select>
+    <!-- 快速記帳 -->
+    <div class="card">
+        <div class="ctitle" id="trip-form-title">🌸 記帳</div>
+
+        <!-- 幣別切換 -->
+        <div id="trip-currency-btns" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
+
+        <div class="form-row">
+            <label id="trip-amount-label">金額</label>
+            <input type="number" id="jp-amount" placeholder="0"
+                   inputmode="decimal" oninput="calcTripLive()"
+                   style="font-size:22px;font-weight:700;text-align:center">
+        </div>
+
+        <div id="jp-convert-box" style="text-align:center;margin:-4px 0 12px;padding:10px;border-radius:8px;display:none">
+            <div style="font-size:12px;color:var(--t3)" id="jp-rate-note"></div>
+            <div style="font-size:22px;font-weight:700" id="jp-twd-result">NT$—</div>
+        </div>
+
+        <div class="form-row-2">
+            <div class="form-row" style="margin:0">
+                <label>類別</label>
+                <select id="jp-cat"></select>
+            </div>
+            <div class="form-row" style="margin:0">
+                <label>付款</label>
+                <select id="jp-pay"></select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>項目說明</label>
+            <input type="text" id="jp-desc" placeholder="說明">
+        </div>
+
+        <div class="form-row">
+            <label>日期</label>
+            <select id="jp-date"></select>
+        </div>
+
+        <button class="btn-primary" id="jp-sub-btn" onclick="submitTravelRecord()">🌸 記帳</button>
+        <div id="jp-msg" style="display:none;margin-top:8px"></div>
     </div>
 
-    <button class="btn-primary" id="jp-sub-btn" onclick="submitTravelRecord()">🌸 記帳</button>
-    <div id="jp-msg" style="display:none;margin-top:8px"></div>
-</div>
-
-<!-- 支出分類 -->
-<div class="card">
-    <div class="ctitle">📊 支出分類</div>
-    <div id="trip-summary"><div class="loading"><span class="spin">⟳</span></div></div>
-</div>
-
-<!-- 每日明細 -->
-<div class="card">
-    <div class="ctitle">📅 每日明細</div>
-    <div id="trip-daily"><div class="loading"><span class="spin">⟳</span></div></div>
-</div>
-
-<div class="card" style="background:#fffbeb">
-    <div style="font-size:12px;color:var(--t2);line-height:1.8">
-        💡 匯率使用台銀即時公告，每次進入自動更新。台幣直接記帳匯率=1，機票/住宿/地陪費用可直接以台幣記入。
+    <!-- 支出分類 -->
+    <div class="card">
+        <div class="ctitle">📊 支出分類</div>
+        <div id="trip-summary"><div class="loading"><span class="spin">⟳</span></div></div>
     </div>
-</div>
 
+    <!-- 每日明細 -->
+    <div class="card">
+        <div class="ctitle">📅 每日明細</div>
+        <div id="trip-daily"><div class="loading"><span class="spin">⟳</span></div></div>
+    </div>
+
+    <div class="card" style="background:#fffbeb">
+        <div style="font-size:12px;color:var(--t2);line-height:1.8">
+            💡 匯率使用台銀即時公告，每次進入自動更新。台幣直接記帳匯率=1，機票/住宿/地陪費用可直接以台幣記入。
+        </div>
+    </div>
 </div>
 
 </div>
@@ -747,23 +856,22 @@ const SCRIPT_URL = `https://script.google.com/macros/s/${SCRIPT_ID}/exec`;
 const RETIRE_TARGET = 12380000;
 const MORTGAGE = 1528295;  // 房貸餘額（來自Sheets 2026/4/20）
 
-// 預算設定（每月）—— 12科目，與記帳類別完全對應
+// 預算設定（每月）
 // fixed:true = 固定支出，直接顯示預算金額；false = 從記帳記錄抓實際數字
 const BUDGETS = [
-    { name: '餐飲',   budget: 15000, icon: '🍱', fixed: false },
+    { name: '餐飲',     budget: 15000, icon: '🍱', fixed: false },
     { name: '生活雜支', budget: 20000, icon: '🛒', fixed: false },
-    { name: '交通',   budget: 3000,  icon: '🚌', fixed: false },
-    { name: '娛樂休閒', budget: 5000,  icon: '🎮', fixed: false },
+    { name: '交通',     budget: 3000,  icon: '🚌', fixed: false },
+    { name: '娛樂休閒', budget: 5000,  icon: '🎬', fixed: false },
     { name: '學習成長', budget: 5000,  icon: '📚', fixed: false },
     { name: '醫療保健', budget: 3000,  icon: '💊', fixed: false },
-    { name: '水電費',  budget: 2000,  icon: '💡', fixed: false },
-    { name: '房貸',   budget: 15515, icon: '🏠', fixed: true  },
-    { name: '保險費',  budget: 9494,  icon: '🛡', fixed: true  },
-    { name: '健身房',  budget: 2376,  icon: '🏋', fixed: true  },  // 聯邦聯名卡 1,188×2，到11月
-    { name: '手機費',  budget: 1098,  icon: '📱', fixed: true  },
-    { name: '投資',   budget: 35000, icon: '📈', fixed: true  },
+    { name: '水電費',   budget: 2000,  icon: '💡', fixed: false },
+    { name: '房貸',     budget: 15515, icon: '🏠', fixed: true  },
+    { name: '保險費',   budget: 9494,  icon: '🛡', fixed: true  },
+    { name: '健身房',   budget: 2376,  icon: '🏋', fixed: true  },
+    { name: '手機費',   budget: 1098,  icon: '📱', fixed: true  },
+    { name: '投資',     budget: 35000, icon: '📈', fixed: true  },
 ];
-// 月總預算：NT$116,483
 
 // ═══════════════════════════════════
 // 全域狀態
@@ -911,23 +1019,24 @@ function loadAssets() {
     });
 }
 
-// fallback：使用 Sheets 最近一筆正確數據（2026/4/24）
+// fallback：使用 Sheets 最近一筆正確數據（2026/4/19）
 function loadAssetsFallback() {
     gAssets = {
-        date: '2026/4/24',
-        stock:         3257162,  // 台股市值
+        date: '2026/4/19',
+        stock:         3257162,  // 台股市值（帳戶一2,853,570 + 帳戶二403,592）
         vt:             257282,  // VT 54.67269股
         fund:          2654183,  // 鉅亨五支基金合計
         cash:           600000,  // 現金定存
         husbandRetire:  876792,  // 先生勞退專戶
         wifeRetire:     431850,  // 彩虹勞退專戶
-        total:         8287041,  // 淨資產 + 房貸
-        netWorth:      6758746,  // 2026/4/24 確認值
-        progress:          54.6,
-        distToTarget:  5621254,
+        total:         8077269,
+        netWorth:      6536390,  // 總額 - 房貸
+        progress:          52.8,
+        distToTarget:  5843610,
     };
     gAssetHistory = [gAssets];
     renderAllAsset();
+    
 }
 
 // ═══════════════════════════════════
@@ -979,7 +1088,7 @@ function setType(t) {
     if (t === '收入') {
         catSel.innerHTML = '<option>薪資</option><option>投資收益</option><option>退休金</option><option>兼職</option><option>其他</option>';
     } else {
-        catSel.innerHTML = '<option>餐飲</option><option>生活雜支</option><option>交通</option><option>娛樂休閒</option><option>學習成長</option><option>醫療保健</option><option>水電費</option><option>房貸</option><option>保險費</option><option>健身房</option><option>手機費</option><option>投資</option><option>其他</option>';
+        catSel.innerHTML = '<option>餐飲</option><option>生活雜支</option><option>交通</option><option>醫療保健</option><option>娛樂休閒</option><option>學習成長</option><option>水電費</option><option>房貸</option><option>保險費</option><option>健身房</option><option>手機費</option><option>投資</option><option>其他</option>';
     }
 }
 
@@ -997,7 +1106,8 @@ function submitRecord() {
         date:     document.getElementById('f-date').value,
         type:     currentType,
         category: document.getElementById('f-cat').value,   // Apps Script 用 category
-        desc:     document.getElementById('f-desc').value || document.getElementById('f-cat').value,
+        item:     document.getElementById('f-desc').value || '',
+        desc:     document.getElementById('f-desc').value || '',
         amount:   amt,
         account:  document.getElementById('f-acct').value,
         project:  '一般'
@@ -1102,7 +1212,7 @@ function renderExpense(records) {
         catMap[c] = (catMap[c]||0) + (+r.amount||0);
     });
     const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-    const colors = ['#2d6a4f','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16'];
+    const colors = ['#018790','#00a896','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16','#0e6494','#c9748a','#e8a0b0','#3b82f6','#f97316','#64748b'];
     if (!cats.length) {
         document.getElementById('expense-cats').innerHTML = '<div style="text-align:center;padding:16px;color:var(--t3);font-size:14px">本月尚無支出記錄</div>';
     } else {
@@ -1485,7 +1595,7 @@ const TRIP_PROJECTS = {
         dates: ['2026-05-16','2026-05-17','2026-05-18','2026-05-19','2026-05-20','2026-05-21','2026-05-22'],
         dateLabels: ['5/16 出發','5/17','5/18','5/19','5/20','5/21','5/22 返台'],
         cats: ['餐飲','交通','住宿','購物','門票景點','Suica儲值','藥妝零食','機票','地陪費','其他'],
-        pays: ['現金日幣','Suica','信用卡','LINE Pay','台幣預付'],
+        pays: ['現金日幣','玉山日幣','彩虹Suica','先生Suica','熊本熊卡','富邦JCB','LINE Pay','台幣預付','Kimi地陪現金'],
     },
     PH2026: {
         name: '🏝 薄荷島之旅',
@@ -1523,6 +1633,10 @@ function switchTrip(code) {
     document.getElementById('trip-header-card').style.background = proj.gradient;
     document.getElementById('trip-title').textContent    = proj.name;
     document.getElementById('trip-subtitle').textContent = proj.subtitle;
+
+    // 日幣備用金卡片（只在 JP2026 顯示）
+    const reserveCard = document.getElementById('jp-reserve-card');
+    if (reserveCard) reserveCard.style.display = (code === 'JP2026') ? 'block' : 'none';
 
     // 幣別按鈕
     const btnNames = { JPY:'🇯🇵 日幣', PHP:'🇵🇭 菲幣', USD:'🇺🇸 美元', TWD:'🇹🇼 台幣' };
@@ -1708,6 +1822,49 @@ function renderTripSummary(records) {
     document.getElementById('trip-budget-bar').style.width = budgetPct+'%';
     document.getElementById('trip-budget-bar').style.background =
         budgetPct >= 90 ? '#ffd700' : 'white';
+
+    // ── 日幣備用金追蹤（JP2026 專用）──
+    if (currentTrip === 'JP2026') {
+        const RESERVE = { total: 93779, yushan: 23597, cash: 58062, suicaR: 5206, suicaH: 6914 };
+
+        const jpy = r => r.currency === 'JPY';
+        // 排除 Kimi地陪現金（獨立管理，不計入可支配備用金）
+        const notKimi = r => r.payment !== 'Kimi地陪現金';
+        const pay = (r, ...names) => names.some(n => r.payment === n);
+
+        const usedYushan  = records.filter(r => jpy(r) && notKimi(r) && pay(r,'玉山日幣')).reduce((s,r)=>s+(+r.amount||0),0);
+        const usedCash    = records.filter(r => jpy(r) && notKimi(r) && pay(r,'現金日幣')).reduce((s,r)=>s+(+r.amount||0),0);
+        const usedSuicaR  = records.filter(r => jpy(r) && notKimi(r) && pay(r,'彩虹Suica','彩虹 Suica')).reduce((s,r)=>s+(+r.amount||0),0);
+        const usedSuicaH  = records.filter(r => jpy(r) && notKimi(r) && pay(r,'先生Suica','先生 Suica')).reduce((s,r)=>s+(+r.amount||0),0);
+        const usedTotal   = usedYushan + usedCash + usedSuicaR + usedSuicaH;
+        const remainTotal = RESERVE.total - usedTotal;
+        const pctTotal    = Math.min(100, usedTotal / RESERVE.total * 100);
+
+        const q = id => document.getElementById(id);
+        if (!q('jp-used-jpy')) return;
+
+        // 總體
+        q('jp-used-jpy').textContent   = `¥${fmt(usedTotal)}`;
+        q('jp-remain-jpy').textContent = `¥${fmt(remainTotal)}`;
+        q('jp-remain-jpy').style.color = remainTotal < 5000 ? 'var(--r)' : 'var(--g)';
+        q('jp-reserve-bar').style.width      = pctTotal + '%';
+        q('jp-reserve-bar').style.background = pctTotal >= 80 ? 'var(--r)' : 'var(--ac)';
+        q('jp-used-pct').textContent         = `已使用 ${pctTotal.toFixed(1)}%`;
+
+        // 各帳戶
+        const setCard = (remainId, usedId, barId, init, used) => {
+            const remain = init - used;
+            const pct    = Math.min(100, used / init * 100);
+            q(remainId).textContent = `¥${fmt(Math.max(0, remain))}`;
+            q(remainId).style.color = remain < 500 ? 'var(--r)' : 'var(--ac)';
+            q(usedId).textContent   = `¥${fmt(used)}`;
+            q(barId).style.width    = pct + '%';
+        };
+        setCard('yushan-remain',       'yushan-used',       'yushan-bar',       RESERVE.yushan, usedYushan);
+        setCard('cash-remain',         'cash-used',         'cash-bar',         RESERVE.cash,   usedCash);
+        setCard('suica-rainbow-remain','suica-rainbow-used','suica-rainbow-bar', RESERVE.suicaR, usedSuicaR);
+        setCard('suica-husband-remain','suica-husband-used','suica-husband-bar', RESERVE.suicaH, usedSuicaH);
+    }
 
     // 類別統計
     const catMap = {};
