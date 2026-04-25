@@ -1896,7 +1896,7 @@ function renderTripSummary(records) {
     }
 
     document.getElementById('trip-daily').innerHTML = Object.entries(dayMap)
-        .sort((a,b) => a[0].localeCompare(b[0]))
+        .sort((a,b) => b[0].localeCompare(a[0]))
         .map(([date, dayRecs]) => {
             const dayTwd = dayRecs.reduce((s,r) => s+r.amountTwd, 0);
             return `<div style="margin-bottom:12px">
