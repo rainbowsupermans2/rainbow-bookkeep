@@ -721,14 +721,17 @@
 
     <!-- 地陪費（確認費用，獨立顯示）-->
     <div style="background:#fff8e6;border:1px solid #f59e0b33;border-radius:10px;padding:10px">
-        <div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:8px">🧭 Kimi 地陪費（已確認）</div>
+        <div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:8px">🧭 Kimi 地陪費（已確認，獨立計算）</div>
         <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
             <span style="color:var(--t2)">✅ 台幣訂金已付</span>
             <span style="color:#92400e;font-weight:600">NT$2,400</span>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:12px">
-            <span style="color:var(--t2)">⏳ 日幣尾款待付</span>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span style="color:var(--t2)">⏳ 日幣尾款（現場付現）</span>
             <span style="color:var(--r);font-weight:600">¥42,000</span>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:6px">
+            💡 記帳時選付款「Kimi地陪現金」，不影響備用金統計
         </div>
     </div>
     <!-- 動態計算已花/剩餘 -->
@@ -1609,7 +1612,7 @@ const TRIP_PROJECTS = {
         dates: ['2026-05-16','2026-05-17','2026-05-18','2026-05-19','2026-05-20','2026-05-21','2026-05-22'],
         dateLabels: ['5/16 出發','5/17','5/18','5/19','5/20','5/21','5/22 返台'],
         cats: ['餐飲','交通','住宿','購物','門票景點','Suica儲值','藥妝零食','機票','地陪費','其他'],
-        pays: ['現金日幣','玉山日幣','彩虹Suica','先生Suica','熊本熊卡','富邦JCB','LINE Pay','台幣預付'],
+        pays: ['現金日幣','玉山日幣','彩虹Suica','先生Suica','熊本熊卡','富邦JCB','LINE Pay','台幣預付','Kimi地陪現金'],
     },
     PH2026: {
         name: '🏝 薄荷島之旅',
@@ -1842,12 +1845,14 @@ function renderTripSummary(records) {
         const RESERVE = { total: 93779, yushan: 23597, cash: 58062, suicaR: 5206, suicaH: 6914 };
 
         const jpy = r => r.currency === 'JPY';
+        // 排除 Kimi地陪現金（獨立管理，不計入可支配備用金）
+        const notKimi = r => r.payment !== 'Kimi地陪現金';
         const pay = (r, ...names) => names.some(n => r.payment === n);
 
-        const usedYushan  = records.filter(r => jpy(r) && pay(r,'玉山日幣')).reduce((s,r)=>s+(+r.amount||0),0);
-        const usedCash    = records.filter(r => jpy(r) && pay(r,'現金日幣')).reduce((s,r)=>s+(+r.amount||0),0);
-        const usedSuicaR  = records.filter(r => jpy(r) && pay(r,'彩虹Suica','彩虹 Suica')).reduce((s,r)=>s+(+r.amount||0),0);
-        const usedSuicaH  = records.filter(r => jpy(r) && pay(r,'先生Suica','先生 Suica')).reduce((s,r)=>s+(+r.amount||0),0);
+        const usedYushan  = records.filter(r => jpy(r) && notKimi(r) && pay(r,'玉山日幣')).reduce((s,r)=>s+(+r.amount||0),0);
+        const usedCash    = records.filter(r => jpy(r) && notKimi(r) && pay(r,'現金日幣')).reduce((s,r)=>s+(+r.amount||0),0);
+        const usedSuicaR  = records.filter(r => jpy(r) && notKimi(r) && pay(r,'彩虹Suica','彩虹 Suica')).reduce((s,r)=>s+(+r.amount||0),0);
+        const usedSuicaH  = records.filter(r => jpy(r) && notKimi(r) && pay(r,'先生Suica','先生 Suica')).reduce((s,r)=>s+(+r.amount||0),0);
         const usedTotal   = usedYushan + usedCash + usedSuicaR + usedSuicaH;
         const remainTotal = RESERVE.total - usedTotal;
         const pctTotal    = Math.min(100, usedTotal / RESERVE.total * 100);
