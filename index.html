@@ -525,6 +525,12 @@
             • 超支項目優先削減非必要費用
         </div>
     </div>
+
+    <!-- ⏪ 上月結算（v3.8 新增）-->
+    <div class="card" id="closing-card" style="display:none">
+        <div class="ctitle">📅 <span id="closing-month-label">上月結算</span></div>
+        <div id="closing-content"></div>
+    </div>
 </div>
 
 <!-- ⑦ 財務健康 -->
@@ -616,6 +622,11 @@
         <div style="margin-top:10px;background:rgba(255,255,255,0.3);border-radius:4px;height:6px;overflow:hidden">
             <div id="trip-budget-bar" style="height:100%;border-radius:4px;background:white;transition:width 0.5s;width:0%"></div>
         </div>
+    </div>
+
+    <!-- ⏱ 出發倒數 / 旅程進度卡（依日期動態切換） -->
+    <div class="card" id="trip-countdown-card" style="display:none;padding:16px;text-align:center">
+        <div id="countdown-content"></div>
     </div>
 
     <!-- 日幣備用金追蹤（JP2026專用）-->
@@ -926,9 +937,80 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadAll() {
-    
+
     loadAssets();
     loadRecords();
+    loadClosing();
+}
+
+// ═══════════════════════════════════
+// 載入上月結算（v3.8）
+// ═══════════════════════════════════
+function loadClosing() {
+    jsonp(`${SCRIPT_URL}?type=getClosing&months=1`, (err, data) => {
+        const card = document.getElementById('closing-card');
+        if (!card) return;
+        if (err || !data || !data.success || !data.data || !data.data.length) {
+            card.style.display = 'none';
+            return;
+        }
+        const last = data.data[data.data.length - 1];
+        renderClosing(last);
+    });
+}
+
+function renderClosing(c) {
+    const card = document.getElementById('closing-card');
+    if (!c || !c.month) { card.style.display = 'none'; return; }
+
+    document.getElementById('closing-month-label').textContent = c.month + ' 結算報告';
+
+    const balanceColor = c.balance >= 0 ? 'var(--g)' : 'var(--r)';
+    const balanceSign  = c.balance >= 0 ? '+' : '';
+    const utilColor    = c.utilization > 110 ? 'var(--r)' : c.utilization > 90 ? 'var(--y)' : 'var(--g)';
+
+    const overspentHtml = c.overspent && c.overspent !== '無'
+        ? c.overspent.split('\n').map(s => '<div>🔴 ' + s + '</div>').join('')
+        : '<div style="color:var(--g)">✅ 無超支類別</div>';
+
+    const savedHtml = c.saved && c.saved !== '無'
+        ? c.saved.split('\n').map(s => '<div>🟢 ' + s + '</div>').join('')
+        : '';
+
+    const sugHtml = (c.suggestions || '').split('\n').filter(Boolean).map(s => '<div>' + s + '</div>').join('');
+
+    document.getElementById('closing-content').innerHTML = `
+        <div class="metric-grid-3" style="margin-bottom:12px">
+            <div class="metric">
+                <div class="metric-label">收入</div>
+                <div class="metric-value" style="color:var(--g);font-size:15px">NT$${fmtW(c.totalIncome)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">支出</div>
+                <div class="metric-value" style="color:var(--r);font-size:15px">NT$${fmtW(c.totalExpense)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">結餘</div>
+                <div class="metric-value" style="color:${balanceColor};font-size:15px">${balanceSign}NT$${fmtW(Math.abs(c.balance))}</div>
+            </div>
+        </div>
+        <div class="progress-label">
+            <span>預算使用率</span>
+            <span style="color:${utilColor};font-weight:700">${c.utilization}%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width:${Math.min(100,c.utilization)}%;background:${utilColor}"></div>
+        </div>
+        <div style="margin-top:14px;font-size:13px;line-height:1.8;color:var(--t2)">
+            <div style="font-weight:700;color:var(--t1);margin-bottom:4px">超支類別</div>
+            ${overspentHtml}
+            ${savedHtml ? '<div style="font-weight:700;color:var(--t1);margin:8px 0 4px">節餘類別</div>' + savedHtml : ''}
+            <div style="font-weight:700;color:var(--t1);margin:8px 0 4px">CFO 建議</div>
+            ${sugHtml}
+            <div style="font-size:11px;color:var(--t3);margin-top:8px;text-align:right">結算時間：${c.closingDate || '—'}</div>
+        </div>
+    `;
+    card.style.display = 'block';
 }
 
 // ═══════════════════════════════════
@@ -1459,7 +1541,7 @@ function renderBudget(records) {
 // ═══════════════════════════════════
 function renderHealth(netWorth, totalAsset, progress) {
     const debtPct = MORTGAGE / totalAsset * 100;
-    const investPct = (totalAsset - MORTGAGE * 0 - 5372) / totalAsset * 100; // 近似
+    const investPct = (totalAsset - MORTGAGE - 5372) / totalAsset * 100; // 近似投資佔比
 
     // 評分算法
     let score = 0;
@@ -1576,9 +1658,11 @@ const TRIP_PROJECTS = {
         subtitle: '2026/5/16–5/22・帶小公主慶祝四歲生日 🎂👸',
         gradient: 'linear-gradient(135deg, #c9748a, #e8a0b0, #f5c9d4)',
         color: '#b85c75', light: '#fdf0f3',
-        budget: 100000,
+        budget: 130000, // 含日幣備用金 ¥141,779（≈NT$30,000）
         currencies: ['JPY','TWD'],
         defaultCurrency: 'JPY',
+        departureDate: '2026-05-16',
+        returnDate:    '2026-05-22',
         dates: ['2026-05-01','2026-05-16','2026-05-17','2026-05-18','2026-05-19','2026-05-20','2026-05-21','2026-05-22'],
         dateLabels: ['出發前預付','5/16 出發','5/17','5/18','5/19','5/20','5/21','5/22 返台'],
         cats: ['餐飲','交通','住宿','購物','門票景點','Suica儲值','藥妝零食','機票','地陪費','其他'],
@@ -1592,6 +1676,8 @@ const TRIP_PROJECTS = {
         budget: 80000,
         currencies: ['PHP','TWD','USD'],
         defaultCurrency: 'PHP',
+        departureDate: null,
+        returnDate:    null,
         dates: [],
         dateLabels: [],
         cats: ['餐飲','交通','住宿','購物','門票景點','水上活動','伴手禮','機票','其他'],
@@ -1649,10 +1735,86 @@ function switchTrip(code) {
     document.getElementById('jp-sub-btn').style.background = proj.gradient;
     document.getElementById('trip-form-title').textContent = proj.name.replace(/^../,'') + ' 記帳';
 
-    // 預設幣別 + 抓匯率 + 讀記錄
+    // 預設幣別 + 抓匯率 + 讀記錄 + 倒數卡
     setCurrency(proj.defaultCurrency);
     fetchTripRates();
     loadTravelRecords();
+    renderTripCountdown();
+}
+
+// ── 出發倒數 / 旅程進度卡 ──
+function renderTripCountdown() {
+    const proj = TRIP_PROJECTS[currentTrip];
+    const card = document.getElementById('trip-countdown-card');
+    if (!card) return;
+    if (!proj.departureDate || !proj.returnDate) {
+        card.style.display = 'none';
+        return;
+    }
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dep   = new Date(proj.departureDate); dep.setHours(0,0,0,0);
+    const ret   = new Date(proj.returnDate);   ret.setHours(0,0,0,0);
+    const ms    = 24 * 3600 * 1000;
+    const totalDays  = Math.round((ret - dep) / ms) + 1;
+    const daysToDep  = Math.ceil((dep - today) / ms);
+    const dayInTrip  = Math.floor((today - dep) / ms) + 1;
+
+    let content = '';
+    let bg      = proj.light;
+
+    if (today < dep) {
+        // ─── 出發前：倒數＋確認清單 ───
+        const checklist = [
+            daysToDep > 14 ? '☐ 確認護照效期（至少 6 個月）' : null,
+            daysToDep > 14 ? '☐ 申請 ESTA 或簽證' : null,
+            '☐ 充飽行動電源／充電器',
+            '☐ 確認 Suica 餘額（彩虹 ¥5,206／先生 ¥6,914）',
+            '☐ 列印電子機票／飯店訂房資訊',
+            '☐ 換好日幣現金（目前備用金 ¥' + fmt(141779) + '）',
+            daysToDep <= 7 ? '☐ <strong>本週打包行李</strong>' : null,
+            daysToDep <= 3 ? '☐ <strong style="color:var(--r)">明後天最後檢查</strong>' : null,
+        ].filter(Boolean).join('<br>');
+
+        const urgentColor = daysToDep <= 7 ? 'var(--r)' : daysToDep <= 30 ? '#d97706' : proj.color;
+
+        content = `
+            <div style="font-size:12px;color:var(--t3);margin-bottom:6px">🛫 距離出發</div>
+            <div style="font-size:36px;font-weight:700;color:${urgentColor};line-height:1">還有 ${daysToDep} 天</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:6px">出發日：${fmtDate(proj.departureDate)} · ${totalDays} 天行程</div>
+            <div style="margin-top:14px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.85;color:var(--t2);text-align:left">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--t1);text-align:center">📋 出發前確認清單</div>
+                ${checklist}
+            </div>
+        `;
+    } else if (today >= dep && today <= ret) {
+        // ─── 旅程中 ───
+        const remain = totalDays - dayInTrip;
+        bg = 'linear-gradient(135deg,' + proj.light + ', #fff)';
+        content = `
+            <div style="font-size:12px;color:var(--t3);margin-bottom:6px">✈️ 旅程進行中</div>
+            <div style="font-size:36px;font-weight:700;color:${proj.color};line-height:1">第 ${dayInTrip} / ${totalDays} 天</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:8px">
+                ${remain > 0 ? '還剩 ' + remain + ' 天 · ' : '🎉 最後一天 · '}
+                返台日 ${fmtDate(proj.returnDate)}
+            </div>
+        `;
+    } else {
+        // ─── 已結束 ───
+        bg = '#f0fff4';
+        const daysAgo = Math.floor((today - ret) / ms);
+        content = `
+            <div style="font-size:12px;color:var(--t3);margin-bottom:6px">✅ 旅程已完成</div>
+            <div style="font-size:30px;font-weight:700;color:var(--g);line-height:1">回家了！</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:8px">
+                ${fmtDate(proj.departureDate)}–${fmtDate(proj.returnDate)} · 共 ${totalDays} 天 · ${daysAgo} 天前返台
+            </div>
+        `;
+    }
+
+    card.style.background  = bg;
+    card.style.display     = 'block';
+    document.getElementById('countdown-content').innerHTML = content;
 }
 
 // ── 切換幣別 ──
@@ -1800,7 +1962,23 @@ function loadTravelRecords() {
 // ── 渲染統計 ──
 function renderTripSummary(records) {
     const proj      = TRIP_PROJECTS[currentTrip];
-    const totalTwd  = records.reduce((s,r) => s+r.amountTwd, 0);
+    let   totalTwd  = records.reduce((s,r) => s+r.amountTwd, 0);
+
+    // ── JP2026: 加入 Kimi 地陪費已確認承諾（避免與已記帳項目重複）──
+    // 訂金 NT$2,400（已付）+ 尾款 ¥42,000（現場付）
+    let kimiPending = 0;
+    if (currentTrip === 'JP2026') {
+        const KIMI_TWD_TOTAL  = 2400;
+        const KIMI_JPY_TOTAL  = 42000;
+        const jpyRate         = tripRates.JPY || 0.21;
+        const expectedKimiTotal = KIMI_TWD_TOTAL + Math.round(KIMI_JPY_TOTAL * jpyRate);
+        const actualKimiPaid  = records
+            .filter(r => r.payment === 'Kimi地陪現金' || r.category === '地陪費')
+            .reduce((s,r) => s + r.amountTwd, 0);
+        kimiPending = Math.max(0, expectedKimiTotal - actualKimiPaid);
+        totalTwd   += kimiPending;
+    }
+
     const budgetPct = proj.budget > 0 ? Math.min(100, totalTwd/proj.budget*100) : 0;
 
     // 更新標題卡數字
@@ -1859,6 +2037,10 @@ function renderTripSummary(records) {
         const c = r.category||'其他';
         catMap[c] = (catMap[c]||0) + r.amountTwd;
     });
+    // 將 Kimi 承諾納入類別統計（顯示為「地陪費」）
+    if (kimiPending > 0) {
+        catMap['地陪費'] = (catMap['地陪費']||0) + kimiPending;
+    }
     const cats   = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
     const colors = [proj.color,'#e67e22','#3498db','#27ae60','#9b59b6','#1abc9c','#f39c12','#e74c3c','#7f8c8d'];
 
@@ -1899,7 +2081,7 @@ function renderTripSummary(records) {
     }
 
     document.getElementById('trip-daily').innerHTML = Object.entries(dayMap)
-        .sort((a,b) => a[0].localeCompare(b[0]))
+        .sort((a,b) => b[0].localeCompare(a[0])) // 由新到舊
         .map(([date, dayRecs]) => {
             const dayTwd = dayRecs.reduce((s,r) => s+r.amountTwd, 0);
             return `<div style="margin-bottom:12px">
