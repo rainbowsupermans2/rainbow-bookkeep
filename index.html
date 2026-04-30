@@ -1242,7 +1242,8 @@ function renderRecentRecords(records) {
 function renderExpense(records) {
     const now = new Date();
     const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    const monthly = records.filter(r => (r.date || '').startsWith(thisMonth));
+    // v3.13：使用切齊後的歸屬月份（薪資月底自動移到次月）
+    const monthly = records.filter(r => getEffectiveMonth(r) === thisMonth);
 
     const income = monthly.filter(r => r.type === '收入').reduce((s,r) => s + (+r.amount||0), 0);
     const expense = monthly.filter(r => r.type === '支出').reduce((s,r) => s + (+r.amount||0), 0);
@@ -1597,6 +1598,30 @@ function swPg(page) {
             if (opts.includes(today)) sel.value = today;
         }
     }
+}
+
+// ★ 薪資切齊法：月底最後一天的「薪資」→ 歸入次月（YYYY-MM 字串）
+function getEffectiveMonth(r) {
+    const raw = String(r.date || '');
+    if (!raw) return '';
+    const date = new Date(raw);
+    if (isNaN(date.getTime())) return raw.slice(0, 7);
+
+    const cat = r.cat || r.category || '';
+    const isSalary = r.type === '收入' && cat === '薪資';
+    if (!isSalary) return raw.slice(0, 7);
+
+    // 判斷是否為當月最後一天
+    const tomorrow = new Date(date);
+    tomorrow.setDate(date.getDate() + 1);
+    const isLastDay = (tomorrow.getMonth() !== date.getMonth());
+    if (!isLastDay) return raw.slice(0, 7);
+
+    // 月底薪資 → 次月
+    const next = new Date(date);
+    next.setDate(1);
+    next.setMonth(next.getMonth() + 1);
+    return `${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,'0')}`;
 }
 
 function fmt(n) {
