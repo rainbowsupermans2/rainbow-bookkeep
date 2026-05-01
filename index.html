@@ -418,15 +418,8 @@
 
 <!-- ② 收支 -->
 <div class="pg" id="pg-expense">
-    <div id="expense-summary">
-        <div class="card">
-            <div class="ctitle">📊 本月收支概況</div>
-            <div id="expense-metrics"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
-        </div>
-        <div class="card">
-            <div class="ctitle">🏷 支出分類</div>
-            <div id="expense-cats"><div class="loading"><span class="spin">⟳</span></div></div>
-        </div>
+    <div id="expense-container">
+        <div class="loading"><span class="spin">⟳</span> 載入中…</div>
     </div>
 </div>
 
@@ -1095,8 +1088,8 @@ function loadAssetsFallback() {
         vt:             257282,  // VT 54.67269股
         fund:          2654183,  // 鉅亨五支基金合計
         cash:           600000,  // 現金定存
-        husbandRetire:  876792,  // 先生勞退專戶
-        wifeRetire:     431850,  // 彩虹勞退專戶
+        husbandRetire:  1607275, // 先生勞退專戶（更新 2026/04/30）
+        wifeRetire:     1052243, // 彩虹勞退專戶（更新 2026/04/30）
         total:         8077269,
         netWorth:      6536390,  // 總額 - 房貸
         progress:          52.8,
@@ -1236,65 +1229,80 @@ function renderRecentRecords(records) {
 }
 
 // ═══════════════════════════════════
-// 渲染：收支分析
+// 渲染：收支分析（按月分組，由新到舊直接顯示）
 // ═══════════════════════════════════
 function renderExpense(records) {
-    const now = new Date();
-    const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    // v3.13：使用切齊後的歸屬月份（薪資月底自動移到次月）
-    const monthly = records.filter(r => getEffectiveMonth(r) === thisMonth);
+    const container = document.getElementById('expense-container');
+    if (!container) return;
 
-    const income = monthly.filter(r => r.type === '收入').reduce((s,r) => s + (+r.amount||0), 0);
-    const expense = monthly.filter(r => r.type === '支出').reduce((s,r) => s + (+r.amount||0), 0);
-    const balance = income - expense;
-
-    document.getElementById('expense-metrics').innerHTML = `
-        <div class="metric-grid">
-            <div class="metric">
-                <div class="metric-label">本月收入</div>
-                <div class="metric-value" style="color:var(--g)">NT$${fmt(income)}</div>
-            </div>
-            <div class="metric">
-                <div class="metric-label">本月支出</div>
-                <div class="metric-value" style="color:var(--r)">NT$${fmt(expense)}</div>
-            </div>
-        </div>
-        <div class="metric" style="margin-bottom:12px">
-            <div class="metric-label">結餘</div>
-            <div class="metric-value" style="color:${balance>=0?'var(--g)':'var(--r)'}">
-                ${balance>=0?'+':''} NT$${fmt(Math.abs(balance))}
-            </div>
-        </div>
-        <div class="progress-label">
-            <span>支出率</span>
-            <span>${income > 0 ? Math.round(expense/income*100) : 0}%</span>
-        </div>
-        <div class="progress-bar">
-            <div class="progress-fill" style="width:${income>0?Math.min(100,expense/income*100):0}%;background:${expense>income?'var(--r)':''}"></div>
-        </div>
-    `;
-
-    // 類別圓餅（橫條）
-    const catMap = {};
-    monthly.filter(r=>r.type==='支出').forEach(r => {
-        const c = r.cat || r.category || '其他';
-        catMap[c] = (catMap[c]||0) + (+r.amount||0);
-    });
-    const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
-    const colors = ['#018790','#00a896','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16','#0e6494','#c9748a','#e8a0b0','#3b82f6','#f97316','#64748b'];
-    if (!cats.length) {
-        document.getElementById('expense-cats').innerHTML = '<div style="text-align:center;padding:16px;color:var(--t3);font-size:14px">本月尚無支出記錄</div>';
-    } else {
-        document.getElementById('expense-cats').innerHTML = cats.map(([cat, amt], i) => `
-            <div class="alloc-row">
-                <div class="alloc-label">${cat}</div>
-                <div class="alloc-bar-wrap">
-                    <div class="alloc-bar" style="width:${Math.round(amt/expense*100)}%;background:${colors[i%colors.length]}"></div>
-                </div>
-                <div class="alloc-pct">NT$${fmt(amt)}</div>
-            </div>
-        `).join('');
+    if (!records || !records.length) {
+        container.innerHTML = '<div class="card"><div style="text-align:center;padding:24px;color:var(--t3)">尚無記帳記錄</div></div>';
+        return;
     }
+
+    // 依歸屬月份分組
+    const monthMap = {};
+    records.forEach(r => {
+        const m = getEffectiveMonth(r);
+        if (!m) return;
+        if (!monthMap[m]) monthMap[m] = [];
+        monthMap[m].push(r);
+    });
+
+    // 月份由新到舊排序
+    const months = Object.keys(monthMap).sort().reverse();
+
+    const colors = ['#018790','#00a896','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16','#0e6494','#c9748a','#e8a0b0','#3b82f6','#f97316','#64748b'];
+
+    container.innerHTML = months.map(m => {
+        const recs = monthMap[m];
+        const income  = recs.filter(r => r.type === '收入').reduce((s,r) => s + (+r.amount||0), 0);
+        const expense = recs.filter(r => r.type === '支出').reduce((s,r) => s + (+r.amount||0), 0);
+        const balance = income - expense;
+
+        // 支出類別橫條
+        const catMap = {};
+        recs.filter(r => r.type === '支出').forEach(r => {
+            const c = r.cat || r.category || '其他';
+            catMap[c] = (catMap[c]||0) + (+r.amount||0);
+        });
+        const cats = Object.entries(catMap).sort((a,b) => b[1]-a[1]);
+
+        const [yr, mo] = m.split('-');
+        const monthLabel = `${yr} 年 ${parseInt(mo)} 月`;
+
+        const catsHtml = cats.length
+            ? cats.map(([cat, amt], i) => `
+                <div class="alloc-row">
+                    <div class="alloc-label">${cat}</div>
+                    <div class="alloc-bar-wrap">
+                        <div class="alloc-bar" style="width:${expense>0?Math.min(100,Math.round(amt/expense*100)):0}%;background:${colors[i%colors.length]}"></div>
+                    </div>
+                    <div class="alloc-pct">NT$${fmt(amt)}</div>
+                </div>`).join('')
+            : `<div style="color:var(--t3);font-size:13px;padding:4px 0">本月無支出記錄</div>`;
+
+        return `
+        <div class="card" style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div style="font-size:15px;font-weight:700;color:var(--ac)">${monthLabel}</div>
+                <div style="font-size:14px;font-weight:700;color:${balance>=0?'var(--g)':'var(--r)'}">
+                    ${balance>=0?'+':''}NT$${fmt(Math.abs(balance))}
+                </div>
+            </div>
+            <div class="metric-grid" style="margin-bottom:12px">
+                <div class="metric">
+                    <div class="metric-label">收入</div>
+                    <div class="metric-value" style="color:var(--g);font-size:15px">NT$${fmt(income)}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">支出</div>
+                    <div class="metric-value" style="color:var(--r);font-size:15px">NT$${fmt(expense)}</div>
+                </div>
+            </div>
+            ${catsHtml}
+        </div>`;
+    }).join('');
 }
 
 // ═══════════════════════════════════
