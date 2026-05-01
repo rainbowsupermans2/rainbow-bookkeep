@@ -1254,7 +1254,7 @@ function renderExpense(records) {
 
     const colors = ['#018790','#00a896','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16','#0e6494','#c9748a','#e8a0b0','#3b82f6','#f97316','#64748b'];
 
-    container.innerHTML = months.map(m => {
+    container.innerHTML = months.map((m, idx) => {
         const recs = monthMap[m];
         const income  = recs.filter(r => r.type === '收入').reduce((s,r) => s + (+r.amount||0), 0);
         const expense = recs.filter(r => r.type === '支出').reduce((s,r) => s + (+r.amount||0), 0);
@@ -1270,6 +1270,8 @@ function renderExpense(records) {
 
         const [yr, mo] = m.split('-');
         const monthLabel = `${yr} 年 ${parseInt(mo)} 月`;
+        const bodyId = `exp-body-${m}`;
+        const isOpen = idx === 0; // 最新月份預設展開
 
         const catsHtml = cats.length
             ? cats.map(([cat, amt], i) => `
@@ -1283,26 +1285,44 @@ function renderExpense(records) {
             : `<div style="color:var(--t3);font-size:13px;padding:4px 0">本月無支出記錄</div>`;
 
         return `
-        <div class="card" style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-                <div style="font-size:15px;font-weight:700;color:var(--ac)">${monthLabel}</div>
-                <div style="font-size:14px;font-weight:700;color:${balance>=0?'var(--g)':'var(--r)'}">
-                    ${balance>=0?'+':''}NT$${fmt(Math.abs(balance))}
+        <div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">
+            <div onclick="toggleExpMonth('${bodyId}')" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span id="${bodyId}-arrow" style="font-size:11px;color:var(--t3);transition:transform 0.2s;display:inline-block;transform:rotate(${isOpen?90:0}deg)">▶</span>
+                    <span style="font-size:15px;font-weight:700;color:var(--ac)">${monthLabel}</span>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-size:14px;font-weight:700;color:${balance>=0?'var(--g)':'var(--r)'}">
+                        ${balance>=0?'+':''}NT$${fmt(Math.abs(balance))}
+                    </div>
+                    <div style="font-size:11px;color:var(--t3)">收${fmt(income)} ／ 支${fmt(expense)}</div>
                 </div>
             </div>
-            <div class="metric-grid" style="margin-bottom:12px">
-                <div class="metric">
-                    <div class="metric-label">收入</div>
-                    <div class="metric-value" style="color:var(--g);font-size:15px">NT$${fmt(income)}</div>
+            <div id="${bodyId}" style="display:${isOpen?'block':'none'};padding:0 16px 14px">
+                <div style="height:1px;background:var(--border);margin-bottom:12px"></div>
+                <div class="metric-grid" style="margin-bottom:12px">
+                    <div class="metric">
+                        <div class="metric-label">收入</div>
+                        <div class="metric-value" style="color:var(--g);font-size:15px">NT$${fmt(income)}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">支出</div>
+                        <div class="metric-value" style="color:var(--r);font-size:15px">NT$${fmt(expense)}</div>
+                    </div>
                 </div>
-                <div class="metric">
-                    <div class="metric-label">支出</div>
-                    <div class="metric-value" style="color:var(--r);font-size:15px">NT$${fmt(expense)}</div>
-                </div>
+                ${catsHtml}
             </div>
-            ${catsHtml}
         </div>`;
     }).join('');
+}
+
+function toggleExpMonth(bodyId) {
+    const body = document.getElementById(bodyId);
+    const arrow = document.getElementById(bodyId + '-arrow');
+    if (!body) return;
+    const isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    if (arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
 }
 
 // ═══════════════════════════════════
