@@ -1571,16 +1571,20 @@ function renderHealth(netWorth, totalAsset, progress) {
     const debtPct = MORTGAGE / totalAsset * 100;
     const investPct = (totalAsset - MORTGAGE - 5372) / totalAsset * 100; // 近似投資佔比
 
-    // 評分算法
+    // 評分算法（細緻版）
     let score = 0;
-    score += debtPct < 20 ? 25 : debtPct < 35 ? 15 : 5;
-    score += progress > 50 ? 25 : progress > 30 ? 15 : 8;
-    score += netWorth > 3000000 ? 20 : netWorth > 1000000 ? 12 : 5;
-    score += 15; // 投資分散加分
+    // 負債比例（滿分 30）
+    score += debtPct < 10 ? 30 : debtPct < 15 ? 28 : debtPct < 20 ? 25 : debtPct < 35 ? 15 : 5;
+    // 退休進度（滿分 35）
+    score += progress > 80 ? 35 : progress > 65 ? 30 : progress > 50 ? 25 : progress > 30 ? 15 : 8;
+    // 淨資產（滿分 25）
+    score += netWorth > 8000000 ? 25 : netWorth > 6000000 ? 22 : netWorth > 3000000 ? 18 : netWorth > 1000000 ? 12 : 5;
+    // 投資分散（固定 10）
+    score += 10;
     score = Math.min(100, Math.round(score));
 
-    const grade = score >= 85 ? '財務狀況優秀 🌟' : score >= 70 ? '財務狀況良好 ✅' : score >= 55 ? '財務待改善 ⚠️' : '需要重視 🚨';
-    const gradeColor = score >= 85 ? 'var(--g)' : score >= 70 ? 'var(--ac)' : 'var(--y)';
+    const grade = score >= 88 ? '財務狀況優秀 🌟' : score >= 75 ? '財務狀況良好 ✅' : score >= 55 ? '財務待改善 ⚠️' : '需要重視 🚨';
+    const gradeColor = score >= 88 ? 'var(--g)' : score >= 75 ? 'var(--ac)' : 'var(--y)';
 
     document.getElementById('score-num').textContent = score;
     document.getElementById('score-grade').innerHTML = `<span style="color:${gradeColor}">${grade}</span>`;
@@ -1590,8 +1594,8 @@ function renderHealth(netWorth, totalAsset, progress) {
     document.getElementById('hm-debt').textContent = debtPct.toFixed(1) + '%';
     document.getElementById('hm-retire').textContent = parseFloat(progress).toFixed(1) + '%';
 
-    document.getElementById('ev-debt').innerHTML = debtPct < 25 ? '<span style="color:var(--g);font-weight:600">🟢 優秀</span>' : '<span style="color:var(--y);font-weight:600">🟡 尚可</span>';
-    document.getElementById('ev-retire').innerHTML = progress > 50 ? '<span style="color:var(--g);font-weight:600">🟢 良好</span>' : '<span style="color:var(--y);font-weight:600">🟡 努力中</span>';
+    document.getElementById('ev-debt').innerHTML = debtPct < 15 ? '<span style="color:var(--g);font-weight:600">🟢 優秀</span>' : debtPct < 25 ? '<span style="color:var(--g);font-weight:600">🟢 良好</span>' : '<span style="color:var(--y);font-weight:600">🟡 尚可</span>';
+    document.getElementById('ev-retire').innerHTML = progress > 65 ? '<span style="color:var(--g);font-weight:600">🟢 優秀</span>' : progress > 50 ? '<span style="color:var(--g);font-weight:600">🟢 良好</span>' : '<span style="color:var(--y);font-weight:600">🟡 努力中</span>';
     document.getElementById('ev-cash').innerHTML = '<span style="color:var(--y);font-weight:600">🟡 偏低</span>';
 
     document.getElementById('health-warn').innerHTML = `
