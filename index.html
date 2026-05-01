@@ -1160,7 +1160,7 @@ function computeMonthlyStats() {
 // JSONP 工具
 // ═══════════════════════════════════
 function jsonp(url, cb) {
-    const id = 'cb_' + Date.now();
+    const id = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
     const s = document.createElement('script');
     s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + id;
     window[id] = (data) => {
