@@ -579,6 +579,13 @@
                 • 保持定期定額安聯日本 USD300<br>
                 • 確認下月記帳數據完整
             </div>
+            <button class="btn-primary" onclick="exportSnapshot()" style="margin-top:12px">
+                📥 匯出 snapshot.json
+            </button>
+            <div style="font-size:12px;color:var(--t3);margin-top:6px;line-height:1.6">
+                下載後放到 <code>data/snapshot.json</code>，再執行<br>
+                <code>python .\analyze_portfolio.py</code> 產生 CFO 月度報告
+            </div>
         </div>
     </div>
 </div>
@@ -869,6 +876,7 @@ const BUDGETS = [
 let gAssets = null;     // 最新資產列
 let gAssetHistory = []; // 歷史資產資料
 let gRecords = [];      // 記帳記錄
+let gClosing = [];      // 上月結算資料（給 snapshot 匯出用）
 let currentType = '支出';
 
 // ═══════════════════════════════════
@@ -946,6 +954,7 @@ function loadClosing() {
             card.style.display = 'none';
             return;
         }
+        gClosing = data.data;
         const last = data.data[data.data.length - 1];
         renderClosing(last);
     });
@@ -1006,6 +1015,124 @@ function renderClosing(c) {
 }
 
 // ═══════════════════════════════════
+// 匯出 snapshot.json（給 analyze_portfolio.py 使用）
+// ═══════════════════════════════════
+function exportSnapshot() {
+    if (!gAssets) {
+        alert('資料尚未載入完成，請稍候再按');
+        return;
+    }
+
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const ts = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const ymd = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
+
+    const a = gAssets;
+    const asset = {
+        date: a.date,
+        stock: a.stock, vt: a.vt, fund: a.fund, cash: a.cash,
+        husbandRetire: a.husbandRetire, wifeRetire: a.wifeRetire,
+        total: a.total, netWorth: a.netWorth,
+        progress: a.progress, distToTarget: a.distToTarget,
+    };
+
+    const history = gAssetHistory.map(r => [
+        r.date, r.stock, r.vt, r.fund, r.cash,
+        r.husbandRetire, r.wifeRetire, r.total, r.netWorth,
+        r.progress, r.distToTarget
+    ]);
+
+    const expense = [
+        ['日期','類型','類別','用途說明','金額','帳戶','專案'],
+        ...gRecords.map(r => [r.date, r.type, r.cat, r.desc, r.amount, r.account, r.project])
+    ];
+
+    const snapshot = {
+        generated: ts,
+        version: '3.13',
+        asset,
+        history,
+        expense,
+        monthly: computeMonthlyStats(),
+        closing: gClosing,
+        constants: {
+            retireGoalGross: RETIRE_TARGET,
+            retireGoalNet: RETIRE_TARGET - MORTGAGE,
+            mortgage: MORTGAGE,
+            husbandRetire: a.husbandRetire,
+            wifeRetire: a.wifeRetire,
+        }
+    };
+
+    const blob = new Blob([JSON.stringify(snapshot)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `snapshot_${ymd}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function computeMonthlyStats() {
+    const now = new Date();
+    const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const inMonth = gRecords.filter(r => (r.date||'').startsWith(ym));
+    const expRecs = inMonth.filter(r => r.type === '支出');
+    const incRecs = inMonth.filter(r => r.type === '收入');
+
+    const totalExp = expRecs.reduce((s,r) => s + (+r.amount||0), 0);
+    const totalInc = incRecs.reduce((s,r) => s + (+r.amount||0), 0);
+    const budgetTotal = BUDGETS.reduce((s,b) => s + b.budget, 0);
+
+    const byCategory = BUDGETS.map(b => {
+        const actual = b.fixed
+            ? expRecs.filter(r => (r.cat||'') === b.name)
+                     .reduce((s,r) => s + (+r.amount||0), 0)
+            : expRecs.filter(r => {
+                const c = r.cat || '';
+                return c === b.name || c.includes(b.name) || b.name.includes(c);
+              }).reduce((s,r) => s + (+r.amount||0), 0);
+        return {
+            cat: b.name,
+            actual,
+            budget: b.budget,
+            diff: actual - b.budget,
+            pct: b.budget > 0 ? Math.round(actual / b.budget * 100) : 0,
+        };
+    });
+
+    let assetChange = 0;
+    if (gAssetHistory.length >= 2) {
+        assetChange = gAssetHistory[gAssetHistory.length-1].netWorth
+                    - gAssetHistory[0].netWorth;
+    }
+
+    return {
+        success: true,
+        period: 1,
+        generated: `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`,
+        income: { monthlyAvg: totalInc },
+        expense: {
+            monthlyAvg: totalExp,
+            budgetTotal,
+            utilization: budgetTotal > 0 ? Math.round(totalExp / budgetTotal * 100) : 0,
+            byCategory,
+        },
+        asset: gAssets ? {
+            netWorth: gAssets.netWorth,
+            change: assetChange,
+            progress: gAssets.progress,
+            retireGoalGross: RETIRE_TARGET,
+            retireGoalNet: RETIRE_TARGET - MORTGAGE,
+            gap: gAssets.distToTarget,
+        } : null,
+    };
+}
+
+// ═══════════════════════════════════
 // JSONP 工具
 // ═══════════════════════════════════
 function jsonp(url, cb) {
@@ -1021,7 +1148,7 @@ function jsonp(url, cb) {
         delete window[id];
         try { document.body.removeChild(s); } catch(e) {}
         cb(new Error('載入失敗'));
-    };
+};
     document.body.appendChild(s);
 }
 
