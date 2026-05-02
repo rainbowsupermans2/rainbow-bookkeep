@@ -568,7 +568,7 @@
             </div>
             <div class="list-item" style="padding:10px 0">
                 <span style="font-size:14px">投資分散度</span>
-                <span id="ev-invest">🟡 中高風險</span>
+                <span id="ev-invest">⏳</span>
             </div>
             <div class="list-item" style="padding:10px 0">
                 <span style="font-size:14px">現金流動性</span>
@@ -1782,7 +1782,17 @@ function renderBudget(records) {
 // ═══════════════════════════════════
 function renderHealth(netWorth, totalAsset, progress) {
     const debtPct = TOTAL_DEBT / totalAsset * 100;
-    const investPct = (totalAsset - TOTAL_DEBT - 5372) / totalAsset * 100; // 近似投資佔比
+    // 現金（含定存+活存）：優先用 gDebts/gAssets 的 cash，沒有就用 a.cash
+    const cashTotal = (gDebts && typeof gDebts.totalDebt === 'number' && gAssets) ? +(gAssets.cash || 0) : +(gAssets && gAssets.cash || 0);
+    const cashPct = cashTotal > 0 ? cashTotal / totalAsset * 100 : 0;
+    const investPct = (totalAsset - TOTAL_DEBT - cashTotal) / totalAsset * 100; // 投資（含勞退）佔比
+    // 月支出基準（用 BUDGET 總額 ~10.5 萬）算可撐月數
+    const monthlySpendBaseline = 105000;
+    const liquidityMonths = cashTotal / monthlySpendBaseline;
+    const liquidityIcon = liquidityMonths >= 6 ? '🟢 優秀' :
+                         liquidityMonths >= 3 ? '🟢 良好' :
+                         liquidityMonths >= 1 ? '🟡 偏低' : '🔴 緊張';
+    const liquidityColor = liquidityMonths >= 3 ? 'var(--g)' : 'var(--y)';
 
     // 評分算法（細緻版）
     let score = 0;
@@ -1809,12 +1819,23 @@ function renderHealth(netWorth, totalAsset, progress) {
 
     document.getElementById('ev-debt').innerHTML = debtPct < 15 ? '<span style="color:var(--g);font-weight:600">🟢 優秀</span>' : debtPct < 25 ? '<span style="color:var(--g);font-weight:600">🟢 良好</span>' : '<span style="color:var(--y);font-weight:600">🟡 尚可</span>';
     document.getElementById('ev-retire').innerHTML = progress > 65 ? '<span style="color:var(--g);font-weight:600">🟢 優秀</span>' : progress > 50 ? '<span style="color:var(--g);font-weight:600">🟢 良好</span>' : '<span style="color:var(--y);font-weight:600">🟡 努力中</span>';
-    document.getElementById('ev-cash').innerHTML = '<span style="color:var(--y);font-weight:600">🟡 偏低</span>';
+    document.getElementById('ev-cash').innerHTML = `<span style="color:${liquidityColor};font-weight:600">${liquidityIcon}</span>`;
+
+    // 投資分散度：以海外（VT）佔投資比例衡量
+    const stkV = +(gAssets && gAssets.stock || 0);
+    const vtV  = +(gAssets && gAssets.vt    || 0);
+    const fdV  = +(gAssets && gAssets.fund  || 0);
+    const invSum = stkV + vtV + fdV;
+    const overseasPct = invSum > 0 ? vtV / invSum * 100 : 0;
+    const investEval = overseasPct >= 15 ? { txt: '🟢 良好', color: 'var(--g)' } :
+                      overseasPct >= 5  ? { txt: '🟡 中等（海外比重低）', color: 'var(--y)' } :
+                                          { txt: '🟠 集中台灣（海外 < 5%）', color: 'var(--y)' };
+    document.getElementById('ev-invest').innerHTML = `<span style="color:${investEval.color};font-weight:600">${investEval.txt}</span>`;
 
     document.getElementById('health-warn').innerHTML = `
-        ⚠️ <strong>風險提醒</strong><br>
-        投資比例偏高，現金佔比僅約 ${(5372/totalAsset*100).toFixed(1)}%。
-        建議轉職過渡期間增加現金緩衝至少 $300,000（6個月生活費）。
+        💡 <strong>結構分析</strong><br>
+        現金 NT$${fmt(cashTotal)}（佔資產 ${cashPct.toFixed(1)}%，可撐 ${liquidityMonths.toFixed(1)} 個月）。
+        投資（含勞退）佔比 ${investPct.toFixed(1)}%。
     `;
 }
 
