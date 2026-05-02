@@ -1001,6 +1001,15 @@ function renderClosing(c) {
 
     const sugHtml = (c.suggestions || '').split('\n').filter(Boolean).map(s => '<div>' + s + '</div>').join('');
 
+    // 💸 本月實際還卡（純資訊，不影響預算/結餘）
+    const cardPayment = +c.cardPayment || 0;
+    const cardRow = cardPayment > 0
+        ? `<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:8px 10px;border-radius:6px;margin:10px 0;font-size:13px">
+             <div style="font-weight:700;color:#92400e">💸 本月實際還卡 NT$${fmt(cardPayment)}</div>
+             <div style="color:#92400e;font-size:11px;margin-top:2px">純資訊：旅遊/分期信用卡實際匯出金額（不計入支出/結餘）</div>
+           </div>`
+        : '';
+
     document.getElementById('closing-content').innerHTML = `
         <div class="metric-grid-3" style="margin-bottom:12px">
             <div class="metric">
@@ -1016,6 +1025,7 @@ function renderClosing(c) {
                 <div class="metric-value" style="color:${balanceColor};font-size:15px">${balanceSign}NT$${fmtW(Math.abs(c.balance))}</div>
             </div>
         </div>
+        ${cardRow}
         <div class="progress-label">
             <span>預算使用率</span>
             <span style="color:${utilColor};font-weight:700">${c.utilization}%</span>
@@ -1104,11 +1114,14 @@ function computeMonthlyStats() {
     const now = new Date();
     const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     const inMonth = gRecords.filter(r => (r.date||'').startsWith(ym));
-    const expRecs = inMonth.filter(r => r.type === '支出');
+    // 排除「還卡費」避免雙重計算（旅遊刷卡已寫入信用卡負債）
+    const expRecs = inMonth.filter(r => r.type === '支出' && (r.cat||r.category||'') !== '還卡費');
+    const cardPayRecs = inMonth.filter(r => r.type === '支出' && (r.cat||r.category||'') === '還卡費');
     const incRecs = inMonth.filter(r => r.type === '收入');
 
     const totalExp = expRecs.reduce((s,r) => s + (+r.amount||0), 0);
     const totalInc = incRecs.reduce((s,r) => s + (+r.amount||0), 0);
+    const cardPayment = cardPayRecs.reduce((s,r) => s + (+r.amount||0), 0);
     const budgetTotal = BUDGETS.reduce((s,b) => s + b.budget, 0);
 
     const byCategory = BUDGETS.map(b => {
@@ -1141,6 +1154,7 @@ function computeMonthlyStats() {
         income: { monthlyAvg: totalInc },
         expense: {
             monthlyAvg: totalExp,
+            cardPayment,
             budgetTotal,
             utilization: budgetTotal > 0 ? Math.round(totalExp / budgetTotal * 100) : 0,
             byCategory,
@@ -1693,17 +1707,32 @@ function renderDebt(netWorth, totalAsset) {
 function renderBudget(records) {
     const now = new Date();
     const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    const monthly = records.filter(r => r.type === '支出' && (r.date||'').startsWith(thisMonth));
+    // 本月支出（排除「還卡費」，避免和負債管理重複計算）
+    const monthly = records.filter(r => {
+        const cat = r.cat || r.category || '';
+        return r.type === '支出' && cat !== '還卡費' && (r.date||'').startsWith(thisMonth);
+    });
+    // 本月實際還卡（純資訊）
+    const cardPayment = records.filter(r => {
+        const cat = r.cat || r.category || '';
+        return r.type === '支出' && cat === '還卡費' && (r.date||'').startsWith(thisMonth);
+    }).reduce((s,r) => s+(+r.amount||0), 0);
 
     // 合計支出
     const totalBudget = BUDGETS.reduce((s,b) => s+b.budget, 0);
     const totalSpent = monthly.reduce((s,r) => s+(+r.amount||0), 0);
     const pct = totalBudget > 0 ? Math.round(totalSpent/totalBudget*100) : 0;
+    const cardRow = cardPayment > 0
+        ? `<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:8px 10px;border-radius:6px;margin-top:8px;font-size:13px">
+             <strong style="color:#92400e">💸 本月實際還卡 NT$${fmt(cardPayment)}</strong>
+             <div style="color:#92400e;font-size:11px;margin-top:2px">純資訊：旅遊/分期信用卡實際匯出（不計入上方支出）</div>
+           </div>` : '';
 
     document.getElementById('budget-alert-area').innerHTML = `
         <div class="alert ${pct > 80 ? 'alert-warning' : 'alert-success'}" style="margin-bottom:14px">
             <strong>${now.getMonth()+1}月預算執行</strong><br>
             總支出 NT$${fmt(totalSpent)} / 預算 NT$${fmt(totalBudget)}（${pct}%）
+            ${cardRow}
         </div>
     `;
 
@@ -2214,7 +2243,7 @@ function renderTripSummary(records) {
     if (currentTrip === 'JP2026') {
         const KIMI_TWD_TOTAL  = 2400;
         const KIMI_JPY_TOTAL  = 42000;
-        const jpyRate         = tripRates.JPY || 0.21;
+        const jpyRate         = tripRates.JPY || 0.215;
         const expectedKimiTotal = KIMI_TWD_TOTAL + Math.round(KIMI_JPY_TOTAL * jpyRate);
         const actualKimiPaid  = records
             .filter(r => r.payment === 'Kimi地陪現金' || r.category === '地陪費')
