@@ -224,13 +224,14 @@
         align-items: center;
         padding: 14px 0;
         border-bottom: 1px solid #f1f5f9;
+        gap: 8px;
     }
     .list-item:last-child { border-bottom: none; }
-    .list-left { display: flex; flex-direction: column; }
+    .list-left { display: flex; flex-direction: column; min-width: 0; flex: 1; }
     .list-title { font-size: 17px; font-weight: 600; color: var(--t1); }
     .list-sub { font-size: 14px; color: var(--t3); margin-top: 2px; }
     .list-right { text-align: right; }
-    .list-amount { font-size: 18px; font-weight: 700; }
+    .list-amount { font-size: 18px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
     .list-date { font-size: 13px; color: var(--t3); margin-top: 2px; }
 
     /* Health Score */
