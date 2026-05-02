@@ -337,6 +337,7 @@
     .alloc-bar-wrap { flex: 1; height: 14px; background: #e2e8f0; border-radius: 7px; overflow: hidden; }
     .alloc-bar { height: 100%; border-radius: 7px; transition: width 0.5s; }
     .alloc-pct { font-size: 12px; font-weight: 700; color: var(--t1); width: 36px; text-align: right; }
+    .alloc-amt { font-size: 12px; font-weight: 700; color: var(--t1); min-width: 80px; text-align: right; flex-shrink: 0; }
 
     @media (max-width: 380px) {
         .bicon-wrap svg { width: 20px; height: 20px; }
@@ -1445,7 +1446,7 @@ function renderExpense(records) {
                     <div class="alloc-bar-wrap">
                         <div class="alloc-bar" style="width:${expense>0?Math.min(100,Math.round(amt/expense*100)):0}%;background:${colors[i%colors.length]}"></div>
                     </div>
-                    <div class="alloc-pct">NT$${fmt(amt)}</div>
+                    <div class="alloc-amt">NT$${fmt(amt)}</div>
                 </div>`).join('')
             : `<div style="color:var(--t3);font-size:13px;padding:4px 0">本月無支出記錄</div>`;
 
