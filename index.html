@@ -642,26 +642,29 @@
 
         <!-- 各帳戶明細 -->
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;font-size:13px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;align-items:center">
                 <span style="color:var(--t2)">🏦 玉山日幣帳</span>
-                <span style="font-weight:600">¥23,597</span>
+                <span style="display:flex;align-items:center;gap:6px">
+                    <span style="font-weight:600" id="jp-init-yushan">¥122,853</span>
+                    <button onclick="editYushanBalance()" style="background:none;border:none;padding:2px 4px;cursor:pointer;font-size:13px;color:var(--t3);line-height:1" title="更新玉山日幣帳餘額">✏️</button>
+                </span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:13px">
                 <span style="color:var(--t2)">💵 實體現金</span>
-                <span style="font-weight:600">¥58,062</span>
+                <span style="font-weight:600" id="jp-init-cash">¥58,062</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:13px">
                 <span style="color:var(--t2)">🚃 彩虹 Suica</span>
-                <span style="font-weight:600">¥5,206</span>
+                <span style="font-weight:600" id="jp-init-suicaR">¥5,206</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:13px">
                 <span style="color:var(--t2)">🚃 先生 Suica</span>
-                <span style="font-weight:600">¥6,914</span>
+                <span style="font-weight:600" id="jp-init-suicaH">¥6,914</span>
             </div>
             <div style="height:1px;background:var(--border);margin:4px 0"></div>
             <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
                 <span>可支配合計</span>
-                <span style="color:var(--ac)">¥93,779</span>
+                <span style="color:var(--ac)" id="jp-init-total">¥193,035</span>
             </div>
         </div>
 
@@ -673,7 +676,7 @@
             </div>
             <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
                 <span>剩餘可支配</span>
-                <span id="jp-remain-jpy" style="color:var(--g)">¥93,779</span>
+                <span id="jp-remain-jpy" style="color:var(--g)">¥193,035</span>
             </div>
             <div style="margin-top:8px;background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden">
                 <div id="jp-reserve-bar" style="height:100%;border-radius:4px;background:var(--ac);transition:width 0.5s;width:0%"></div>
@@ -687,7 +690,7 @@
             <!-- 玉山日幣帳 -->
             <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
                 <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🏦 玉山日幣</div>
-                <div style="font-size:13px;font-weight:700" id="yushan-remain">¥23,597</div>
+                <div style="font-size:13px;font-weight:700" id="yushan-remain">¥122,853</div>
                 <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="yushan-used">¥0</span></div>
                 <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
                     <div id="yushan-bar" style="height:100%;border-radius:3px;background:#018790;transition:width 0.5s;width:0%"></div>
@@ -2293,6 +2296,43 @@ function loadTravelRecords() {
     });
 }
 
+// ── JP2026 備用金初始值（localStorage 可覆寫）──
+const JP2026_RESERVE_DEFAULTS = { yushan: 122853, cash: 58062, suicaR: 5206, suicaH: 6914 };
+
+function getJp2026Reserve() {
+    try {
+        const stored = localStorage.getItem('jp2026_reserve');
+        if (stored) {
+            const r = JSON.parse(stored);
+            const yushan  = r.yushan  ?? JP2026_RESERVE_DEFAULTS.yushan;
+            const cash    = r.cash    ?? JP2026_RESERVE_DEFAULTS.cash;
+            const suicaR  = r.suicaR  ?? JP2026_RESERVE_DEFAULTS.suicaR;
+            const suicaH  = r.suicaH  ?? JP2026_RESERVE_DEFAULTS.suicaH;
+            return { yushan, cash, suicaR, suicaH, total: yushan + cash + suicaR + suicaH };
+        }
+    } catch(e) {}
+    const d = JP2026_RESERVE_DEFAULTS;
+    return { ...d, total: d.yushan + d.cash + d.suicaR + d.suicaH };
+}
+
+function saveJp2026Reserve(reserve) {
+    const { total, ...rest } = reserve;
+    localStorage.setItem('jp2026_reserve', JSON.stringify(rest));
+}
+
+function editYushanBalance() {
+    const current = getJp2026Reserve().yushan;
+    const input = prompt(`請輸入玉山日幣帳最新餘額（目前：¥${fmt(current)}）`, current);
+    if (input === null) return;
+    const val = parseInt(input.replace(/[,，\s]/g, ''), 10);
+    if (isNaN(val) || val < 0) { alert('請輸入有效的日幣金額'); return; }
+    const r = getJp2026Reserve();
+    r.yushan = val;
+    r.total  = r.yushan + r.cash + r.suicaR + r.suicaH;
+    saveJp2026Reserve(r);
+    renderTripSummary(travelRecords);
+}
+
 // ── 渲染統計 ──
 function renderTripSummary(records) {
     const proj      = TRIP_PROJECTS[currentTrip];
@@ -2324,7 +2364,7 @@ function renderTripSummary(records) {
 
     // ── 日幣備用金追蹤（JP2026 專用）──
     if (currentTrip === 'JP2026') {
-        const RESERVE = { total: 93779, yushan: 23597, cash: 58062, suicaR: 5206, suicaH: 6914 };
+        const RESERVE = getJp2026Reserve();
 
         const jpy = r => r.currency === 'JPY';
         // 排除 Kimi地陪現金（獨立管理，不計入可支配備用金）
@@ -2363,6 +2403,13 @@ function renderTripSummary(records) {
         setCard('cash-remain',         'cash-used',         'cash-bar',         RESERVE.cash,   usedCash);
         setCard('suica-rainbow-remain','suica-rainbow-used','suica-rainbow-bar', RESERVE.suicaR, usedSuicaR);
         setCard('suica-husband-remain','suica-husband-used','suica-husband-bar', RESERVE.suicaH, usedSuicaH);
+
+        // 同步更新明細列表顯示（初始額度）
+        if (q('jp-init-yushan')) q('jp-init-yushan').textContent = `¥${fmt(RESERVE.yushan)}`;
+        if (q('jp-init-cash'))   q('jp-init-cash').textContent   = `¥${fmt(RESERVE.cash)}`;
+        if (q('jp-init-suicaR')) q('jp-init-suicaR').textContent = `¥${fmt(RESERVE.suicaR)}`;
+        if (q('jp-init-suicaH')) q('jp-init-suicaH').textContent = `¥${fmt(RESERVE.suicaH)}`;
+        if (q('jp-init-total'))  q('jp-init-total').textContent  = `¥${fmt(RESERVE.total)}`;
     }
 
     // 類別統計
