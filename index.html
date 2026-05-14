@@ -1905,15 +1905,24 @@ function renderTaiwanStockAnalysis() {
     const daysLeft  = Math.max(0, Math.ceil((departure - today) / 86400000));
     const weeksLeft = Math.floor(daysLeft / 7);
 
-    const scenarios = [
-        { label: '維持現況',  desc: '成長型個股（估算）',        rate: 0.035 },
-        { label: '月配ETF',   desc: '轉換 00929 / 00878',        rate: 0.055 },
-        { label: '高息ETF',   desc: '全部換高殖利率 ETF',         rate: 0.065 },
+    // 台股配置策略：20萬短線交易 + 其餘長期持有
+    const TRADING_ALLOC  = 200000;
+    const holdingStock   = stockVal - TRADING_ALLOC;
+
+    // 短線交易：需要多少月報酬率才能覆蓋缺口
+    const tradingReturnNeeded = shortfall / TRADING_ALLOC * 100; // %
+
+    // 長期持有部位月配息試算
+    const holdingScenarios = [
+        { label: '維持現況',  desc: '成長型持倉（估算）', rate: 0.035 },
+        { label: '部分月配',  desc: '約NT$30萬→00929/00878', rate: 0.055 },
     ];
 
-    const swrMonthly       = investTotal * 0.04 / 12;
-    const capitalNeeded55  = shortfall * 12 / 0.055;
-    const stockOK          = stockVal * 0.055 / 12 >= shortfall;
+    // 從剩餘持倉轉換多少可覆蓋缺口
+    const capitalNeeded = shortfall * 12 / 0.055;
+    const passiveCovers = holdingStock * 0.055 / 12 >= shortfall;
+
+    const swrMonthly = investTotal * 0.04 / 12;
 
     el.innerHTML = `
         <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:12px;padding:14px 16px;color:white;margin-bottom:14px;text-align:center">
@@ -1922,7 +1931,7 @@ function renderTaiwanStockAnalysis() {
             <div style="font-size:12px;opacity:.85">天 &nbsp;·&nbsp; ${weeksLeft} 週</div>
         </div>
 
-        <div style="font-weight:600;margin-bottom:8px">💰 離職後月收支</div>
+        <div style="font-weight:600;margin-bottom:8px">💰 離職後月收支缺口</div>
         <div class="list-item" style="padding:7px 0">
             <span style="font-size:13px;color:var(--t2)">勞退月收（兩人合計）</span>
             <span style="font-weight:600;color:var(--g)">+NT$${fmt(PENSION)}</span>
@@ -1936,9 +1945,32 @@ function renderTaiwanStockAnalysis() {
             <span style="font-size:15px;font-weight:700;color:var(--r)">NT$${fmt(shortfall)}/月</span>
         </div>
 
-        <div style="font-weight:600;margin:14px 0 8px">📈 台股 NT$${fmtW(stockVal)} 月收益試算</div>
-        ${scenarios.map(s => {
-            const monthly = stockVal * s.rate / 12;
+        <div style="font-weight:600;margin:14px 0 8px">📐 台股 NT$${fmtW(stockVal)} 配置規劃</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+            <div style="flex:1;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px;text-align:center">
+                <div style="font-size:11px;color:#92400e;margin-bottom:3px">短線交易</div>
+                <div style="font-size:17px;font-weight:700;color:#c2410c">NT$${fmtW(TRADING_ALLOC)}</div>
+                <div style="font-size:10px;color:#92400e;margin-top:2px">機動操作</div>
+            </div>
+            <div style="flex:2;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;text-align:center">
+                <div style="font-size:11px;color:#166534;margin-bottom:3px">長期持有</div>
+                <div style="font-size:17px;font-weight:700;color:#15803d">NT$${fmtW(holdingStock)}</div>
+                <div style="font-size:10px;color:#166534;margin-top:2px">配息＋成長</div>
+            </div>
+        </div>
+
+        <div style="font-weight:600;margin-bottom:8px">⚡ 短線交易 NT$20萬 月收試算</div>
+        <div style="background:#fff7ed;border-radius:8px;padding:11px;margin-bottom:12px">
+            <div style="font-size:12px;color:var(--t2);line-height:1.8">
+                覆蓋全部缺口需月報酬：<strong style="color:#c2410c">${tradingReturnNeeded.toFixed(1)}%</strong>（難度極高）<br>
+                現實可期待月報酬：<strong>2–5%</strong> → NT$${fmt(Math.round(TRADING_ALLOC*0.02))}–NT$${fmt(Math.round(TRADING_ALLOC*0.05))}<br>
+                <span style="color:#92400e">→ 作為<strong>加分收入</strong>，不宜作主要依賴</span>
+            </div>
+        </div>
+
+        <div style="font-weight:600;margin-bottom:8px">📈 長期持倉 NT$${fmtW(holdingStock)} 配息試算</div>
+        ${holdingScenarios.map(s => {
+            const monthly = holdingStock * s.rate / 12;
             const covers  = monthly >= shortfall;
             const bar     = shortfall > 0 ? Math.min(100, Math.round(monthly / shortfall * 100)) : 100;
             return `<div style="margin-bottom:11px">
@@ -1955,24 +1987,20 @@ function renderTaiwanStockAnalysis() {
         }).join('')}
 
         <div style="background:#f0fff4;border-radius:8px;padding:12px;margin:6px 0 12px">
-            <div style="font-size:13px;font-weight:600;color:var(--g);margin-bottom:5px">🛡️ 安全提領法（4%法則）</div>
+            <div style="font-size:13px;font-weight:600;color:var(--g);margin-bottom:5px">🛡️ 安全提領法（4%法則）底線</div>
             <div style="font-size:12px;color:var(--t2);line-height:1.8">
                 可投資總額 NT$${fmtW(investTotal)}<br>
-                年提領上限 NT$${fmt(Math.round(investTotal * 0.04))}<br>
-                <strong>月提領 NT$${fmt(Math.round(swrMonthly))}</strong> + 勞退 NT$${fmt(PENSION)} = <strong style="color:var(--g)">NT$${fmt(Math.round(swrMonthly + PENSION))}/月</strong>
-                <span style="margin-left:6px;color:var(--g);font-size:11px">（超出預算 NT$${fmt(Math.round(swrMonthly + PENSION - MONTHLY_NEED))}）</span>
+                <strong>月提領 NT$${fmt(Math.round(swrMonthly))}</strong> + 勞退 = <strong style="color:var(--g)">NT$${fmt(Math.round(swrMonthly + PENSION))}/月</strong>
+                <span style="color:var(--g);font-size:11px">（超預算 +NT$${fmt(Math.round(swrMonthly + PENSION - MONTHLY_NEED))}）</span>
             </div>
         </div>
 
         <div style="font-weight:600;margin-bottom:7px">💡 建議行動</div>
         <div style="font-size:13px;color:var(--t2);line-height:1.85">
-            ${stockOK
-                ? `✅ 台股部位以 5.5% 殖利率即可覆蓋月缺口<br>`
-                : `⚠️ 需約 NT$${fmtW(capitalNeeded55)} 轉換高息標的<br>`}
-            • 將台股約 <strong>NT$${fmtW(capitalNeeded55)}</strong> 換成 <strong>00929 / 00878</strong>（月配息）<br>
-            • 剩餘 NT$${fmtW(Math.max(0, stockVal - capitalNeeded55))} 保留成長型部位<br>
-            • 基金 NT$${fmtW(fundVal)} 維持現況作為備援<br>
-            • 安全提領法為底線保障，資產不會見底
+            • 台股 <strong>NT$20萬</strong>留短線，控制在總資產 ${Math.round(TRADING_ALLOC/stockVal*100)}% 內，虧損上限設 10%（${fmt(TRADING_ALLOC*0.1)}）<br>
+            • 剩餘約 <strong>NT$${fmtW(capitalNeeded)}</strong> 轉換 <strong>00929 / 00878</strong>（月配息，覆蓋 NT$${fmt(shortfall)} 缺口）<br>
+            • 再餘 NT$${fmtW(Math.max(0, holdingStock - capitalNeeded))} 保留成長型持倉<br>
+            • 基金 NT$${fmtW(fundVal)} 停止定期定額、繼續持有
         </div>
     `;
 }
