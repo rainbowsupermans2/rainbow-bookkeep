@@ -1,12 +1,15 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.21
-// 更新日期：2026/05/07
+// 彩虹CFO Apps Script v3.22
+// 更新日期：2026/06/03
 // ───────────────────────────────────────────────────────
-// 新增（vs v3.20）：
-//   ★ getFixedAssets：whitelist 支援玉山日幣/富邦美金/旅遊基金/Suica/現金日幣
-//   ★ updateLiquidCash：preferredKey 優先扣特定 row
-//   ★ addTravelRecord：旅遊頁付款帳戶自動扣現金（依帳戶優先扣對應 row）
-//   ★ findVtMarketValue：從新 table 格式抓 VT 市值
+// 新增（vs v3.21）：
+//   ★ getTravelCreditCardSums：sum 旅遊明細 信用卡付款 by 卡別
+//   ★ getDebts：動態加入旅遊明細信用卡金額（避免直接 paste CSV 繞過自動扣的問題）
+//   ★ addTravelRecord：信用卡 payment 不再呼叫 updateDebtBalance（避免與動態 sum 重複）
+// 重要說明：
+//   - 既有「信用卡負債」row 應設為「pre-trip 信用卡 outstanding」
+//   - 旅遊 trip 信用卡金額由 getDebts 動態 sum from 旅遊明細
+//   - 還卡費 in 收支記帳 會 -既有 row balance（淨額 = 旅遊明細 sum + balance）
 // ═══════════════════════════════════════════════════════
 
 const SS_ID              = '1PcD6z0CWAMghLgjXgY69W176DQf0LHPV-pbWnTDyjYI';
@@ -222,10 +225,61 @@ function getDebts() {
       if (d.type === '房貸') mortgage = d.balance;
       else creditCard += d.balance;
     });
+
+    // ★ v3.22: 旅遊明細信用卡部分動態加入負債計算
+    try {
+      const travelSums = getTravelCreditCardSums();
+      Object.keys(travelSums).forEach(cardType => {
+        const amt = travelSums[cardType];
+        if (byType[cardType]) {
+          byType[cardType].balance += amt;
+        } else {
+          byType[cardType] = {
+            date: '', type: cardType, balance: amt, monthly: 0,
+            rate: 0, payoffDate: '', note: '旅遊明細動態計算'
+          };
+          data.push(byType[cardType]);
+        }
+        totalDebt += amt;
+        creditCard += amt;
+      });
+    } catch(e) {
+      Logger.log('Travel debt sync error: ' + e.message);
+    }
+
     return { rows: data, byType, totalDebt, mortgage, creditCard };
   } catch(e) {
     Logger.log('getDebts error: ' + e.message);
     return { rows:[], byType:{}, totalDebt:0, mortgage:0, creditCard:0, error:e.message };
+  }
+}
+
+// ★ v3.22: sum 旅遊明細 信用卡付款金額（依卡別）
+function getTravelCreditCardSums() {
+  try {
+    const ss = SpreadsheetApp.openById(SS_ID);
+    const sheet = ss.getSheetByName(TRAVEL_SHEET);
+    if (!sheet) return {};
+    const rows = sheet.getDataRange().getValues();
+    if (rows.length <= 1) return {};
+
+    const CREDIT_CARDS = [
+      '玉山熊本熊卡', '富邦信用卡', '中信信用卡',
+      'LINE Bank聯邦聯名卡', 'LINE Bank 聯邦聯名卡',
+      '聯邦信用卡', '中國信託信用卡'
+    ];
+    const sums = {};
+    rows.slice(1).forEach(r => {
+      const payment = String(r[7]||'').trim();
+      const amountTwd = parseFloat(r[6]) || 0;
+      if (CREDIT_CARDS.indexOf(payment) >= 0 && amountTwd > 0) {
+        sums[payment] = (sums[payment]||0) + amountTwd;
+      }
+    });
+    return sums;
+  } catch(e) {
+    Logger.log('getTravelCreditCardSums error: ' + e.message);
+    return {};
   }
 }
 
@@ -366,17 +420,15 @@ function addTravelRecord(dataStr) {
     const updates = [];
     const payment = String(d.payment || '');
     if (payment && amountTwd > 0) {
-      const debts = getDebts();
-      if (debts.byType[payment] && payment !== '房貸') {
-        if (updateDebtBalance(payment, amountTwd)) updates.push(payment + ' +' + amountTwd);
-      } else {
-        const TRIP_CASH = ['現金日幣', '玉山日幣', '彩虹Suica', '先生Suica',
-                           'LINE Pay', '台幣預付', 'Kimi地陪現金',
-                           '現金菲幣', '富邦銀行', 'LINE Bank'];
-        if (TRIP_CASH.indexOf(payment) >= 0) {
-          if (updateLiquidCash(-amountTwd, payment)) {
-            updates.push('現金(' + payment + ') -' + amountTwd);
-          }
+      // ★ v3.22: 信用卡 payment 不再自動 updateDebtBalance
+      //   → 信用卡負債由 getDebts 動態 sum 從旅遊明細統一計算
+      //   → 避免「form 加 + CSV paste」兩種來源重複計算
+      const TRIP_CASH = ['現金日幣', '玉山日幣', '彩虹Suica', '先生Suica',
+                         'LINE Pay', '台幣預付', 'Kimi地陪現金',
+                         '現金菲幣', '富邦銀行', 'LINE Bank'];
+      if (TRIP_CASH.indexOf(payment) >= 0) {
+        if (updateLiquidCash(-amountTwd, payment)) {
+          updates.push('現金(' + payment + ') -' + amountTwd);
         }
       }
     }
