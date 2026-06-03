@@ -1,11 +1,14 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.23
+// 彩虹CFO Apps Script v3.24
 // 更新日期：2026/06/03
 // ───────────────────────────────────────────────────────
-// 新增（vs v3.22）：
-//   ★ dailyAssetUpdate：sum 所有「1150421台幣市值」row（支援多帳戶 板橋+營業部）
-//   ★ 移除 F15 硬編碼 override（避免使用者改 sheet 結構時誤讀 VT 收盤價 158.6 為台股市值）
-//   ★ fundValue 也改為 sum 所有 row（如有多基金 subtotal）
+// 新增（vs v3.23）：
+//   ★ sumTaiStockMarketValue：直接 sum 個股 row 的 F 欄（不依賴「1150421台幣市值」row 可能是舊值）
+//   ★ dailyAssetUpdate 用上述直接 sum，更準確反映當前市值
+// 設計：
+//   - 個股 row：column A = 4-6 位數股票代碼，column F = 當前市值（股數×現價）
+//   - VT 由 findVtMarketValue 個別抓
+//   - 基金仍用 findMarketValues sum 多 row
 // ═══════════════════════════════════════════════════════
 
 const SS_ID              = '1PcD6z0CWAMghLgjXgY69W176DQf0LHPV-pbWnTDyjYI';
@@ -526,6 +529,21 @@ function findVtMarketValue(sheet) {
   return 0;
 }
 
+// ★ v3.24: 直接 sum 個股 row（不依賴「1150421台幣市值」row 可能是舊值）
+//   股票代碼：4-6 位數字（00878, 2330, 0050, 006208 等台股代碼）
+//   F 欄：當前市值 = 股數 × 現價
+function sumTaiStockMarketValue(sheet) {
+  const rows = sheet.getDataRange().getValues();
+  let total = 0;
+  for (let i = 1; i < rows.length; i++) {
+    const code = String(rows[i][0] || '').trim();
+    if (!/^[0-9]{4,6}$/.test(code)) continue;  // 只算台股代碼 4-6 位數
+    const value = parseFloat(rows[i][5]) || 0;  // F 欄市值
+    if (value > 0) total += value;
+  }
+  return total;
+}
+
 function dailyAssetUpdate(force) {
   try {
     const now = new Date();
@@ -539,12 +557,10 @@ function dailyAssetUpdate(force) {
     const assetSheet = ss.getSheetByName('資產記錄');
     if (!stockSheet || !fundSheet || !assetSheet) return { success: false, error: '找不到必要工作表' };
 
-    const stockSheetValues = findMarketValues(stockSheet);
     const fundSheetValues  = findMarketValues(fundSheet);
-    // ★ v3.23: sum 所有「1150421台幣市值」row（支援多帳戶 板橋+營業部）
-    //   並移除 F15 硬編碼 override（之前會誤把 VT 收盤價 158.6 當成台股市值）
+    // ★ v3.24: 改成直接 sum 個股 row（不依賴「1150421台幣市值」row 可能是舊值）
+    const stockValue = sumTaiStockMarketValue(stockSheet);
     const vtValue = findVtMarketValue(stockSheet);
-    const stockValue = stockSheetValues.reduce((s, v) => s + v, 0);
     const fundValue = fundSheetValues.reduce((s, v) => s + v, 0);
     if (stockValue === 0 || fundValue === 0 || vtValue === 0) {
       const missing = [];
