@@ -2592,6 +2592,7 @@ function renderTripSummary(records) {
         catMap['地陪費'] = (catMap['地陪費']||0) + kimiPending;
     }
     const cats   = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+    const maxVal = cats[0]?.[1] || 1;  // 最大類別當作 100% 基準（最直觀的視覺比例）
     const colors = [proj.color,'#e67e22','#3498db','#27ae60','#9b59b6','#1abc9c','#f39c12','#e74c3c','#7f8c8d'];
 
     document.getElementById('trip-summary').innerHTML = !records.length
@@ -2615,9 +2616,9 @@ function renderTripSummary(records) {
                <div class="alloc-row">
                    <div class="alloc-label" style="font-size:12px">${cat}</div>
                    <div class="alloc-bar-wrap">
-                       <div class="alloc-bar" style="width:${Math.round(val/totalTwd*100)}%;background:${colors[i%colors.length]}"></div>
+                       <div class="alloc-bar" style="width:${Math.round(val/maxVal*100)}%;background:${colors[i%colors.length]}"></div>
                    </div>
-                   <div style="font-size:12px;font-weight:700;width:80px;text-align:right">NT$${fmt(val)}</div>
+                   <div style="font-size:12px;font-weight:700;width:108px;text-align:right;white-space:nowrap">NT$${fmt(val)} <span style="color:var(--t3);font-weight:400;font-size:10px">${Math.round(val/totalTwd*100)}%</span></div>
                </div>`).join('')}`;
 
     // 每日明細
