@@ -1,15 +1,11 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.22
+// 彩虹CFO Apps Script v3.23
 // 更新日期：2026/06/03
 // ───────────────────────────────────────────────────────
-// 新增（vs v3.21）：
-//   ★ getTravelCreditCardSums：sum 旅遊明細 信用卡付款 by 卡別
-//   ★ getDebts：動態加入旅遊明細信用卡金額（避免直接 paste CSV 繞過自動扣的問題）
-//   ★ addTravelRecord：信用卡 payment 不再呼叫 updateDebtBalance（避免與動態 sum 重複）
-// 重要說明：
-//   - 既有「信用卡負債」row 應設為「pre-trip 信用卡 outstanding」
-//   - 旅遊 trip 信用卡金額由 getDebts 動態 sum from 旅遊明細
-//   - 還卡費 in 收支記帳 會 -既有 row balance（淨額 = 旅遊明細 sum + balance）
+// 新增（vs v3.22）：
+//   ★ dailyAssetUpdate：sum 所有「1150421台幣市值」row（支援多帳戶 板橋+營業部）
+//   ★ 移除 F15 硬編碼 override（避免使用者改 sheet 結構時誤讀 VT 收盤價 158.6 為台股市值）
+//   ★ fundValue 也改為 sum 所有 row（如有多基金 subtotal）
 // ═══════════════════════════════════════════════════════
 
 const SS_ID              = '1PcD6z0CWAMghLgjXgY69W176DQf0LHPV-pbWnTDyjYI';
@@ -545,11 +541,11 @@ function dailyAssetUpdate(force) {
 
     const stockSheetValues = findMarketValues(stockSheet);
     const fundSheetValues  = findMarketValues(fundSheet);
-    const stockManual = parseFloat(stockSheet.getRange('F15').getValue()) || 0;
-    const stockValue  = stockManual > 0 ? stockManual : (stockSheetValues[0] || 0);
-    const vtNew = findVtMarketValue(stockSheet);
-    const vtValue = vtNew > 0 ? vtNew : (stockSheetValues[1] || 0);
-    const fundValue = fundSheetValues[0] || 0;
+    // ★ v3.23: sum 所有「1150421台幣市值」row（支援多帳戶 板橋+營業部）
+    //   並移除 F15 硬編碼 override（之前會誤把 VT 收盤價 158.6 當成台股市值）
+    const vtValue = findVtMarketValue(stockSheet);
+    const stockValue = stockSheetValues.reduce((s, v) => s + v, 0);
+    const fundValue = fundSheetValues.reduce((s, v) => s + v, 0);
     if (stockValue === 0 || fundValue === 0 || vtValue === 0) {
       const missing = [];
       if (stockValue === 0) missing.push('台股市值');
