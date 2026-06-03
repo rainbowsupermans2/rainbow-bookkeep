@@ -506,7 +506,8 @@ function findMarketValues(sheet) {
   const values = [];
   for (let i = 0; i < rows.length; i++) {
     const label = String(rows[i][0] || '');
-    if (label.indexOf('台幣市值') >= 0) {
+    // ★ v3.24+: 接受「台幣市值」/「台股市值」/「基金市值」等任何含「市值」的 label
+    if (label.indexOf('市值') >= 0) {
       for (let j = 2; j < rows[i].length; j++) {
         const v = parseFloat(rows[i][j]);
         if (!isNaN(v) && v > 100000) { values.push(v); break; }
