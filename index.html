@@ -635,6 +635,143 @@
         <div id="countdown-content"></div>
     </div>
 
+    <!-- 📊 旅程結算（JP2026 旅程結束後顯示） -->
+    <div class="card" id="jp-final-summary" style="display:none">
+        <div class="ctitle">📊 JP2026 旅程結算</div>
+
+        <!-- Hero：總花費 vs 預算 -->
+        <div style="background:linear-gradient(135deg,#fdf0f3,#fbe4eb);padding:14px;border-radius:12px;margin-bottom:12px;text-align:center">
+            <div style="font-size:11px;color:var(--t3)">總花費 / 預算</div>
+            <div style="font-size:26px;font-weight:700;color:#b85c75;line-height:1.2;margin-top:4px">
+                NT$98,806 <span style="font-size:14px;color:var(--t3);font-weight:400">/ NT$130,000</span>
+            </div>
+            <div style="display:flex;justify-content:space-around;margin-top:12px;font-size:12px">
+                <div>
+                    <div style="color:var(--t3)">預算使用</div>
+                    <div style="font-weight:700;color:#b85c75;font-size:15px">76%</div>
+                </div>
+                <div>
+                    <div style="color:var(--t3)">結餘</div>
+                    <div style="font-weight:700;color:var(--g);font-size:15px">+NT$31,194</div>
+                </div>
+                <div>
+                    <div style="color:var(--t3)">每日平均</div>
+                    <div style="font-weight:700;font-size:15px">NT$14,115</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 按付款方式 -->
+        <div style="font-size:12px;color:var(--t3);margin:14px 0 8px;font-weight:600">💳 按付款方式</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:var(--bg);border-radius:10px;padding:10px">
+                <div style="font-size:11px;color:var(--t3)">🏦 玉山卡</div>
+                <div style="font-size:14px;font-weight:700">NT$62,189</div>
+                <div style="font-size:10px;color:var(--t3)">¥308,630 · 63%</div>
+            </div>
+            <div style="background:var(--bg);border-radius:10px;padding:10px">
+                <div style="font-size:11px;color:var(--t3)">🏦 玉山日幣連結</div>
+                <div style="font-size:14px;font-weight:700">NT$16,364</div>
+                <div style="font-size:10px;color:var(--t3)">¥81,211 · 17%</div>
+            </div>
+            <div style="background:var(--bg);border-radius:10px;padding:10px">
+                <div style="font-size:11px;color:var(--t3)">💵 現金日幣</div>
+                <div style="font-size:14px;font-weight:700">NT$10,870</div>
+                <div style="font-size:10px;color:var(--t3)">¥53,944 · 11%</div>
+            </div>
+            <div style="background:var(--bg);border-radius:10px;padding:10px">
+                <div style="font-size:11px;color:var(--t3)">💳 富邦 J卡</div>
+                <div style="font-size:14px;font-weight:700">NT$7,234</div>
+                <div style="font-size:10px;color:var(--t3)">Eztravel+Disney · 7%</div>
+            </div>
+            <div style="background:var(--bg);border-radius:10px;padding:10px;grid-column:span 2">
+                <div style="font-size:11px;color:var(--t3)">🚃 Suica 原餘額（彩虹+先生）</div>
+                <div style="font-size:14px;font-weight:700">NT$2,138</div>
+                <div style="font-size:10px;color:var(--t3)">¥10,611 · 2%（另 ¥10,000 加值來自現金）</div>
+            </div>
+        </div>
+
+        <!-- 按類別 -->
+        <div style="font-size:12px;color:var(--t3);margin:14px 0 8px;font-weight:600">🎯 按類別</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:3px">
+                    <span>🏨 Disney 飯店（3 晚）</span>
+                    <span style="font-weight:600">NT$35,283 <span style="color:var(--t3);font-size:11px">(36%)</span></span>
+                </div>
+                <div style="background:#e2e8f0;border-radius:3px;height:5px"><div style="width:36%;height:100%;background:#b85c75;border-radius:3px"></div></div>
+            </div>
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:3px">
+                    <span>🛍 購物（浅草 + 秋葉原）</span>
+                    <span style="font-weight:600">NT$18,853 <span style="color:var(--t3);font-size:11px">(19%)</span></span>
+                </div>
+                <div style="background:#e2e8f0;border-radius:3px;height:5px"><div style="width:19%;height:100%;background:#e8a0b0;border-radius:3px"></div></div>
+            </div>
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:3px">
+                    <span>🎢 Disney 樂園內（餐+紀念+周遊券）</span>
+                    <span style="font-weight:600">NT$10,084 <span style="color:var(--t3);font-size:11px">(10%)</span></span>
+                </div>
+                <div style="background:#e2e8f0;border-radius:3px;height:5px"><div style="width:10%;height:100%;background:#018790;border-radius:3px"></div></div>
+            </div>
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:3px">
+                    <span>🍱 餐飲（飯店外）</span>
+                    <span style="font-weight:600">NT$12,000 <span style="color:var(--t3);font-size:11px">(12%)</span></span>
+                </div>
+                <div style="background:#e2e8f0;border-radius:3px;height:5px"><div style="width:12%;height:100%;background:#f59e0b;border-radius:3px"></div></div>
+            </div>
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:3px">
+                    <span>🚆 交通（JR + 計程車 + Suica）</span>
+                    <span style="font-weight:600">NT$10,000 <span style="color:var(--t3);font-size:11px">(10%)</span></span>
+                </div>
+                <div style="background:#e2e8f0;border-radius:3px;height:5px"><div style="width:10%;height:100%;background:#0e6494;border-radius:3px"></div></div>
+            </div>
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:3px">
+                    <span>📦 雜項（手續費 + 小販）</span>
+                    <span style="font-weight:600">NT$12,586 <span style="color:var(--t3);font-size:11px">(13%)</span></span>
+                </div>
+                <div style="background:#e2e8f0;border-radius:3px;height:5px"><div style="width:13%;height:100%;background:#a78bfa;border-radius:3px"></div></div>
+            </div>
+        </div>
+
+        <!-- 代購回收提示 -->
+        <div style="background:#fff8e6;border:1px solid #f59e0b33;border-radius:10px;padding:10px;margin-top:14px">
+            <div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:6px">💰 代購可回收（不計入個人花費）</div>
+            <div style="font-size:11px;color:var(--t2);line-height:1.7">
+                • 同學（媽媽轉交）：合利他命 + 感冒藥 ×2 = <strong>NT$4,100 ✅ 已收</strong><br>
+                • 妹妹：膠原蛋白 + 感冒藥 = <strong>NT$~2,800 ⏳ 待收</strong><br>
+                • 合計可回收 <strong>NT$~6,900</strong> → 實質個人花費 <strong>NT$~91,906</strong>
+            </div>
+        </div>
+
+        <!-- 重點觀察 -->
+        <div style="background:#f0fff4;border:1px solid #34a85333;border-radius:10px;padding:10px;margin-top:10px">
+            <div style="font-size:12px;font-weight:600;color:#166534;margin-bottom:6px">✨ 重點觀察</div>
+            <div style="font-size:11px;color:var(--t2);line-height:1.7">
+                • <strong>Disney 飯店 ¥175k 是最大支出</strong>（36%），3 晚不同 Hotel 是慶生特別體驗，值得<br>
+                • <strong>實際比預算省 NT$31k</strong>（24%），規劃得當<br>
+                • <strong>Suica 加值精準</strong>（剩餘 ¥1,509），無浪費<br>
+                • <strong>4 個日幣帳戶追蹤模式</strong>運作良好，下次可複製<br>
+                • <strong>6/15 玉山卡扣 ¥306,752</strong> 自玉山日幣帳（已預存），不影響現金流<br>
+                • <strong>下期玉山卡會多 ¥1,878</strong>（おいもやさん 還沒入帳）
+            </div>
+        </div>
+
+        <!-- 後續追蹤 -->
+        <div style="background:var(--bg);border-radius:10px;padding:10px;margin-top:10px">
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:6px">📌 後續追蹤</div>
+            <div style="font-size:11px;color:var(--t2);line-height:1.7">
+                ⏳ 6/5 前：查玉山網銀，確認 おいもやさん ¥1,878 入帳<br>
+                ⏳ 6/15：富邦扣 NT$21,810 + 玉山日幣帳扣 ¥306,752<br>
+                ⏳ 6/底：跟妹妹收 NT$2,800 代購款
+            </div>
+        </div>
+    </div>
+
     <!-- 日幣備用金追蹤（JP2026專用）-->
     <div class="card" id="jp-reserve-card" style="display:none">
         <div class="ctitle">💴 日幣備用金</div>
@@ -2050,6 +2187,18 @@ function switchTrip(code) {
     // 日幣備用金卡片（只在 JP2026 顯示）
     const reserveCard = document.getElementById('jp-reserve-card');
     if (reserveCard) reserveCard.style.display = (code === 'JP2026') ? 'block' : 'none';
+
+    // 旅程結算卡片（只在 JP2026 旅程結束後顯示）
+    const finalSummary = document.getElementById('jp-final-summary');
+    if (finalSummary) {
+        let showSummary = false;
+        if (code === 'JP2026' && proj.returnDate) {
+            const today = new Date(); today.setHours(0,0,0,0);
+            const ret   = new Date(proj.returnDate);
+            showSummary = today > ret;
+        }
+        finalSummary.style.display = showSummary ? 'block' : 'none';
+    }
 
     // 幣別按鈕
     const btnNames = { JPY:'🇯🇵 日幣', PHP:'🇵🇭 菲幣', USD:'🇺🇸 美元', TWD:'🇹🇼 台幣' };
