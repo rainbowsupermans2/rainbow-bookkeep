@@ -645,26 +645,38 @@
             <div style="display:flex;justify-content:space-between;font-size:13px;align-items:center">
                 <span style="color:var(--t2)">🏦 玉山日幣帳</span>
                 <span style="display:flex;align-items:center;gap:6px">
-                    <span style="font-weight:600" id="jp-init-yushan">¥122,853</span>
-                    <button onclick="editYushanBalance()" style="background:none;border:none;padding:2px 4px;cursor:pointer;font-size:13px;color:var(--t3);line-height:1" title="更新玉山日幣帳餘額">✏️</button>
+                    <span style="font-weight:600" id="jp-init-yushan">¥316,991</span>
+                    <button onclick="editJp2026Reserve('yushan','玉山日幣帳')" style="background:none;border:none;padding:2px 4px;cursor:pointer;font-size:13px;color:var(--t3);line-height:1" title="更新玉山日幣帳餘額">✏️</button>
                 </span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:13px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;align-items:center">
                 <span style="color:var(--t2)">💵 實體現金</span>
-                <span style="font-weight:600" id="jp-init-cash">¥58,062</span>
+                <span style="display:flex;align-items:center;gap:6px">
+                    <span style="font-weight:600" id="jp-init-cash">¥4,118</span>
+                    <button onclick="editJp2026Reserve('cash','實體現金')" style="background:none;border:none;padding:2px 4px;cursor:pointer;font-size:13px;color:var(--t3);line-height:1" title="更新實體現金餘額">✏️</button>
+                </span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:13px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;align-items:center">
                 <span style="color:var(--t2)">🚃 彩虹 Suica</span>
-                <span style="font-weight:600" id="jp-init-suicaR">¥5,206</span>
+                <span style="display:flex;align-items:center;gap:6px">
+                    <span style="font-weight:600" id="jp-init-suicaR">¥638</span>
+                    <button onclick="editJp2026Reserve('suicaR','彩虹 Suica')" style="background:none;border:none;padding:2px 4px;cursor:pointer;font-size:13px;color:var(--t3);line-height:1" title="更新彩虹 Suica 餘額">✏️</button>
+                </span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:13px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;align-items:center">
                 <span style="color:var(--t2)">🚃 先生 Suica</span>
-                <span style="font-weight:600" id="jp-init-suicaH">¥6,914</span>
+                <span style="display:flex;align-items:center;gap:6px">
+                    <span style="font-weight:600" id="jp-init-suicaH">¥871</span>
+                    <button onclick="editJp2026Reserve('suicaH','先生 Suica')" style="background:none;border:none;padding:2px 4px;cursor:pointer;font-size:13px;color:var(--t3);line-height:1" title="更新先生 Suica 餘額">✏️</button>
+                </span>
             </div>
             <div style="height:1px;background:var(--border);margin:4px 0"></div>
             <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
                 <span>可支配合計</span>
-                <span style="color:var(--ac)" id="jp-init-total">¥193,035</span>
+                <span style="color:var(--ac)" id="jp-init-total">¥322,618</span>
+            </div>
+            <div style="font-size:10px;color:var(--t3);margin-top:6px;text-align:right">
+                ⚠️ 玉山日幣帳含 ¥306,752 預留 6/15 信用卡扣款
             </div>
         </div>
 
@@ -676,7 +688,7 @@
             </div>
             <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700">
                 <span>剩餘可支配</span>
-                <span id="jp-remain-jpy" style="color:var(--g)">¥193,035</span>
+                <span id="jp-remain-jpy" style="color:var(--g)">¥322,618</span>
             </div>
             <div style="margin-top:8px;background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden">
                 <div id="jp-reserve-bar" style="height:100%;border-radius:4px;background:var(--ac);transition:width 0.5s;width:0%"></div>
@@ -690,7 +702,7 @@
             <!-- 玉山日幣帳 -->
             <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
                 <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🏦 玉山日幣</div>
-                <div style="font-size:13px;font-weight:700" id="yushan-remain">¥122,853</div>
+                <div style="font-size:13px;font-weight:700" id="yushan-remain">¥316,991</div>
                 <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="yushan-used">¥0</span></div>
                 <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
                     <div id="yushan-bar" style="height:100%;border-radius:3px;background:#018790;transition:width 0.5s;width:0%"></div>
@@ -699,7 +711,7 @@
             <!-- 實體現金 -->
             <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
                 <div style="font-size:11px;color:var(--t3);margin-bottom:4px">💵 實體現金</div>
-                <div style="font-size:13px;font-weight:700" id="cash-remain">¥58,062</div>
+                <div style="font-size:13px;font-weight:700" id="cash-remain">¥4,118</div>
                 <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="cash-used">¥0</span></div>
                 <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
                     <div id="cash-bar" style="height:100%;border-radius:3px;background:#f59e0b;transition:width 0.5s;width:0%"></div>
@@ -708,7 +720,7 @@
             <!-- 彩虹Suica -->
             <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
                 <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🚃 彩虹Suica</div>
-                <div style="font-size:13px;font-weight:700" id="suica-rainbow-remain">¥5,206</div>
+                <div style="font-size:13px;font-weight:700" id="suica-rainbow-remain">¥638</div>
                 <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="suica-rainbow-used">¥0</span></div>
                 <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
                     <div id="suica-rainbow-bar" style="height:100%;border-radius:3px;background:#b85c75;transition:width 0.5s;width:0%"></div>
@@ -717,7 +729,7 @@
             <!-- 先生Suica -->
             <div style="background:var(--bg);border-radius:10px;padding:10px;text-align:center">
                 <div style="font-size:11px;color:var(--t3);margin-bottom:4px">🚃 先生Suica</div>
-                <div style="font-size:13px;font-weight:700" id="suica-husband-remain">¥6,914</div>
+                <div style="font-size:13px;font-weight:700" id="suica-husband-remain">¥871</div>
                 <div style="font-size:10px;color:var(--t3);margin-top:2px">已用 <span id="suica-husband-used">¥0</span></div>
                 <div style="margin-top:6px;background:#e2e8f0;border-radius:3px;height:4px;overflow:hidden">
                     <div id="suica-husband-bar" style="height:100%;border-radius:3px;background:#018790;transition:width 0.5s;width:0%"></div>
@@ -2297,7 +2309,8 @@ function loadTravelRecords() {
 }
 
 // ── JP2026 備用金初始值（localStorage 可覆寫）──
-const JP2026_RESERVE_DEFAULTS = { yushan: 122853, cash: 58062, suicaR: 5206, suicaH: 6914 };
+// 旅程結束後狀態（2026/6/3 更新）：玉山日幣 含 ¥306,752 預留信用卡扣款
+const JP2026_RESERVE_DEFAULTS = { yushan: 316991, cash: 4118, suicaR: 638, suicaH: 871 };
 
 function getJp2026Reserve() {
     try {
@@ -2320,18 +2333,21 @@ function saveJp2026Reserve(reserve) {
     localStorage.setItem('jp2026_reserve', JSON.stringify(rest));
 }
 
-function editYushanBalance() {
-    const current = getJp2026Reserve().yushan;
-    const input = prompt(`請輸入玉山日幣帳最新餘額（目前：¥${fmt(current)}）`, current);
+function editJp2026Reserve(key, label) {
+    const r = getJp2026Reserve();
+    const current = r[key];
+    const input = prompt(`請輸入${label}最新餘額（目前：¥${fmt(current)}）`, current);
     if (input === null) return;
     const val = parseInt(input.replace(/[,，\s]/g, ''), 10);
     if (isNaN(val) || val < 0) { alert('請輸入有效的日幣金額'); return; }
-    const r = getJp2026Reserve();
-    r.yushan = val;
-    r.total  = r.yushan + r.cash + r.suicaR + r.suicaH;
+    r[key] = val;
+    r.total = r.yushan + r.cash + r.suicaR + r.suicaH;
     saveJp2026Reserve(r);
     renderTripSummary(travelRecords);
 }
+
+// 向後相容（如有舊呼叫）
+function editYushanBalance() { editJp2026Reserve('yushan', '玉山日幣帳'); }
 
 // ── 渲染統計 ──
 function renderTripSummary(records) {
@@ -2340,8 +2356,12 @@ function renderTripSummary(records) {
 
     // ── JP2026: 加入 Kimi 地陪費已確認承諾（避免與已記帳項目重複）──
     // 訂金 NT$2,400（已付）+ 尾款 ¥42,000（現場付）
+    // 旅程結束後（today > returnDate）不再列入 pending（避免膨脹總額）
     let kimiPending = 0;
-    if (currentTrip === 'JP2026') {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const tripReturn = new Date(proj.returnDate);
+    const tripEnded = today > tripReturn;
+    if (currentTrip === 'JP2026' && !tripEnded) {
         const KIMI_TWD_TOTAL  = 2400;
         const KIMI_JPY_TOTAL  = 42000;
         const jpyRate         = tripRates.JPY || 0.215;
