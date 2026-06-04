@@ -1934,9 +1934,13 @@ function renderTaiwanStockAnalysis() {
     const totalHoldingVal = H.reduce((s,h) => s+h.v, 0);
     const totalMonthlyNow = H.reduce((s,h) => s + h.v*h.ya/12, 0);
 
-    const TRADING_DONE        = 76000 + 3900 + 33402;  // NT$113,302 已到位
+    const TRADING_DONE        = 76000 + 3900 + 33402;     // NT$113,302 已到位
     const TRADING_ALLOC       = 200000;
-    const TRADING_FROM_YUANTA = TRADING_ALLOC - TRADING_DONE;  // ~86,698，用元大金現金股利補足（無需賣持倉）
+    const YUANTA_SHARES       = 26527;
+    const YUANTA_DIV_PER_SHARE = 1.8;                      // 2026年現金股利確認 NT$1.8/股
+    const YUANTA_DIV_CASH     = Math.round(YUANTA_SHARES * YUANTA_DIV_PER_SHARE);  // ~NT$47,749
+    const TRADING_AFTER_DIV   = TRADING_DONE + YUANTA_DIV_CASH;  // ~NT$161,051
+    const TRADING_STILL_SHORT = TRADING_ALLOC - TRADING_AFTER_DIV;  // ~NT$38,949
     const CONVERT_TO_929     = 228000 + 26317 + 5093;
     const YIELD_929          = 0.065;
     const after_00878        = 163400 * 0.055 / 12;
@@ -2022,15 +2026,16 @@ function renderTaiwanStockAnalysis() {
 
         <div style="font-weight:600;margin-bottom:8px">🔄 轉換行動計畫</div>
         <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px;margin-bottom:8px">
-            <div style="font-size:10px;color:#92400e;font-weight:600;margin-bottom:5px">⚡ NT$20萬短線資金（進度 ${Math.round(TRADING_DONE/TRADING_ALLOC*100)}%）</div>
+            <div style="font-size:10px;color:#92400e;font-weight:600;margin-bottom:5px">⚡ NT$20萬短線資金（加入股利後 ${Math.round(TRADING_AFTER_DIV/TRADING_ALLOC*100)}%）</div>
             <div style="font-size:11px;color:#78350f;line-height:1.8">
                 ✅ 星宇航空 NT$76K <span style="color:#059669">已賣出</span><br>
                 ✅ 玉山金 NT$3.9K <span style="color:#059669">已賣出</span><br>
                 ✅ 富邦金293股 NT$33.4K <span style="color:#059669">已賣出</span><br>
-                ⏳ 元大金現金股利 ~NT$${fmt(Math.round(TRADING_FROM_YUANTA))} <span style="color:#d97706">近期入帳（不賣持倉）</span>
+                ⏳ 元大金現金股利 NT$1.8/股×${fmt(YUANTA_SHARES)}股 = <strong>NT$${fmt(YUANTA_DIV_CASH)}</strong> <span style="color:#d97706">近期入帳</span><br>
+                <span style="color:#6b7280">小計 NT$${fmt(TRADING_AFTER_DIV)}，尚缺 NT$${fmt(TRADING_STILL_SHORT)}（可視需要補賣元大金）</span>
             </div>
             <div style="height:5px;background:#fde68a;border-radius:3px;margin-top:6px">
-                <div style="height:5px;width:${Math.round(TRADING_DONE/TRADING_ALLOC*100)}%;background:#f59e0b;border-radius:3px"></div>
+                <div style="height:5px;width:${Math.round(TRADING_AFTER_DIV/TRADING_ALLOC*100)}%;background:#f59e0b;border-radius:3px"></div>
             </div>
         </div>
         <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;margin-bottom:8px">
