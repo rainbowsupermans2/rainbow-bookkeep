@@ -1898,31 +1898,46 @@ function renderTaiwanStockAnalysis() {
 
     const PENSION      = 49362;
     const MONTHLY_NEED = 63000;
-    const shortfall    = Math.max(0, MONTHLY_NEED - PENSION);
+    const shortfall    = 13638;
 
     const today     = new Date();
     const departure = new Date('2026-06-30');
     const daysLeft  = Math.max(0, Math.ceil((departure - today) / 86400000));
     const weeksLeft = Math.floor(daysLeft / 7);
 
-    // 台股配置策略：20萬短線交易 + 其餘長期持有
-    const TRADING_ALLOC  = 200000;
-    const holdingStock   = stockVal - TRADING_ALLOC;
-
-    // 短線交易：需要多少月報酬率才能覆蓋缺口
-    const tradingReturnNeeded = shortfall / TRADING_ALLOC * 100; // %
-
-    // 長期持有部位月配息試算
-    const holdingScenarios = [
-        { label: '維持現況',  desc: '成長型持倉（估算）', rate: 0.035 },
-        { label: '部分月配',  desc: '約NT$30萬→00929/00878', rate: 0.055 },
+    // ── 實際持倉 (Google Sheets, 2026-06-04) ──
+    const H = [
+        { n:'2330 台積電',      v:1779210, ya:0.005, f:'季配', role:'核心長線', clr:'#166534', bg:'#f0fdf4', tag:'keep'    },
+        { n:'2885 元大金',      v:1695075, ya:0.025, f:'年配', role:'主力（撥出短線）', clr:'#92400e', bg:'#fff7ed', tag:'partial' },
+        { n:'2881 富邦金',      v:261402,  ya:0.022, f:'年配', role:'→轉00929', clr:'#1e40af', bg:'#eff6ff', tag:'convert' },
+        { n:'00878 國泰高股息', v:163400,  ya:0.055, f:'月配', role:'月配保留', clr:'#166534', bg:'#f0fdf4', tag:'keep'    },
+        { n:'006208 富邦台50',  v:26317,   ya:0.025, f:'年配', role:'→轉00929', clr:'#1e40af', bg:'#eff6ff', tag:'convert' },
+        { n:'2646 星宇航空',    v:76000,   ya:0.000, f:'無',   role:'短線資金', clr:'#92400e', bg:'#fff7ed', tag:'trade'   },
+        { n:'0050 元大台50',    v:5093,    ya:0.025, f:'季配', role:'→轉00929', clr:'#1e40af', bg:'#eff6ff', tag:'convert' },
+        { n:'2884 玉山金',      v:3900,    ya:0.040, f:'年配', role:'→轉00929', clr:'#1e40af', bg:'#eff6ff', tag:'convert' },
     ];
+    const totalHoldingVal  = H.reduce((s,h) => s+h.v, 0);
+    const totalMonthlyNow  = H.reduce((s,h) => s + h.v*h.ya/12, 0); // 5,579
 
-    // 從剩餘持倉轉換多少可覆蓋缺口
-    const capitalNeeded = shortfall * 12 / 0.055;
-    const passiveCovers = holdingStock * 0.055 / 12 >= shortfall;
+    // 轉換計畫數字
+    const TRADING_ALLOC   = 200000;
+    const CONVERT_TO_929  = 261402 + 26317 + 5093 + 3900; // 富邦金+006208+0050+玉山金 = 296,712
+    const YIELD_929       = 0.065;
+    const after_tsmc      = 1779210 * 0.005 / 12;  // 741
+    const after_yuanta    = (1695075 - TRADING_ALLOC) * 0.025 / 12; // 3,115
+    const after_00878     = 163400  * 0.055 / 12;  // 749
+    const after_00929     = CONVERT_TO_929 * YIELD_929 / 12;  // 1,607
+    const totalMonthlyAfter = after_tsmc + after_yuanta + after_00878 + after_00929; // 6,212
+    const monthlyEtfActual  = after_00878 + after_00929; // 2,356 (月配ETF實際每月入帳)
 
+    const gapAfter  = shortfall - totalMonthlyAfter; // 7,426
+    const barBefore = Math.min(100, Math.round(totalMonthlyNow  / shortfall * 100)); // 41%
+    const barAfter  = Math.min(100, Math.round(totalMonthlyAfter / shortfall * 100)); // 46%
     const swrMonthly = investTotal * 0.04 / 12;
+
+    const tagColor = { keep:'#166534', partial:'#92400e', convert:'#1e40af', trade:'#7c3aed' };
+    const tagBg    = { keep:'#f0fdf4', partial:'#fff7ed', convert:'#eff6ff', trade:'#f5f3ff'  };
+    const tagLabel = { keep:'持有', partial:'部分轉', convert:'轉ETF', trade:'短線'  };
 
     el.innerHTML = `
         <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:12px;padding:14px 16px;color:white;margin-bottom:14px;text-align:center">
@@ -1945,48 +1960,79 @@ function renderTaiwanStockAnalysis() {
             <span style="font-size:15px;font-weight:700;color:var(--r)">NT$${fmt(shortfall)}/月</span>
         </div>
 
-        <div style="font-weight:600;margin:14px 0 8px">📐 台股 NT$${fmtW(stockVal)} 配置規劃</div>
-        <div style="display:flex;gap:8px;margin-bottom:14px">
-            <div style="flex:1;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px;text-align:center">
-                <div style="font-size:11px;color:#92400e;margin-bottom:3px">短線交易</div>
-                <div style="font-size:17px;font-weight:700;color:#c2410c">NT$${fmtW(TRADING_ALLOC)}</div>
-                <div style="font-size:10px;color:#92400e;margin-top:2px">機動操作</div>
-            </div>
-            <div style="flex:2;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;text-align:center">
-                <div style="font-size:11px;color:#166534;margin-bottom:3px">長期持有</div>
-                <div style="font-size:17px;font-weight:700;color:#15803d">NT$${fmtW(holdingStock)}</div>
-                <div style="font-size:10px;color:#166534;margin-top:2px">配息＋成長</div>
-            </div>
-        </div>
-
-        <div style="font-weight:600;margin-bottom:8px">⚡ 短線交易 NT$20萬 月收試算</div>
-        <div style="background:#fff7ed;border-radius:8px;padding:11px;margin-bottom:12px">
-            <div style="font-size:12px;color:var(--t2);line-height:1.8">
-                覆蓋全部缺口需月報酬：<strong style="color:#c2410c">${tradingReturnNeeded.toFixed(1)}%</strong>（難度極高）<br>
-                現實可期待月報酬：<strong>2–5%</strong> → NT$${fmt(Math.round(TRADING_ALLOC*0.02))}–NT$${fmt(Math.round(TRADING_ALLOC*0.05))}<br>
-                <span style="color:#92400e">→ 作為<strong>加分收入</strong>，不宜作主要依賴</span>
+        <div style="font-weight:600;margin:16px 0 8px">📋 台股實際持倉（2026-06-04）</div>
+        <div style="background:#f8fafc;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:14px">
+            ${H.map(h => {
+                const monthly = Math.round(h.v * h.ya / 12);
+                return `<div style="display:flex;align-items:center;padding:8px 11px;border-bottom:1px solid #f1f5f9;gap:8px">
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h.n}</div>
+                        <div style="font-size:10px;color:var(--t3)">${h.f} · ${(h.ya*100).toFixed(1)}% / 月息≈NT$${fmt(monthly)}</div>
+                    </div>
+                    <div style="text-align:right;min-width:68px">
+                        <div style="font-size:12px;font-weight:700">${fmtW(h.v)}</div>
+                    </div>
+                    <div style="background:${tagBg[h.tag]};color:${tagColor[h.tag]};font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;white-space:nowrap">${tagLabel[h.tag]}</div>
+                </div>`;
+            }).join('')}
+            <div style="display:flex;justify-content:space-between;padding:9px 11px;font-size:12px;font-weight:700;background:#f1f5f9">
+                <span>合計台股</span>
+                <span>NT$${fmt(Math.round(totalHoldingVal))}</span>
             </div>
         </div>
 
-        <div style="font-weight:600;margin-bottom:8px">📈 長期持倉 NT$${fmtW(holdingStock)} 配息試算</div>
-        ${holdingScenarios.map(s => {
-            const monthly = holdingStock * s.rate / 12;
-            const covers  = monthly >= shortfall;
-            const bar     = shortfall > 0 ? Math.min(100, Math.round(monthly / shortfall * 100)) : 100;
-            return `<div style="margin-bottom:11px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-                    <span style="font-size:13px;font-weight:600">${s.label}</span>
-                    <span style="font-size:13px;font-weight:700;color:${covers ? 'var(--g)' : '#f59e0b'}">${covers ? '✅' : '⚠️'} NT$${fmt(Math.round(monthly))}/月</span>
-                </div>
-                <div style="font-size:11px;color:var(--t3);margin-bottom:3px">${s.desc}・年殖利率 ${(s.rate*100).toFixed(1)}%</div>
-                <div style="height:6px;background:#e2e8f0;border-radius:4px">
-                    <div style="height:6px;width:${bar}%;background:${covers ? 'var(--g)' : '#f59e0b'};border-radius:4px"></div>
-                </div>
-                <div style="font-size:11px;color:var(--t3);text-align:right;margin-top:2px">${bar >= 100 ? '✓ 完整覆蓋缺口' : `覆蓋 ${bar}%`}</div>
-            </div>`;
-        }).join('')}
+        <div style="font-weight:600;margin-bottom:8px">📊 配息覆蓋缺口進度</div>
+        <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:3px">
+                <span>現況：月息 NT$${fmt(Math.round(totalMonthlyNow))}（年配均攤）</span>
+                <span>${barBefore}%</span>
+            </div>
+            <div style="height:8px;background:#e2e8f0;border-radius:4px;margin-bottom:8px">
+                <div style="height:8px;width:${barBefore}%;background:#f59e0b;border-radius:4px"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:3px">
+                <span>轉換後：月息 NT$${fmt(Math.round(totalMonthlyAfter))}（含月配 NT$${fmt(Math.round(monthlyEtfActual))}實入帳）</span>
+                <span>${barAfter}%</span>
+            </div>
+            <div style="height:8px;background:#e2e8f0;border-radius:4px;margin-bottom:4px">
+                <div style="height:8px;width:${barAfter}%;background:#22c55e;border-radius:4px"></div>
+            </div>
+            <div style="font-size:11px;color:var(--t3);text-align:right">距缺口 NT$${fmt(shortfall)} 仍差 NT$${fmt(Math.round(gapAfter))}</div>
+        </div>
 
-        <div style="background:#f0fff4;border-radius:8px;padding:12px;margin:6px 0 12px">
+        <div style="font-weight:600;margin-bottom:8px">🔄 轉換行動計畫</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+            <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px">
+                <div style="font-size:10px;color:#92400e;font-weight:600;margin-bottom:4px">⚡ NT$20萬短線資金</div>
+                <div style="font-size:11px;color:#78350f;line-height:1.7">
+                    星宇航空 NT$76K<br>
+                    玉山金 NT$3.9K<br>
+                    富邦金293股 NT$33.4K<br>
+                    元大金1357股 NT$86.7K<br>
+                    <strong>合計 ≈ NT$200K</strong>
+                </div>
+            </div>
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px">
+                <div style="font-size:10px;color:#1e40af;font-weight:600;margin-bottom:4px">📈 轉入00929月配ETF</div>
+                <div style="font-size:11px;color:#1e3a8a;line-height:1.7">
+                    富邦金2000股 NT$228K<br>
+                    006208 NT$26.3K<br>
+                    0050 NT$5.1K<br>
+                    <strong>合計 ≈ NT$${fmtW(Math.round(CONVERT_TO_929))}</strong><br>
+                    <span style="color:#15803d">→ 月配 NT$${fmt(Math.round(after_00929))}/月</span>
+                </div>
+            </div>
+        </div>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;margin-bottom:14px">
+            <div style="font-size:10px;color:#166534;font-weight:600;margin-bottom:4px">🛡️ 核心保留部位</div>
+            <div style="font-size:11px;color:#14532d;line-height:1.7">
+                台積電 746股 NT$178萬（+338%，長線核心）<br>
+                元大金 ~25,170股 NT$160萬（主力，可持續獲利了結）<br>
+                00878 5000股 NT$16.3萬（月配 NT$${fmt(Math.round(after_00878))}/月，繼續滾）
+            </div>
+        </div>
+
+        <div style="background:#f0fff4;border-radius:8px;padding:12px;margin:0 0 12px">
             <div style="font-size:13px;font-weight:600;color:var(--g);margin-bottom:5px">🛡️ 安全提領法（4%法則）底線</div>
             <div style="font-size:12px;color:var(--t2);line-height:1.8">
                 可投資總額 NT$${fmtW(investTotal)}<br>
@@ -1995,12 +2041,13 @@ function renderTaiwanStockAnalysis() {
             </div>
         </div>
 
-        <div style="font-weight:600;margin-bottom:7px">💡 建議行動</div>
-        <div style="font-size:13px;color:var(--t2);line-height:1.85">
-            • 台股 <strong>NT$20萬</strong>留短線，控制在總資產 ${Math.round(TRADING_ALLOC/stockVal*100)}% 內，虧損上限設 10%（${fmt(TRADING_ALLOC*0.1)}）<br>
-            • 剩餘約 <strong>NT$${fmtW(capitalNeeded)}</strong> 轉換 <strong>00929 / 00878</strong>（月配息，覆蓋 NT$${fmt(shortfall)} 缺口）<br>
-            • 再餘 NT$${fmtW(Math.max(0, holdingStock - capitalNeeded))} 保留成長型持倉<br>
-            • 基金 NT$${fmtW(fundVal)} 停止定期定額、繼續持有
+        <div style="font-weight:600;margin-bottom:7px">💡 缺口補足路線圖</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.9">
+            • 月配ETF（00878+00929）實際每月入帳 <strong>NT$${fmt(Math.round(monthlyEtfActual))}</strong><br>
+            • 短線NT$20萬年化10%→月均補貼 <strong>NT$${fmt(Math.round(200000*0.1/12))}</strong><br>
+            • 元大金持續獲利了結→再投00929每增NT$50萬→增月息 <strong>NT$${fmt(Math.round(500000*YIELD_929/12))}</strong><br>
+            • 基金 NT$${fmtW(fundVal)} 停止定額，繼續持有（安聯日本停扣）<br>
+            • <strong style="color:var(--g)">4%法則：資產足夠，中長期無虞 ✅</strong>
         </div>
     `;
 }
