@@ -1905,34 +1905,37 @@ function renderTaiwanStockAnalysis() {
     const daysLeft  = Math.max(0, Math.ceil((departure - today) / 86400000));
     const weeksLeft = Math.floor(daysLeft / 7);
 
-    // ── 實際持倉 (Google Sheets, 2026-06-04) ──
+    // ── 實際持倉 (Google Sheets, 2026-06-04 最新)
+    // 已賣出：2646星宇NT$76K、2884玉山金NT$3.9K、2881富邦金293股NT$33.4K
     const H = [
-        { n:'2330 台積電',      v:1779210, ya:0.005, f:'季配', role:'核心長線', clr:'#166534', bg:'#f0fdf4', tag:'keep'    },
-        { n:'2885 元大金',      v:1695075, ya:0.025, f:'年配', role:'主力（撥出短線）', clr:'#92400e', bg:'#fff7ed', tag:'partial' },
-        { n:'2881 富邦金',      v:261402,  ya:0.022, f:'年配', role:'→轉00929', clr:'#1e40af', bg:'#eff6ff', tag:'convert' },
-        { n:'00878 國泰高股息', v:163400,  ya:0.055, f:'月配', role:'月配保留', clr:'#166534', bg:'#f0fdf4', tag:'keep'    },
-        { n:'006208 富邦台50',  v:26317,   ya:0.025, f:'年配', role:'→轉00929', clr:'#1e40af', bg:'#eff6ff', tag:'convert' },
-        { n:'2646 星宇航空',    v:76000,   ya:0.000, f:'無',   role:'短線資金', clr:'#92400e', bg:'#fff7ed', tag:'trade'   },
-        { n:'0050 元大台50',    v:5093,    ya:0.025, f:'季配', role:'→轉00929', clr:'#1e40af', bg:'#eff6ff', tag:'convert' },
-        { n:'2884 玉山金',      v:3900,    ya:0.040, f:'年配', role:'→轉00929', clr:'#1e40af', bg:'#eff6ff', tag:'convert' },
+        { n:'2330 台積電',      v:1779210, ya:0.005, f:'季配', role:'核心長線', tag:'keep'    },
+        { n:'2885 元大金',      v:1695075, ya:0.025, f:'年配', role:'主力（補短線）', tag:'partial' },
+        { n:'2881 富邦金',      v:228000,  ya:0.022, f:'年配', role:'→轉00929', tag:'convert' },
+        { n:'00878 國泰高股息', v:163400,  ya:0.055, f:'月配', role:'月配保留', tag:'keep'    },
+        { n:'006208 富邦台50',  v:26317,   ya:0.025, f:'年配', role:'→轉00929', tag:'convert' },
+        { n:'0050 元大台50',    v:5093,    ya:0.025, f:'季配', role:'→轉00929', tag:'convert' },
     ];
-    const totalHoldingVal  = H.reduce((s,h) => s+h.v, 0);
-    const totalMonthlyNow  = H.reduce((s,h) => s + h.v*h.ya/12, 0); // 5,579
-
-    // 轉換計畫數字
+    // 短線資金進度：已到位 NT$113,302（星宇76K+玉山3.9K+富邦金293股33.4K）
+    // 尚缺 NT$86,698 → 從元大金約1,357股獲利了結補足
+    const TRADING_DONE    = 76000 + 3900 + 33402; // 113,302
     const TRADING_ALLOC   = 200000;
-    const CONVERT_TO_929  = 261402 + 26317 + 5093 + 3900; // 富邦金+006208+0050+玉山金 = 296,712
+    const TRADING_FROM_YUANTA = TRADING_ALLOC - TRADING_DONE; // 86,698
+    const totalHoldingVal  = H.reduce((s,h) => s+h.v, 0);
+    const totalMonthlyNow  = H.reduce((s,h) => s + h.v*h.ya/12, 0);
+
+    // 轉換計畫：富邦金2000股NT$228K + 006208 + 0050 → 00929
+    const CONVERT_TO_929  = 228000 + 26317 + 5093; // 259,410
     const YIELD_929       = 0.065;
     const after_tsmc      = 1779210 * 0.005 / 12;  // 741
-    const after_yuanta    = (1695075 - TRADING_ALLOC) * 0.025 / 12; // 3,115
+    const after_yuanta    = (1695075 - TRADING_FROM_YUANTA) * 0.025 / 12; // 3,349
     const after_00878     = 163400  * 0.055 / 12;  // 749
-    const after_00929     = CONVERT_TO_929 * YIELD_929 / 12;  // 1,607
-    const totalMonthlyAfter = after_tsmc + after_yuanta + after_00878 + after_00929; // 6,212
-    const monthlyEtfActual  = after_00878 + after_00929; // 2,356 (月配ETF實際每月入帳)
+    const after_00929     = CONVERT_TO_929 * YIELD_929 / 12;  // 1,406
+    const totalMonthlyAfter = after_tsmc + after_yuanta + after_00878 + after_00929; // ~6,245
+    const monthlyEtfActual  = after_00878 + after_00929; // 2,155（月配ETF每月實入帳）
 
-    const gapAfter  = shortfall - totalMonthlyAfter; // 7,426
-    const barBefore = Math.min(100, Math.round(totalMonthlyNow  / shortfall * 100)); // 41%
-    const barAfter  = Math.min(100, Math.round(totalMonthlyAfter / shortfall * 100)); // 46%
+    const gapAfter  = shortfall - totalMonthlyAfter;
+    const barBefore = Math.min(100, Math.round(totalMonthlyNow  / shortfall * 100));
+    const barAfter  = Math.min(100, Math.round(totalMonthlyAfter / shortfall * 100));
     const swrMonthly = investTotal * 0.04 / 12;
 
     const tagColor = { keep:'#166534', partial:'#92400e', convert:'#1e40af', trade:'#7c3aed' };
@@ -2001,34 +2004,34 @@ function renderTaiwanStockAnalysis() {
         </div>
 
         <div style="font-weight:600;margin-bottom:8px">🔄 轉換行動計畫</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-            <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px">
-                <div style="font-size:10px;color:#92400e;font-weight:600;margin-bottom:4px">⚡ NT$20萬短線資金</div>
-                <div style="font-size:11px;color:#78350f;line-height:1.7">
-                    星宇航空 NT$76K<br>
-                    玉山金 NT$3.9K<br>
-                    富邦金293股 NT$33.4K<br>
-                    元大金1357股 NT$86.7K<br>
-                    <strong>合計 ≈ NT$200K</strong>
-                </div>
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px;margin-bottom:8px">
+            <div style="font-size:10px;color:#92400e;font-weight:600;margin-bottom:5px">⚡ NT$20萬短線資金（進度 ${Math.round(TRADING_DONE/TRADING_ALLOC*100)}%）</div>
+            <div style="font-size:11px;color:#78350f;line-height:1.8">
+                ✅ 星宇航空 NT$76K <span style="color:#059669">已賣出</span><br>
+                ✅ 玉山金 NT$3.9K <span style="color:#059669">已賣出</span><br>
+                ✅ 富邦金293股 NT$33.4K <span style="color:#059669">已賣出</span><br>
+                ⏳ 元大金約1,357股 NT$86.7K <span style="color:#d97706">待賣出</span><br>
+                <strong>到位 NT$${fmt(TRADING_DONE)} ／ 目標 NT$${fmt(TRADING_ALLOC)}</strong>
             </div>
-            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px">
-                <div style="font-size:10px;color:#1e40af;font-weight:600;margin-bottom:4px">📈 轉入00929月配ETF</div>
-                <div style="font-size:11px;color:#1e3a8a;line-height:1.7">
-                    富邦金2000股 NT$228K<br>
-                    006208 NT$26.3K<br>
-                    0050 NT$5.1K<br>
-                    <strong>合計 ≈ NT$${fmtW(Math.round(CONVERT_TO_929))}</strong><br>
-                    <span style="color:#15803d">→ 月配 NT$${fmt(Math.round(after_00929))}/月</span>
-                </div>
+            <div style="height:5px;background:#fde68a;border-radius:3px;margin-top:6px">
+                <div style="height:5px;width:${Math.round(TRADING_DONE/TRADING_ALLOC*100)}%;background:#f59e0b;border-radius:3px"></div>
+            </div>
+        </div>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;margin-bottom:8px">
+            <div style="font-size:10px;color:#1e40af;font-weight:600;margin-bottom:4px">📈 轉入00929月配ETF（待執行）</div>
+            <div style="font-size:11px;color:#1e3a8a;line-height:1.7">
+                富邦金2000股 NT$228K<br>
+                006208 NT$26.3K<br>
+                0050 NT$5.1K<br>
+                <strong>合計 NT$${fmtW(Math.round(CONVERT_TO_929))}→ 月配 NT$${fmt(Math.round(after_00929))}/月</strong>
             </div>
         </div>
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;margin-bottom:14px">
             <div style="font-size:10px;color:#166534;font-weight:600;margin-bottom:4px">🛡️ 核心保留部位</div>
             <div style="font-size:11px;color:#14532d;line-height:1.7">
                 台積電 746股 NT$178萬（+338%，長線核心）<br>
-                元大金 ~25,170股 NT$160萬（主力，可持續獲利了結）<br>
-                00878 5000股 NT$16.3萬（月配 NT$${fmt(Math.round(after_00878))}/月，繼續滾）
+                元大金 ~25,170股 NT$161萬（主力，持續滾）<br>
+                00878 5000股 NT$16.3萬（月配 NT$${fmt(Math.round(after_00878))}/月）
             </div>
         </div>
 
