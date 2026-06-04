@@ -1896,51 +1896,56 @@ function renderTaiwanStockAnalysis() {
     const vtVal       = +(gAssets.vt    || 0);
     const investTotal = stockVal + fundVal + vtVal;
 
-    const PENSION      = 49362;
     const MONTHLY_NEED = 63000;
-    const shortfall    = 13638;
 
     const today     = new Date();
     const departure = new Date('2026-06-30');
     const daysLeft  = Math.max(0, Math.ceil((departure - today) / 86400000));
     const weeksLeft = Math.floor(daysLeft / 7);
 
-    // ── 實際持倉 (Google Sheets, 2026-06-04 最新)
-    // 已賣出：2646星宇NT$76K、2884玉山金NT$3.9K、2881富邦金293股NT$33.4K
-    const H = [
-        { n:'2330 台積電',      v:1779210, ya:0.005, f:'季配', role:'核心長線', tag:'keep'    },
-        { n:'2885 元大金',      v:1695075, ya:0.025, f:'年配', role:'主力（補短線）', tag:'partial' },
-        { n:'2881 富邦金',      v:228000,  ya:0.022, f:'年配', role:'→轉00929', tag:'convert' },
-        { n:'00878 國泰高股息', v:163400,  ya:0.055, f:'月配', role:'月配保留', tag:'keep'    },
-        { n:'006208 富邦台50',  v:26317,   ya:0.025, f:'年配', role:'→轉00929', tag:'convert' },
-        { n:'0050 元大台50',    v:5093,    ya:0.025, f:'季配', role:'→轉00929', tag:'convert' },
+    // ── 退休收入時間表 ──
+    // 勞保年金（63歲申請）: 先生 2031，彩虹 2036，合計 NT$49,362
+    // 勞退專戶（60歲可領）: 先生 2028，彩虹 2033
+    const SWR         = Math.round(investTotal * 0.04 / 12); // 可投資資產 4% SWR
+    const HIS_RETIRE_M = Math.round(1612309 / 300);  // 先生勞退月領 ≈ NT$5,374（2028）
+    const HER_RETIRE_M = Math.round(1057739 / 300);  // 彩虹勞退月領 ≈ NT$3,526（2033）
+    const PENSION_HIS  = 27000;   // 先生勞保年金（粗估，2031）
+    const PENSION_HER  = 22362;   // 彩虹勞保年金（粗估，2036）
+    const HIS_LOCKED   = 1612309;
+    const HER_LOCKED   = 1057739;
+
+    const PHASES = [
+        { period:'2026–2028', label:'現在',   event:'離職初期',     govt:0 },
+        { period:'2028–2031', label:'2028',   event:'先生勞退可領', govt:HIS_RETIRE_M },
+        { period:'2031–2033', label:'2031 ★', event:'先生勞保年金', govt:HIS_RETIRE_M + PENSION_HIS },
+        { period:'2033–2036', label:'2033',   event:'彩虹勞退可領', govt:HIS_RETIRE_M + HER_RETIRE_M + PENSION_HIS },
+        { period:'2036+ ✅',  label:'2036',   event:'彩虹勞保年金', govt:HIS_RETIRE_M + HER_RETIRE_M + PENSION_HIS + PENSION_HER },
     ];
-    // 短線資金進度：已到位 NT$113,302（星宇76K+玉山3.9K+富邦金293股33.4K）
-    // 尚缺 NT$86,698 → 從元大金約1,357股獲利了結補足
-    const TRADING_DONE    = 76000 + 3900 + 33402; // 113,302
-    const TRADING_ALLOC   = 200000;
-    const TRADING_FROM_YUANTA = TRADING_ALLOC - TRADING_DONE; // 86,698
-    const totalHoldingVal  = H.reduce((s,h) => s+h.v, 0);
-    const totalMonthlyNow  = H.reduce((s,h) => s + h.v*h.ya/12, 0);
 
-    // 轉換計畫：富邦金2000股NT$228K + 006208 + 0050 → 00929
-    const CONVERT_TO_929  = 228000 + 26317 + 5093; // 259,410
-    const YIELD_929       = 0.065;
-    const after_tsmc      = 1779210 * 0.005 / 12;  // 741
-    const after_yuanta    = (1695075 - TRADING_FROM_YUANTA) * 0.025 / 12; // 3,349
-    const after_00878     = 163400  * 0.055 / 12;  // 749
-    const after_00929     = CONVERT_TO_929 * YIELD_929 / 12;  // 1,406
-    const totalMonthlyAfter = after_tsmc + after_yuanta + after_00878 + after_00929; // ~6,245
-    const monthlyEtfActual  = after_00878 + after_00929; // 2,155（月配ETF每月實入帳）
+    // ── 實際持倉 (Google Sheets, 2026-06-04)
+    const H = [
+        { n:'2330 台積電',      v:1779210, ya:0.005, f:'季配', role:'核心長線',   tag:'keep'    },
+        { n:'2885 元大金',      v:1695075, ya:0.025, f:'年配', role:'主力（補短線）', tag:'partial' },
+        { n:'2881 富邦金',      v:228000,  ya:0.022, f:'年配', role:'→轉00929',  tag:'convert' },
+        { n:'00878 國泰高股息', v:163400,  ya:0.055, f:'月配', role:'月配保留',   tag:'keep'    },
+        { n:'006208 富邦台50',  v:26317,   ya:0.025, f:'年配', role:'→轉00929',  tag:'convert' },
+        { n:'0050 元大台50',    v:5093,    ya:0.025, f:'季配', role:'→轉00929',  tag:'convert' },
+    ];
+    const totalHoldingVal = H.reduce((s,h) => s+h.v, 0);
+    const totalMonthlyNow = H.reduce((s,h) => s + h.v*h.ya/12, 0);
 
-    const gapAfter  = shortfall - totalMonthlyAfter;
-    const barBefore = Math.min(100, Math.round(totalMonthlyNow  / shortfall * 100));
-    const barAfter  = Math.min(100, Math.round(totalMonthlyAfter / shortfall * 100));
-    const swrMonthly = investTotal * 0.04 / 12;
+    const TRADING_DONE       = 76000 + 3900 + 33402;
+    const TRADING_ALLOC      = 200000;
+    const TRADING_FROM_YUANTA = TRADING_ALLOC - TRADING_DONE;
+    const CONVERT_TO_929     = 228000 + 26317 + 5093;
+    const YIELD_929          = 0.065;
+    const after_00878        = 163400 * 0.055 / 12;
+    const after_00929        = CONVERT_TO_929 * YIELD_929 / 12;
+    const monthlyEtfActual   = after_00878 + after_00929;
 
-    const tagColor = { keep:'#166534', partial:'#92400e', convert:'#1e40af', trade:'#7c3aed' };
-    const tagBg    = { keep:'#f0fdf4', partial:'#fff7ed', convert:'#eff6ff', trade:'#f5f3ff'  };
-    const tagLabel = { keep:'持有', partial:'部分轉', convert:'轉ETF', trade:'短線'  };
+    const tagColor = { keep:'#166534', partial:'#92400e', convert:'#1e40af' };
+    const tagBg    = { keep:'#f0fdf4', partial:'#fff7ed', convert:'#eff6ff' };
+    const tagLabel = { keep:'持有', partial:'部分轉', convert:'轉ETF' };
 
     el.innerHTML = `
         <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:12px;padding:14px 16px;color:white;margin-bottom:14px;text-align:center">
@@ -1949,58 +1954,70 @@ function renderTaiwanStockAnalysis() {
             <div style="font-size:12px;opacity:.85">天 &nbsp;·&nbsp; ${weeksLeft} 週</div>
         </div>
 
-        <div style="font-weight:600;margin-bottom:8px">💰 離職後月收支缺口</div>
-        <div class="list-item" style="padding:7px 0">
-            <span style="font-size:13px;color:var(--t2)">勞退月收（兩人合計）</span>
-            <span style="font-weight:600;color:var(--g)">+NT$${fmt(PENSION)}</span>
+        <div style="font-weight:600;margin-bottom:8px">📅 退休收入五階段時間線</div>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:10px">
+            月生活預算 <strong>NT$${fmt(MONTHLY_NEED)}</strong> · 4% SWR 投資組合提領 <strong>NT$${fmt(SWR)}/月</strong>（起始底線）
         </div>
-        <div class="list-item" style="padding:7px 0">
-            <span style="font-size:13px;color:var(--t2)">每月生活預算</span>
-            <span style="font-weight:600;color:var(--r)">−NT$${fmt(MONTHLY_NEED)}</span>
-        </div>
-        <div class="list-item" style="padding:9px 0;border-top:1px solid #e2e8f0;margin-top:4px">
-            <span style="font-size:14px;font-weight:600">需要投資月收益</span>
-            <span style="font-size:15px;font-weight:700;color:var(--r)">NT$${fmt(shortfall)}/月</span>
+        <div style="background:#f8fafc;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:14px">
+            ${PHASES.map((p,i) => {
+                const totalIncome = SWR + p.govt;
+                const gap = MONTHLY_NEED - totalIncome;
+                const surplus = gap <= 0;
+                const bar = Math.min(100, Math.round(totalIncome / MONTHLY_NEED * 100));
+                const barColor = surplus ? '#15803d' : bar >= 80 ? '#22c55e' : bar >= 50 ? '#f59e0b' : '#dc2626';
+                const rowBg = surplus ? '#f0fdf4' : i === 0 ? '#fff7ed' : 'white';
+                return `<div style="padding:9px 11px;border-bottom:1px solid #f1f5f9;background:${rowBg}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                        <div>
+                            <span style="font-size:11px;font-weight:700;color:#374151">${p.period}</span>
+                            <span style="font-size:10px;color:var(--t3);margin-left:5px">${p.event}</span>
+                        </div>
+                        <div style="text-align:right">
+                            <span style="font-size:12px;font-weight:700;color:${barColor}">${surplus ? '✅ +' : '缺 '}NT$${fmt(Math.abs(Math.round(gap)))}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px">
+                        <div style="flex:1;height:5px;background:#e2e8f0;border-radius:3px">
+                            <div style="height:5px;width:${bar}%;background:${barColor};border-radius:3px;transition:width .3s"></div>
+                        </div>
+                        <span style="font-size:10px;color:var(--t3);white-space:nowrap">月入 NT$${fmt(Math.round(totalIncome))}</span>
+                    </div>
+                    ${p.govt > 0 ? `<div style="font-size:10px;color:var(--t3);margin-top:2px">政府月收 NT$${fmt(p.govt)}（勞退＋年金累計）+ SWR NT$${fmt(SWR)}</div>` : `<div style="font-size:10px;color:#d97706;margin-top:2px">⚠️ 無政府月收，全靠 4% SWR NT$${fmt(SWR)} ＋ 打工／交易補足 NT$${fmt(Math.round(gap))}</div>`}
+                </div>`;
+            }).join('')}
         </div>
 
-        <div style="font-weight:600;margin:16px 0 8px">📋 台股實際持倉（2026-06-04）</div>
+        <div style="font-weight:600;margin-bottom:6px">🔒 鎖定資產（不可動用）</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+            <div style="flex:1;background:#faf5ff;border:1px solid #e9d5ff;border-radius:8px;padding:10px;text-align:center">
+                <div style="font-size:10px;color:#7c3aed;font-weight:600">先生勞退專戶</div>
+                <div style="font-size:14px;font-weight:700;color:#6d28d9;margin:3px 0">${fmtW(HIS_LOCKED)}</div>
+                <div style="font-size:10px;color:#7c3aed">2028 起可領</div>
+            </div>
+            <div style="flex:1;background:#faf5ff;border:1px solid #e9d5ff;border-radius:8px;padding:10px;text-align:center">
+                <div style="font-size:10px;color:#7c3aed;font-weight:600">彩虹勞退專戶</div>
+                <div style="font-size:14px;font-weight:700;color:#6d28d9;margin:3px 0">${fmtW(HER_LOCKED)}</div>
+                <div style="font-size:10px;color:#7c3aed">2033 起可領</div>
+            </div>
+        </div>
+
+        <div style="font-weight:600;margin:0 0 8px">📋 台股實際持倉（2026-06-04）</div>
         <div style="background:#f8fafc;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:14px">
             ${H.map(h => {
                 const monthly = Math.round(h.v * h.ya / 12);
                 return `<div style="display:flex;align-items:center;padding:8px 11px;border-bottom:1px solid #f1f5f9;gap:8px">
                     <div style="flex:1;min-width:0">
-                        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h.n}</div>
-                        <div style="font-size:10px;color:var(--t3)">${h.f} · ${(h.ya*100).toFixed(1)}% / 月息≈NT$${fmt(monthly)}</div>
+                        <div style="font-size:12px;font-weight:600">${h.n}</div>
+                        <div style="font-size:10px;color:var(--t3)">${h.f} · ${(h.ya*100).toFixed(1)}% · 月息≈NT$${fmt(monthly)}</div>
                     </div>
-                    <div style="text-align:right;min-width:68px">
-                        <div style="font-size:12px;font-weight:700">${fmtW(h.v)}</div>
-                    </div>
+                    <div style="font-size:12px;font-weight:700;min-width:55px;text-align:right">${fmtW(h.v)}</div>
                     <div style="background:${tagBg[h.tag]};color:${tagColor[h.tag]};font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;white-space:nowrap">${tagLabel[h.tag]}</div>
                 </div>`;
             }).join('')}
-            <div style="display:flex;justify-content:space-between;padding:9px 11px;font-size:12px;font-weight:700;background:#f1f5f9">
+            <div style="display:flex;justify-content:space-between;padding:8px 11px;font-size:12px;font-weight:700;background:#f1f5f9">
                 <span>合計台股</span>
-                <span>NT$${fmt(Math.round(totalHoldingVal))}</span>
+                <span>NT$${fmt(Math.round(totalHoldingVal))} · 月息 NT$${fmt(Math.round(totalMonthlyNow))}（月配實入帳 NT$${fmt(Math.round(monthlyEtfActual))}）</span>
             </div>
-        </div>
-
-        <div style="font-weight:600;margin-bottom:8px">📊 配息覆蓋缺口進度</div>
-        <div style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:3px">
-                <span>現況：月息 NT$${fmt(Math.round(totalMonthlyNow))}（年配均攤）</span>
-                <span>${barBefore}%</span>
-            </div>
-            <div style="height:8px;background:#e2e8f0;border-radius:4px;margin-bottom:8px">
-                <div style="height:8px;width:${barBefore}%;background:#f59e0b;border-radius:4px"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:3px">
-                <span>轉換後：月息 NT$${fmt(Math.round(totalMonthlyAfter))}（含月配 NT$${fmt(Math.round(monthlyEtfActual))}實入帳）</span>
-                <span>${barAfter}%</span>
-            </div>
-            <div style="height:8px;background:#e2e8f0;border-radius:4px;margin-bottom:4px">
-                <div style="height:8px;width:${barAfter}%;background:#22c55e;border-radius:4px"></div>
-            </div>
-            <div style="font-size:11px;color:var(--t3);text-align:right">距缺口 NT$${fmt(shortfall)} 仍差 NT$${fmt(Math.round(gapAfter))}</div>
         </div>
 
         <div style="font-weight:600;margin-bottom:8px">🔄 轉換行動計畫</div>
@@ -2010,8 +2027,7 @@ function renderTaiwanStockAnalysis() {
                 ✅ 星宇航空 NT$76K <span style="color:#059669">已賣出</span><br>
                 ✅ 玉山金 NT$3.9K <span style="color:#059669">已賣出</span><br>
                 ✅ 富邦金293股 NT$33.4K <span style="color:#059669">已賣出</span><br>
-                ⏳ 元大金約1,357股 NT$86.7K <span style="color:#d97706">待賣出</span><br>
-                <strong>到位 NT$${fmt(TRADING_DONE)} ／ 目標 NT$${fmt(TRADING_ALLOC)}</strong>
+                ⏳ 元大金約1,357股 NT$86.7K <span style="color:#d97706">待賣出</span>
             </div>
             <div style="height:5px;background:#fde68a;border-radius:3px;margin-top:6px">
                 <div style="height:5px;width:${Math.round(TRADING_DONE/TRADING_ALLOC*100)}%;background:#f59e0b;border-radius:3px"></div>
@@ -2020,37 +2036,25 @@ function renderTaiwanStockAnalysis() {
         <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;margin-bottom:8px">
             <div style="font-size:10px;color:#1e40af;font-weight:600;margin-bottom:4px">📈 轉入00929月配ETF（待執行）</div>
             <div style="font-size:11px;color:#1e3a8a;line-height:1.7">
-                富邦金2000股 NT$228K<br>
-                006208 NT$26.3K<br>
-                0050 NT$5.1K<br>
-                <strong>合計 NT$${fmtW(Math.round(CONVERT_TO_929))}→ 月配 NT$${fmt(Math.round(after_00929))}/月</strong>
+                富邦金2000股 NT$228K ＋ 006208 NT$26K ＋ 0050 NT$5K<br>
+                <strong>合計 NT$${fmtW(Math.round(CONVERT_TO_929))} → 月配 NT$${fmt(Math.round(after_00929))}/月</strong>
             </div>
         </div>
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;margin-bottom:14px">
-            <div style="font-size:10px;color:#166534;font-weight:600;margin-bottom:4px">🛡️ 核心保留部位</div>
+            <div style="font-size:10px;color:#166534;font-weight:600;margin-bottom:4px">🛡️ 核心保留</div>
             <div style="font-size:11px;color:#14532d;line-height:1.7">
-                台積電 746股 NT$178萬（+338%，長線核心）<br>
-                元大金 ~25,170股 NT$161萬（主力，持續滾）<br>
-                00878 5000股 NT$16.3萬（月配 NT$${fmt(Math.round(after_00878))}/月）
+                台積電 746股 NT$178萬（+338%）· 元大金 ~25,170股 NT$161萬 · 00878 5000股（月配 NT$${fmt(Math.round(after_00878))}/月）
             </div>
         </div>
 
-        <div style="background:#f0fff4;border-radius:8px;padding:12px;margin:0 0 12px">
-            <div style="font-size:13px;font-weight:600;color:var(--g);margin-bottom:5px">🛡️ 安全提領法（4%法則）底線</div>
-            <div style="font-size:12px;color:var(--t2);line-height:1.8">
-                可投資總額 NT$${fmtW(investTotal)}<br>
-                <strong>月提領 NT$${fmt(Math.round(swrMonthly))}</strong> + 勞退 = <strong style="color:var(--g)">NT$${fmt(Math.round(swrMonthly + PENSION))}/月</strong>
-                <span style="color:var(--g);font-size:11px">（超預算 +NT$${fmt(Math.round(swrMonthly + PENSION - MONTHLY_NEED))}）</span>
-            </div>
-        </div>
-
-        <div style="font-weight:600;margin-bottom:7px">💡 缺口補足路線圖</div>
+        <div style="font-weight:600;margin-bottom:7px">💡 2026–2031 最關鍵五年應對策略</div>
         <div style="font-size:12px;color:var(--t2);line-height:1.9">
-            • 月配ETF（00878+00929）實際每月入帳 <strong>NT$${fmt(Math.round(monthlyEtfActual))}</strong><br>
-            • 短線NT$20萬年化10%→月均補貼 <strong>NT$${fmt(Math.round(200000*0.1/12))}</strong><br>
-            • 元大金持續獲利了結→再投00929每增NT$50萬→增月息 <strong>NT$${fmt(Math.round(500000*YIELD_929/12))}</strong><br>
-            • 基金 NT$${fmtW(fundVal)} 停止定額，繼續持有（安聯日本停扣）<br>
-            • <strong style="color:var(--g)">4%法則：資產足夠，中長期無虞 ✅</strong>
+            • 4% SWR 月提領 NT$${fmt(SWR)} 已可支應大半預算，不必驚慌<br>
+            • 月配ETF（00878＋00929）每月實入帳 <strong>NT$${fmt(Math.round(monthlyEtfActual))}</strong>，減少提領壓力<br>
+            • 短線交易 NT$20萬 ＋ 打工收入補足每月缺口 ~NT$${fmt(Math.round(MONTHLY_NEED - SWR))}<br>
+            • 基金 NT$${fmtW(fundVal)} 繼續持有，停止定額（安聯日本停扣）<br>
+            • <strong style="color:#7c3aed">2031 先生勞保年金 NT$27,000 到位 → 缺口驟降至 ~NT$6,000 ✨</strong><br>
+            • <strong style="color:var(--g)">2036 全額年金到位 → 月月有餘，資產反而持續增加 ✅</strong>
         </div>
     `;
 }
