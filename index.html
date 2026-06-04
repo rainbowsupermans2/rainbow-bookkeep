@@ -1934,9 +1934,9 @@ function renderTaiwanStockAnalysis() {
     const totalHoldingVal = H.reduce((s,h) => s+h.v, 0);
     const totalMonthlyNow = H.reduce((s,h) => s + h.v*h.ya/12, 0);
 
-    const TRADING_DONE       = 76000 + 3900 + 33402;
-    const TRADING_ALLOC      = 200000;
-    const TRADING_FROM_YUANTA = TRADING_ALLOC - TRADING_DONE;
+    const TRADING_DONE        = 76000 + 3900 + 33402;  // NT$113,302 已到位
+    const TRADING_ALLOC       = 200000;
+    const TRADING_FROM_YUANTA = TRADING_ALLOC - TRADING_DONE;  // ~86,698，用元大金現金股利補足（無需賣持倉）
     const CONVERT_TO_929     = 228000 + 26317 + 5093;
     const YIELD_929          = 0.065;
     const after_00878        = 163400 * 0.055 / 12;
@@ -2027,7 +2027,7 @@ function renderTaiwanStockAnalysis() {
                 ✅ 星宇航空 NT$76K <span style="color:#059669">已賣出</span><br>
                 ✅ 玉山金 NT$3.9K <span style="color:#059669">已賣出</span><br>
                 ✅ 富邦金293股 NT$33.4K <span style="color:#059669">已賣出</span><br>
-                ⏳ 元大金約1,357股 NT$86.7K <span style="color:#d97706">待賣出</span>
+                ⏳ 元大金現金股利 ~NT$${fmt(Math.round(TRADING_FROM_YUANTA))} <span style="color:#d97706">近期入帳（不賣持倉）</span>
             </div>
             <div style="height:5px;background:#fde68a;border-radius:3px;margin-top:6px">
                 <div style="height:5px;width:${Math.round(TRADING_DONE/TRADING_ALLOC*100)}%;background:#f59e0b;border-radius:3px"></div>
