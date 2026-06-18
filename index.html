@@ -2017,7 +2017,13 @@ function renderMonthlyHealth() {
             <span style="font-size:14px;font-weight:700;color:${budC}">${budgetPct}%</span>
         </div>
         ${overCats.length
-            ? overCats.map(b => `<div style="font-size:12px;color:var(--r);padding:2px 0">🔴 ${b.icon}${b.name} NT$${fmt(b.actual)}（超支 ${b.pct-100}%）</div>`).join('')
+            ? overCats.map(b => {
+                const isOneTime = b.pct > 400;
+                const dot   = isOneTime ? '🟡' : '🔴';
+                const color = isOneTime ? 'var(--y)' : 'var(--r)';
+                const note  = isOneTime ? `<span style="font-size:10px;color:var(--t3)"> 一次性支出</span>` : '';
+                return `<div style="font-size:12px;color:${color};padding:2px 0">${dot} ${b.icon}${b.name} NT$${fmt(b.actual)}（超支 ${b.pct-100}%）${note}</div>`;
+              }).join('')
             : `<div style="font-size:12px;color:var(--g);padding:2px 0">✅ 本月無超支類別</div>`
         }
         ${ccRows}
