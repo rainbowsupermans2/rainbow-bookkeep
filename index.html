@@ -534,6 +534,15 @@
 
 <!-- ⑦ 財務健康 -->
 <div class="pg" id="pg-health">
+
+    <!-- 月健檢 -->
+    <div class="card" id="monthly-health-card">
+        <div class="ctitle">📅 <span id="mh-month-label">本月</span> CFO 健檢</div>
+        <div id="monthly-health-content">
+            <div class="loading"><span class="spin">⟳</span> 計算中…</div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="ctitle">🏥 CFO財務健康評分</div>
         <div class="health-score">
@@ -1821,6 +1830,8 @@ function renderBudget(records) {
         `• 建議日均花費：NT$${fmt(monthlyAdv)}<br>
          • 今日已過 ${dayOfMonth}/${daysInMonth} 天（${Math.round(dayOfMonth/daysInMonth*100)}%）<br>
          • ${pct > 80 ? '⚠️ 支出偏高，建議緊縮非必要開銷' : '✅ 預算控制良好，繼續保持'}`;
+
+    renderMonthlyHealth();
 }
 
 // ═══════════════════════════════════
@@ -1829,11 +1840,10 @@ function renderBudget(records) {
 function renderHealth(netWorth, totalAsset, progress) {
     const debtPct = TOTAL_DEBT / totalAsset * 100;
     // 現金（含定存+活存）：優先用 gDebts/gAssets 的 cash，沒有就用 a.cash
-    const cashTotal = (gDebts && typeof gDebts.totalDebt === 'number' && gAssets) ? +(gAssets.cash || 0) : +(gAssets && gAssets.cash || 0);
+    const cashTotal = +(gAssets && gAssets.cash || 0);
     const cashPct = cashTotal > 0 ? cashTotal / totalAsset * 100 : 0;
     const investPct = (totalAsset - TOTAL_DEBT - cashTotal) / totalAsset * 100; // 投資（含勞退）佔比
-    // 月支出基準（用 BUDGET 總額 ~10.5 萬）算可撐月數
-    const monthlySpendBaseline = 105000;
+    const monthlySpendBaseline = BUDGETS.reduce((s,b) => s+b.budget, 0);
     const liquidityMonths = cashTotal / monthlySpendBaseline;
     const liquidityIcon = liquidityMonths >= 6 ? '🟢 優秀' :
                          liquidityMonths >= 3 ? '🟢 良好' :
@@ -1884,7 +1894,120 @@ function renderHealth(netWorth, totalAsset, progress) {
         投資（含勞退）佔比 ${investPct.toFixed(1)}%。
     `;
 
+    // 動態行動清單
+    const _ym  = (() => { const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; })();
+    const _exp = gRecords.filter(r=>r.type==='支出'&&(r.cat||'')!=='還卡費'&&(r.date||'').startsWith(_ym));
+    const _bTotal = BUDGETS.reduce((s,b)=>s+b.budget,0);
+    const _bPct   = _bTotal>0 ? Math.round(_exp.reduce((s,r)=>s+(+r.amount||0),0)/_bTotal*100) : 0;
+    const _ccPend = (gDebts&&gDebts.rows) ? gDebts.rows.filter(d=>d.type!=='房貸'&&(+d.balance||0)>0).map(c=>`${c.type} NT$${fmt(c.balance)}`).join('、') : '';
+    const _dLeft  = Math.max(0, Math.ceil((new Date('2026-06-30')-new Date())/86400000));
+    const _actionEl = document.getElementById('health-action');
+    if (_actionEl) _actionEl.innerHTML = [
+        liquidityMonths>=6 ? `✅ 現金儲備 ${liquidityMonths.toFixed(1)} 個月，流動性充足` : `⚠️ 現金可撐 ${liquidityMonths.toFixed(1)} 個月，建議保持 ≥ 6 個月`,
+        _bPct>100 ? `⚠️ 本月預算使用 ${_bPct}%，已超支` : _bPct>80 ? `⚠️ 本月預算使用 ${_bPct}%，留意剩餘支出` : `✅ 本月預算使用 ${_bPct}%，執行良好`,
+        _ccPend ? `💳 待繳信用卡：${_ccPend}` : `✅ 無待繳信用卡`,
+        `📈 退休進度 ${parseFloat(progress).toFixed(1)}%，距目標 NT$${fmtW(RETIRE_TARGET - netWorth)}`,
+        _dLeft>0 ? `🏃 距離職還有 ${_dLeft} 天，確認後續規劃` : `🎯 離職後：執行 4% SWR + ETF 月配策略中`,
+    ].map(a=>'• '+a).join('<br>');
+
+    renderMonthlyHealth();
     renderTaiwanStockAnalysis();
+}
+
+// ═══════════════════════════════════
+// 渲染：月健檢卡片
+// ═══════════════════════════════════
+function renderMonthlyHealth() {
+    const el = document.getElementById('monthly-health-content');
+    if (!el) return;
+
+    const now = new Date();
+    const ym  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const mlEl = document.getElementById('mh-month-label');
+    if (mlEl) mlEl.textContent = `${now.getFullYear()}年${now.getMonth()+1}月`;
+
+    if (!gRecords.length) { el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--t3);font-size:13px">載入記帳資料中…</div>'; return; }
+
+    const inMonth = gRecords.filter(r => (r.date||'').startsWith(ym));
+    const expRecs  = inMonth.filter(r => r.type==='支出' && (r.cat||r.category||'')!=='還卡費');
+    const incRecs  = inMonth.filter(r => r.type==='收入');
+    const totalExp = expRecs.reduce((s,r) => s+(+r.amount||0), 0);
+    const totalInc = incRecs.reduce((s,r) => s+(+r.amount||0), 0);
+    const balance  = totalInc - totalExp;
+    const saveRate = totalInc>0 ? Math.round(balance/totalInc*100) : 0;
+
+    const budgetTotal = BUDGETS.reduce((s,b) => s+b.budget, 0);
+    const budgetPct   = budgetTotal>0 ? Math.round(totalExp/budgetTotal*100) : 0;
+
+    // 超支類別（變動項目）
+    const overCats = BUDGETS.filter(b => !b.fixed).map(b => {
+        const actual = expRecs.filter(r => (r.cat||r.category||'')===b.name).reduce((s,r) => s+(+r.amount||0), 0);
+        return { name:b.name, icon:b.icon, actual, pct: b.budget>0 ? Math.round(actual/b.budget*100) : 0 };
+    }).filter(b => b.pct>100).sort((a,b) => b.pct-a.pct);
+
+    // 本月資產變化
+    let assetRow = '';
+    if (gAssetHistory.length >= 2) {
+        const mRecs = gAssetHistory.filter(r => (r.date||'').startsWith(ym));
+        const first = mRecs.length>=2 ? mRecs[0] : gAssetHistory[gAssetHistory.length-2];
+        const last  = mRecs.length>=1 ? mRecs[mRecs.length-1] : gAssetHistory[gAssetHistory.length-1];
+        const chg   = last.netWorth - first.netWorth;
+        const chgC  = chg>=0 ? 'var(--g)' : 'var(--r)';
+        assetRow = `<div class="list-item" style="padding:7px 0">
+            <span style="font-size:13px;color:var(--t2)">📈 本月淨資產變化</span>
+            <span style="font-weight:700;color:${chgC}">${chg>=0?'+':''}NT$${fmtW(Math.abs(chg))}</span>
+        </div>`;
+    }
+
+    // 信用卡當期應繳
+    let ccRows = '';
+    if (gDebts && gDebts.rows) {
+        const cards = gDebts.rows.filter(d => d.type!=='房貸' && (+d.balance||0)>0);
+        if (cards.length) ccRows = `
+            <div style="margin:10px 0 2px;font-size:12px;font-weight:600;color:var(--t2)">💳 信用卡當期應繳</div>
+            ${cards.map(c => `<div class="list-item" style="padding:5px 0">
+                <span style="font-size:13px;color:var(--t2)">${c.type}</span>
+                <span style="font-weight:700;color:var(--r)">NT$${fmt(c.balance)}</span>
+            </div>`).join('')}`;
+    }
+
+    const balC = balance>=0 ? 'var(--g)' : 'var(--r)';
+    const savC = saveRate>=30 ? 'var(--g)' : saveRate>=10 ? 'var(--y)' : 'var(--r)';
+    const budC = budgetPct>=100 ? 'var(--r)' : budgetPct>=80 ? 'var(--y)' : 'var(--g)';
+
+    el.innerHTML = `
+        <div class="metric-grid-3" style="margin-bottom:12px">
+            <div class="metric">
+                <div class="metric-label">月收入</div>
+                <div class="metric-value" style="color:var(--g);font-size:14px">NT$${fmtW(totalInc)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">月支出</div>
+                <div class="metric-value" style="color:var(--r);font-size:14px">NT$${fmtW(totalExp)}</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">月結餘</div>
+                <div class="metric-value" style="color:${balC};font-size:14px">${balance>=0?'+':''}NT$${fmtW(Math.abs(balance))}</div>
+            </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <span style="font-size:12px;font-weight:600;color:var(--t2)">儲蓄率</span>
+            <span style="font-size:14px;font-weight:700;color:${savC}">${saveRate}%</span>
+        </div>
+        <div class="progress-bar" style="margin-bottom:12px">
+            <div class="progress-fill" style="width:${Math.min(100,Math.max(0,saveRate))}%;background:${savC}"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <span style="font-size:12px;font-weight:600;color:var(--t2)">預算使用率</span>
+            <span style="font-size:14px;font-weight:700;color:${budC}">${budgetPct}%</span>
+        </div>
+        ${overCats.length
+            ? overCats.map(b => `<div style="font-size:12px;color:var(--r);padding:2px 0">🔴 ${b.icon}${b.name} NT$${fmt(b.actual)}（超支 ${b.pct-100}%）</div>`).join('')
+            : `<div style="font-size:12px;color:var(--g);padding:2px 0">✅ 本月無超支類別</div>`
+        }
+        ${ccRows}
+        ${assetRow}
+    `;
 }
 
 function renderTaiwanStockAnalysis() {
@@ -1898,10 +2021,12 @@ function renderTaiwanStockAnalysis() {
 
     const MONTHLY_NEED = 63000;
 
-    const today     = new Date();
-    const departure = new Date('2026-06-30');
-    const daysLeft  = Math.max(0, Math.ceil((departure - today) / 86400000));
-    const weeksLeft = Math.floor(daysLeft / 7);
+    const today      = new Date();
+    const departure  = new Date('2026-06-30');
+    const hasDeparted = today > departure;
+    const daysLeft   = Math.max(0, Math.ceil((departure - today) / 86400000));
+    const weeksLeft  = Math.floor(daysLeft / 7);
+    const daysSince  = hasDeparted ? Math.floor((today - departure) / 86400000) : 0;
 
     // ── 退休收入時間表 ──
     // 勞保年金（63歲申請）: 先生 2027-11，彩虹 2032-11，合計 NT$49,362
@@ -1952,11 +2077,18 @@ function renderTaiwanStockAnalysis() {
     const tagLabel = { keep:'持有', partial:'部分轉', convert:'轉ETF' };
 
     el.innerHTML = `
-        <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:12px;padding:14px 16px;color:white;margin-bottom:14px;text-align:center">
-            <div style="font-size:11px;opacity:.8;letter-spacing:.5px">距 6月底 離職</div>
-            <div style="font-size:36px;font-weight:700;line-height:1.1">${daysLeft}</div>
-            <div style="font-size:12px;opacity:.85">天 &nbsp;·&nbsp; ${weeksLeft} 週</div>
-        </div>
+        ${hasDeparted
+            ? `<div style="background:linear-gradient(135deg,#059669,#10b981);border-radius:12px;padding:14px 16px;color:white;margin-bottom:14px;text-align:center">
+                <div style="font-size:11px;opacity:.8;letter-spacing:.5px">✅ 已離職</div>
+                <div style="font-size:36px;font-weight:700;line-height:1.1">${daysSince}</div>
+                <div style="font-size:12px;opacity:.85">天 · 展開新生活 🌱</div>
+               </div>`
+            : `<div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:12px;padding:14px 16px;color:white;margin-bottom:14px;text-align:center">
+                <div style="font-size:11px;opacity:.8;letter-spacing:.5px">距 6月底 離職</div>
+                <div style="font-size:36px;font-weight:700;line-height:1.1">${daysLeft}</div>
+                <div style="font-size:12px;opacity:.85">天 &nbsp;·&nbsp; ${weeksLeft} 週</div>
+               </div>`
+        }
 
         <div style="font-weight:600;margin-bottom:8px">📅 退休收入五階段時間線</div>
         <div style="font-size:11px;color:var(--t2);margin-bottom:10px">
