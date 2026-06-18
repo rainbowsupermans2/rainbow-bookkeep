@@ -57,6 +57,8 @@ function doGet(e) {
     else if (type === 'debts')         result = { success: true, data: getDebts() };
     else if (type === 'fixedAssets')   result = { success: true, data: getFixedAssets() };
     else if (type === 'installments')  result = { success: true, data: getInstallments() };
+    else if (type === 'mortgagePost')  result = monthlyMortgageAutoPost(e.parameter.force === '1');
+    else if (type === 'installPost')   result = monthlyInstallmentAutoPost(e.parameter.force === '1');
     else result = { success: false, error: 'unknown type: ' + type };
 
     return ContentService
