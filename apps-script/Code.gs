@@ -59,6 +59,7 @@ function doGet(e) {
     else if (type === 'installments')  result = { success: true, data: getInstallments() };
     else if (type === 'mortgagePost')  result = monthlyMortgageAutoPost(e.parameter.force === '1');
     else if (type === 'installPost')   result = monthlyInstallmentAutoPost(e.parameter.force === '1');
+    else if (type === 'syncInstDebt')  result = syncInstallmentDebtBalances();
     else result = { success: false, error: 'unknown type: ' + type };
 
     return ContentService
@@ -250,6 +251,71 @@ function updateDebtBalance(debtType, delta) {
     }
     return false;
   } catch(e) { Logger.log('updateDebtBalance error: ' + e.message); return false; }
+}
+
+// ════════════════════════════════════════════
+// 同步分期負債餘額 → 負債管理（連動收支記帳）
+// 根據「分期負債」的 passedPeriods 計算剩餘未還總額，
+// 並更新「負債管理」對應列的債務餘額欄位。
+// ════════════════════════════════════════════
+function syncInstallmentDebtBalances() {
+  try {
+    const ss = SpreadsheetApp.openById(SS_ID);
+    const debtSheet = ss.getSheetByName(DEBT_SHEET);
+    if (!debtSheet) return { success: false, error: '找不到負債管理工作表' };
+
+    const inst = getInstallments();
+    const debtRows = debtSheet.getDataRange().getValues();
+    const today = Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyy/MM/dd');
+    const updated = [], notFound = [];
+
+    inst.rows.forEach(function(i) {
+      // 計算正確的剩餘未還總額
+      const correctBalance = i.remainingAmount;
+      let matchRow = -1;
+
+      for (let r = 1; r < debtRows.length; r++) {
+        const type = String(debtRows[r][1] || '');
+        if (!type || type === '房貸') continue;
+        const typeClean = type.split('（')[0].trim();
+
+        // 方法1：card 欄名稱直接對應 負債管理 type
+        if (i.card && (type === i.card || typeClean === i.card ||
+            typeClean.startsWith(i.card) || i.card.startsWith(typeClean))) {
+          matchRow = r; break;
+        }
+        // 方法2：同時含「分期/人壽/保險」關鍵字 + 相同末尾數字
+        const typeNum  = (typeClean.match(/\d+$|\d+(?=期|\s)/) || typeClean.match(/\d+/) || [''])[0];
+        const instStr  = i.item + ' ' + i.card;
+        const instNum  = (instStr.match(/\d+/) || [''])[0];
+        if (typeNum && instNum && typeNum === instNum && /分期|人壽|保險/.test(type)) {
+          const banks = ['富邦','中信','玉山','南山','新光','台灣人壽','國泰'];
+          const bankMatch = banks.some(function(k) {
+            return (type.includes(k) || typeClean.includes(k)) &&
+                   (i.item.includes(k) || i.card.includes(k));
+          });
+          if (bankMatch || (/分期/.test(type) && /分期/.test(instStr))) {
+            matchRow = r; break;
+          }
+        }
+      }
+
+      if (matchRow < 0) { notFound.push(i.item); return; }
+
+      const currentBalance = parseFloat(debtRows[matchRow][2]) || 0;
+      if (currentBalance !== correctBalance) {
+        debtSheet.getRange(matchRow + 1, 1).setValue(today);
+        debtSheet.getRange(matchRow + 1, 3).setValue(correctBalance);
+        updated.push(String(debtRows[matchRow][1]) + '：' + currentBalance + ' → ' + correctBalance);
+        Logger.log('syncInstDebt: ' + debtRows[matchRow][1] + ' ' + currentBalance + ' → ' + correctBalance);
+      }
+    });
+
+    return { success: true, updated: updated, notFound: notFound };
+  } catch(e) {
+    Logger.log('syncInstallmentDebtBalances error: ' + e.message);
+    return { success: false, error: e.message };
+  }
 }
 
 function getInstallments() {
@@ -759,6 +825,10 @@ function monthlyInstallmentAutoPost(force) {
     });
 
     Logger.log('monthlyInstallmentAutoPost：post ' + posted.length + ' / skip ' + skipped.length);
+    // 自動同步 負債管理 的分期餘額（連動）
+    if (posted.length > 0) {
+      try { syncInstallmentDebtBalances(); } catch(se) { Logger.log('sync error: ' + se.message); }
+    }
     return { success: true, date: dateStr, posted, skipped, forced: !!force };
   } catch(e) {
     Logger.log('monthlyInstallmentAutoPost error: ' + e.message);
