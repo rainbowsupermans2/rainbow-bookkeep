@@ -449,6 +449,12 @@
             <div class="loading"><span class="spin">⟳</span></div>
         </div>
     </div>
+    <div class="card">
+        <div class="ctitle">📊 投資成長分析</div>
+        <div id="invest-growth-content">
+            <div class="loading"><span class="spin">⟳</span> 計算中…</div>
+        </div>
+    </div>
 </div>
 
 <!-- ④ 趨勢 -->
@@ -1528,6 +1534,124 @@ function toggleExpMonth(bodyId) {
 }
 
 // ═══════════════════════════════════
+// 渲染：投資成長分析
+// ═══════════════════════════════════
+function renderInvestGrowth() {
+    const el = document.getElementById('invest-growth-content');
+    if (!el || !gAssets) return;
+
+    const hist = gAssetHistory;
+    if (hist.length < 2) {
+        el.innerHTML = '<div style="color:var(--t3);font-size:13px;text-align:center;padding:12px">歷史資料不足，無法計算成長</div>';
+        return;
+    }
+
+    const cur = gAssets;
+    const now = new Date();
+    const curYM  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const prevM  = now.getMonth() === 0 ? 12 : now.getMonth();
+    const prevY  = now.getMonth() === 0 ? now.getFullYear()-1 : now.getFullYear();
+    const prevYM = `${prevY}-${String(prevM).padStart(2,'0')}`;
+    const yearStartYM = `${now.getFullYear()}-01`;
+    const oneYrAgoYM  = `${now.getFullYear()-1}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+    // 找特定月份最後一筆記錄
+    const lastOfMonth = (ym) => {
+        const recs = hist.filter(r => (r.date||'').startsWith(ym));
+        return recs.length ? recs[recs.length-1] : null;
+    };
+    // 找特定月份第一筆記錄
+    const firstOfMonth = (ym) => {
+        const recs = hist.filter(r => (r.date||'').startsWith(ym));
+        return recs.length ? recs[0] : null;
+    };
+
+    const prevMonthRec  = lastOfMonth(prevYM);
+    const yearStartRec  = firstOfMonth(yearStartYM) || hist[0];
+    const oneYrAgoRec   = lastOfMonth(oneYrAgoYM);
+
+    // 比較輔助：回傳 { delta, pct, html }
+    const diff = (curVal, refVal) => {
+        if (!refVal || refVal <= 0) return null;
+        const d = curVal - refVal;
+        const p = Math.round(d / refVal * 100);
+        const c = d >= 0 ? 'var(--g)' : 'var(--r)';
+        const s = d >= 0 ? '+' : '';
+        return { delta: d, pct: p,
+            html: `<span style="color:${c};font-size:11px">${s}${p}%<span style="font-size:10px;color:var(--t3)"> (${s}NT$${fmtW(Math.abs(d))})</span></span>` };
+    };
+
+    const assets = [
+        { label: '台股',   icon: '🏦', key: 'stock', color: '#2d6a4f' },
+        { label: '美股VT', icon: '🌏', key: 'vt',    color: '#8b5cf6' },
+        { label: '基金',   icon: '📂', key: 'fund',  color: '#3b82f6' },
+    ];
+
+    // 可投資合計
+    const investCur  = (cur.stock||0)  + (cur.vt||0)  + (cur.fund||0);
+    const investPrev = prevMonthRec  ? ((prevMonthRec.stock||0)  + (prevMonthRec.vt||0)  + (prevMonthRec.fund||0))  : 0;
+    const investYS   = yearStartRec  ? ((yearStartRec.stock||0)  + (yearStartRec.vt||0)  + (yearStartRec.fund||0))  : 0;
+    const investY1   = oneYrAgoRec   ? ((oneYrAgoRec.stock||0)   + (oneYrAgoRec.vt||0)   + (oneYrAgoRec.fund||0))   : 0;
+
+    // 標題列
+    const hasLastM = !!prevMonthRec;
+    const hasYS    = !!yearStartRec && yearStartYM !== curYM;
+    const hasY1    = !!oneYrAgoRec;
+
+    const colHeaders = [
+        hasLastM ? `<th style="font-size:10px;color:var(--t3);font-weight:400;text-align:right;padding:0 0 6px 6px">vs上月</th>` : '',
+        hasYS    ? `<th style="font-size:10px;color:var(--t3);font-weight:400;text-align:right;padding:0 0 6px 6px">vs年初</th>` : '',
+        hasY1    ? `<th style="font-size:10px;color:var(--t3);font-weight:400;text-align:right;padding:0 0 6px 6px">vs一年前</th>` : '',
+    ].join('');
+
+    const row = (label, icon, curVal, prevRec, color) => {
+        const dM = hasLastM ? diff(curVal, prevRec ? prevRec[label === '可投資' ? '_inv' : assets.find(a=>a.label===label)?.key] : 0) : null;
+        // Simplified: pass values directly
+        return '';
+    };
+
+    // 逐項建立 rows
+    const buildRow = (label, icon, curVal, refPrev, refYS, refY1, bold) => {
+        const dM  = hasLastM ? diff(curVal, refPrev)  : null;
+        const dYS = hasYS    ? diff(curVal, refYS)    : null;
+        const dY1 = hasY1    ? diff(curVal, refY1)    : null;
+        const weight = bold ? '700' : '500';
+        const sep = bold ? `<tr><td colspan="5" style="border-top:1px solid var(--border);padding:0"></td></tr>` : '';
+        return `${sep}<tr>
+            <td style="font-size:13px;font-weight:${weight};padding:5px 0;white-space:nowrap">${icon} ${label}</td>
+            <td style="font-size:13px;font-weight:${weight};text-align:right;padding:5px 0 5px 8px;color:${bold?'var(--ac)':'var(--t1)'}">NT$${fmtW(curVal)}</td>
+            ${hasLastM ? `<td style="text-align:right;padding:5px 0 5px 6px">${dM ? dM.html : '<span style="color:var(--t3);font-size:11px">—</span>'}</td>` : ''}
+            ${hasYS    ? `<td style="text-align:right;padding:5px 0 5px 6px">${dYS ? dYS.html : '<span style="color:var(--t3);font-size:11px">—</span>'}</td>` : ''}
+            ${hasY1    ? `<td style="text-align:right;padding:5px 0 5px 6px">${dY1 ? dY1.html : '<span style="color:var(--t3);font-size:11px">—</span>'}</td>` : ''}
+        </tr>`;
+    };
+
+    const rows = assets.map(a => buildRow(
+        a.label, a.icon, +(cur[a.key]||0),
+        prevMonthRec  ? +(prevMonthRec[a.key]||0)  : 0,
+        yearStartRec  ? +(yearStartRec[a.key]||0)  : 0,
+        oneYrAgoRec   ? +(oneYrAgoRec[a.key]||0)   : 0,
+        false
+    )).join('');
+
+    const totalRow = buildRow('可投資合計', '💰', investCur, investPrev, investYS, investY1, true);
+
+    el.innerHTML = `
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+            <thead><tr>
+                <th style="font-size:10px;color:var(--t3);font-weight:400;text-align:left;padding:0 0 6px 0">項目</th>
+                <th style="font-size:10px;color:var(--t3);font-weight:400;text-align:right;padding:0 0 6px 8px">現值</th>
+                ${colHeaders}
+            </tr></thead>
+            <tbody>${rows}${totalRow}</tbody>
+        </table>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:8px;text-align:right">資料日期：${cur.date||'—'}</div>
+    `;
+}
+
+// ═══════════════════════════════════
 // 渲染：資產頁面
 // ═══════════════════════════════════
 function renderAllAsset() {
@@ -1644,6 +1768,7 @@ function renderAllAsset() {
     );
 
     // 同步更新負債 & 健康頁面
+    renderInvestGrowth();
     renderDebt(netWorth, totalAsset);
     renderHealth(netWorth, totalAsset, progress);
     renderTrend();
