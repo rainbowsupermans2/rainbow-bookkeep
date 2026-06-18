@@ -521,6 +521,7 @@
         <div id="budget-rows">
             <div class="loading"><span class="spin">⟳</span> 載入中…</div>
         </div>
+        <div id="budget-travel-section"></div>
     </div>
     <div class="card" style="background:#fffbeb">
         <div style="font-weight:600;margin-bottom:8px">📊 CFO本月建議</div>
@@ -914,6 +915,7 @@ let gRecords = [];      // 記帳記錄
 let gClosing = [];      // 上月結算資料（給 snapshot 匯出用）
 let gDebts = null;      // 負債管理（來自「負債管理」分頁）
 let gInstallments = null; // 分期負債（來自「分期負債」分頁）
+let gAllTravelRecords = []; // 所有旅遊記錄（跨行程，供月支出/預算連動）
 let currentType = '支出';
 
 // ═══════════════════════════════════
@@ -980,6 +982,7 @@ function loadAll() {
     loadClosing();
     loadDebts();
     loadInstallments();
+    loadAllTravelData();
 }
 
 // ═══════════════════════════════════
@@ -1005,6 +1008,87 @@ function loadInstallments() {
         gInstallments = data.data;
         if (gAssets) renderAllAsset();
     });
+}
+
+// ═══════════════════════════════════
+// 旅遊帳連動：載入全行程記錄 + 月統計輔助
+// ═══════════════════════════════════
+function loadAllTravelData() {
+    const projects = Object.keys(TRIP_PROJECTS);
+    let loaded = 0;
+    const allRecs = [];
+    projects.forEach(proj => {
+        jsonp(`${SCRIPT_URL}?type=getTravel&project=${proj}`, (err, data) => {
+            if (!err && data && data.success) {
+                (data.data || [])
+                    .filter(r => r[0] && r[0] !== '日期')
+                    .forEach(r => {
+                        const amtTwd = +(r[6]||0);
+                        if (amtTwd > 0) {
+                            allRecs.push({
+                                date:      String(r[0]||''),
+                                item:      String(r[1]||''),
+                                category:  String(r[2]||''),
+                                amount:    +(r[3]||0),
+                                currency:  String(r[4]||'JPY'),
+                                rate:      +(r[5]||0),
+                                amountTwd: amtTwd,
+                                payment:   String(r[7]||''),
+                                project:   String(r[8]||proj),
+                            });
+                        }
+                    });
+            }
+            loaded++;
+            if (loaded === projects.length) {
+                gAllTravelRecords = allRecs;
+                if (gRecords.length) {
+                    renderExpense(gRecords);
+                    renderBudget(gRecords);
+                }
+            }
+        });
+    });
+}
+
+function getTravelForMonth(yyyyMM) {
+    return gAllTravelRecords.filter(r => r.date && r.date.startsWith(yyyyMM));
+}
+
+function buildTravelMonthHtml(travelRecs) {
+    if (!travelRecs.length) return '';
+    const sym = { JPY:'¥', PHP:'₱', USD:'$', TWD:'NT$' };
+    const projNames = { JP2026:'🎠 東京', PH2026:'🏝 薄荷島' };
+
+    // 以 project+currency 分組
+    const groups = {};
+    travelRecs.forEach(r => {
+        const key = r.project + '|' + r.currency;
+        if (!groups[key]) groups[key] = { project: r.project, currency: r.currency, cats: {}, total: 0 };
+        groups[key].cats[r.category] = (groups[key].cats[r.category] || 0) + r.amount;
+        groups[key].total += r.amount;
+    });
+
+    const sections = Object.values(groups).map(g => {
+        const cats = Object.entries(g.cats).sort((a,b) => b[1]-a[1]);
+        const s = sym[g.currency] || g.currency;
+        return `
+            <div style="margin-top:6px">
+                <div style="font-size:11px;font-weight:700;color:#0e6494;margin-bottom:3px">
+                    ${projNames[g.project]||g.project}・${s}${fmt(g.total)}
+                </div>
+                ${cats.map(([c,a]) => `
+                    <div style="display:flex;justify-content:space-between;font-size:12px;padding:1px 0;color:var(--t2)">
+                        <span>${c}</span><span>${s}${fmt(a)}</span>
+                    </div>`).join('')}
+            </div>`;
+    }).join('');
+
+    return `
+        <div style="margin-top:10px;padding:8px 10px;background:#e8f4fc;border-left:3px solid #0e6494;border-radius:6px">
+            <div style="font-size:11px;font-weight:700;color:#0e6494;margin-bottom:4px">✈️ 旅遊帳（外幣獨立計算，不含於台幣支出）</div>
+            ${sections}
+        </div>`;
 }
 
 // ═══════════════════════════════════
@@ -1492,12 +1576,16 @@ function renderExpense(records) {
                 </div>`).join('')
             : `<div style="color:var(--t3);font-size:13px;padding:4px 0">本月無支出記錄</div>`;
 
+        // 旅遊帳連動：顯示該月旅遊花費（外幣獨立，不合入台幣）
+        const travelHtml = buildTravelMonthHtml(getTravelForMonth(m));
+
         return `
         <div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">
             <div onclick="toggleExpMonth('${bodyId}')" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none">
                 <div style="display:flex;align-items:center;gap:8px">
                     <span id="${bodyId}-arrow" style="font-size:11px;color:var(--t3);transition:transform 0.2s;display:inline-block;transform:rotate(${isOpen?90:0}deg)">▶</span>
                     <span style="font-size:15px;font-weight:700;color:var(--ac)">${monthLabel}</span>
+                    ${travelHtml ? '<span style="font-size:10px;background:#0e6494;color:white;padding:1px 5px;border-radius:8px;margin-left:2px">✈️</span>' : ''}
                 </div>
                 <div style="text-align:right">
                     <div style="font-size:14px;font-weight:700;color:${balance>=0?'var(--g)':'var(--r)'}">
@@ -1519,6 +1607,7 @@ function renderExpense(records) {
                     </div>
                 </div>
                 ${catsHtml}
+                ${travelHtml}
             </div>
         </div>`;
     }).join('');
@@ -1955,6 +2044,12 @@ function renderBudget(records) {
         `• 建議日均花費：NT$${fmt(monthlyAdv)}<br>
          • 今日已過 ${dayOfMonth}/${daysInMonth} 天（${Math.round(dayOfMonth/daysInMonth*100)}%）<br>
          • ${pct > 80 ? '⚠️ 支出偏高，建議緊縮非必要開銷' : '✅ 預算控制良好，繼續保持'}`;
+
+    // 旅遊帳連動：本月若有旅遊記錄則顯示（外幣獨立，不計入台幣預算）
+    const travelSection = document.getElementById('budget-travel-section');
+    if (travelSection) {
+        travelSection.innerHTML = buildTravelMonthHtml(getTravelForMonth(thisMonth));
+    }
 
     renderMonthlyHealth();
 }
@@ -2452,14 +2547,14 @@ const TRIP_PROJECTS = {
     },
     PH2026: {
         name: '🏝 薄荷島之旅',
-        subtitle: '日期待定・菲律賓薄荷島',
+        subtitle: '2026 年 9 月・菲律賓薄荷島（日期確認後更新）',
         gradient: 'linear-gradient(135deg,#0e6494,#1a8fc1)',
         color: '#0e6494', light: '#e8f4fc',
         budget: 80000,
         currencies: ['PHP','TWD','USD'],
         defaultCurrency: 'PHP',
-        departureDate: null,
-        returnDate:    null,
+        departureDate: null,  // 待確認後填入，如 '2026-09-12'
+        returnDate:    null,  // 待確認後填入，如 '2026-09-16'
         dates: [],
         dateLabels: [],
         cats: ['餐飲','交通','住宿','購物','門票景點','水上活動','伴手禮','機票','其他'],
