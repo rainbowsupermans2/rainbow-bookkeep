@@ -532,6 +532,12 @@
         </div>
     </div>
 
+    <!-- ✈️ 旅遊計畫預算（行程制）-->
+    <div class="card" id="trip-budget-card">
+        <div class="ctitle">✈️ 旅遊計畫預算</div>
+        <div id="trip-budget-content"><div class="loading"><span class="spin">⟳</span> 載入中…</div></div>
+    </div>
+
     <!-- ⏪ 上月結算（v3.8 新增）-->
     <div class="card" id="closing-card" style="display:none">
         <div class="ctitle">📅 <span id="closing-month-label">上月結算</span></div>
@@ -891,19 +897,19 @@ let TOTAL_DEBT = 1528295;
 // 預算設定（每月）
 // fixed:true = 固定支出，直接顯示預算金額；false = 從記帳記錄抓實際數字
 const BUDGETS = [
-    { name: '餐飲',       budget: 19000, icon: '🍱', fixed: false },
+    { name: '餐飲',       budget: 22000, icon: '🍱', fixed: false },  // 19000→22000（符合實際）
     { name: '生活雜支',   budget: 21500, icon: '🛒', fixed: false },
     { name: '交通',       budget: 2500,  icon: '🚌', fixed: false },
     { name: '娛樂休閒',   budget: 5000,  icon: '🎬', fixed: false },
     { name: '學習成長',   budget: 5000,  icon: '📚', fixed: false },
-    { name: '醫療保健',   budget: 4000,  icon: '💊', fixed: false },
+    { name: '醫療保健',   budget: 6000,  icon: '💊', fixed: false },  // 4000→6000（含定期回診）
     { name: '水電費',     budget: 3000,  icon: '💡', fixed: false },
     { name: '房貸',       budget: 15515, icon: '🏠', fixed: true  },
     { name: '保險費',     budget: 9560,  icon: '🛡', fixed: true  },
     { name: '健身房',     budget: 2376,  icon: '🏋', fixed: true  },
-    { name: '手機費',     budget: 1000,  icon: '📱', fixed: true  },
-    { name: '投資',       budget: 35000, icon: '📈', fixed: false },
-    { name: '旅遊基金',   budget: 12000, icon: '✈️', fixed: false },
+    { name: '手機費',     budget: 800,   icon: '📱', fixed: true  },  // 1000→800（台哥大299+老公501）
+    { name: '投資',       budget: 15000, icon: '📈', fixed: false },  // 35000→15000（離職後調降）
+    // 旅遊基金改為行程制，見下方「旅遊計畫」卡片
 ];
 
 // ═══════════════════════════════════
@@ -2052,6 +2058,62 @@ function renderBudget(records) {
     }
 
     renderMonthlyHealth();
+    renderTripBudgets();
+}
+
+// ═══════════════════════════════════
+// 渲染：旅遊計畫預算（行程制）
+// ═══════════════════════════════════
+function renderTripBudgets() {
+    const el = document.getElementById('trip-budget-content');
+    if (!el) return;
+
+    const rows = Object.entries(TRIP_PROJECTS).map(([code, proj]) => {
+        const recs = gAllTravelRecords.filter(r => r.project === code);
+        const spent = recs.reduce((s, r) => s + r.amountTwd, 0);
+        const pct   = proj.budget > 0 ? Math.min(100, spent / proj.budget * 100) : 0;
+        const color = pct >= 90 ? 'var(--r)' : pct > 70 ? 'var(--y)' : '#0e6494';
+        const bar   = pct >= 90 ? 'var(--r)' : pct > 70 ? 'var(--y)' : 'var(--g)';
+
+        // 判斷行程狀態
+        const today = new Date(); today.setHours(0,0,0,0);
+        let statusTag = '';
+        if (proj.returnDate) {
+            const ret = new Date(proj.returnDate); ret.setHours(0,0,0,0);
+            if (today > ret) statusTag = '<span style="font-size:10px;background:#64748b;color:white;padding:1px 6px;border-radius:8px;margin-left:6px">已結束</span>';
+        }
+        if (!proj.departureDate) {
+            statusTag = '<span style="font-size:10px;background:#f59e0b;color:white;padding:1px 6px;border-radius:8px;margin-left:6px">規劃中</span>';
+        } else if (!statusTag) {
+            const dep = new Date(proj.departureDate); dep.setHours(0,0,0,0);
+            if (today < dep) {
+                const days = Math.ceil((dep - today) / 86400000);
+                statusTag = `<span style="font-size:10px;background:#0e6494;color:white;padding:1px 6px;border-radius:8px;margin-left:6px">出發前 ${days} 天</span>`;
+            } else {
+                statusTag = '<span style="font-size:10px;background:var(--g);color:white;padding:1px 6px;border-radius:8px;margin-left:6px">旅途中</span>';
+            }
+        }
+
+        return `
+        <div style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <div>
+                    <span style="font-size:14px;font-weight:700">${proj.name}</span>
+                    ${statusTag}
+                </div>
+                <span style="font-size:13px;color:${color};font-weight:600">NT$${fmt(spent)} / NT$${fmt(proj.budget)}</span>
+            </div>
+            <div style="height:6px;background:#e2e8f0;border-radius:3px;margin-bottom:4px">
+                <div style="height:6px;border-radius:3px;background:${bar};width:${pct}%;transition:width .4s"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3)">
+                <span>${proj.subtitle}</span>
+                <span>${pct.toFixed(1)}%${proj.budget > spent ? `，剩 NT$${fmt(proj.budget - spent)}` : ' ⚠️ 超預算'}</span>
+            </div>
+        </div>`;
+    }).join('');
+
+    el.innerHTML = rows || '<div style="color:var(--t3);font-size:13px;text-align:center;padding:12px">尚無行程資料</div>';
 }
 
 // ═══════════════════════════════════
