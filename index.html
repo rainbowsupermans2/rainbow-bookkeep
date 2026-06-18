@@ -1777,21 +1777,19 @@ function renderAllAsset() {
     const totalAsset = a.total || (+(a.stock||0) + +(a.vt||0) + +(a.fund||0) + +(a.cash||0) + +(a.husbandRetire||0) + +(a.wifeRetire||0));
     // 分期未到期：含 12 期保險費等已承諾未來扣款
     const installmentRemaining = (gInstallments && +gInstallments.totalRemaining) || 0;
-    // 優先用即時數字計算 真實淨值（含所有負債 + 分期未到期）
-    const liveTotalDebt = (gDebts && typeof gDebts.totalDebt === 'number')
-        ? gDebts.totalDebt + installmentRemaining
-        : TOTAL_DEBT + installmentRemaining;
-    const netWorth = (gDebts && typeof gDebts.totalDebt === 'number')
-        ? (totalAsset - liveTotalDebt)
-        : (a.netWorth || (totalAsset - TOTAL_DEBT)) - installmentRemaining;
+    // 信用卡當期帳單（排除分期追蹤列，不與 gInstallments 重複）
+    const ccBillRows = (gDebts && gDebts.rows || []).filter(d =>
+        d.type !== '房貸' && !/分期|人壽|保險費/.test(d.type)
+    );
+    const ccBillTotal = ccBillRows.reduce((s, d) => s + d.balance, 0);
+    const mortgageBalance = (gDebts && gDebts.byType && gDebts.byType['房貸'] && gDebts.byType['房貸'].balance) || MORTGAGE;
+    // 正確的負債合計：房貸 + 信用卡帳單 + 分期未到期（不重複計算）
+    const liveTotalDebt = mortgageBalance + ccBillTotal + installmentRemaining;
+    const netWorth = totalAsset - liveTotalDebt;
     const progress = (netWorth / RETIRE_TARGET * 100);
     const dist = (RETIRE_TARGET - netWorth);
-    const ccPart = (gDebts && gDebts.creditCard) || 0;
-    const breakdown = [];
-    if (ccPart > 0) breakdown.push('信用卡 NT$' + fmtW(ccPart));
-    if (installmentRemaining > 0) breakdown.push('分期未到期 NT$' + fmtW(installmentRemaining));
-    const debtLabel = breakdown.length
-        ? `NT$${fmtW(liveTotalDebt)}<div style="font-size:11px;color:var(--t3);font-weight:400">含 ${breakdown.join('、')}</div>`
+    const debtLabel = ccBillTotal + installmentRemaining > 0
+        ? `NT$${fmtW(liveTotalDebt)}<div style="font-size:11px;color:var(--t3);font-weight:400">含 信用卡 NT$${fmtW(ccBillTotal)}、分期未到期 NT$${fmtW(installmentRemaining)}</div>`
         : `NT$${fmtW(liveTotalDebt)}`;
 
     document.getElementById('asset-total').innerHTML = `
@@ -1954,108 +1952,89 @@ function renderTrend() {
 }
 
 // ═══════════════════════════════════
-// 渲染：負債
+// 渲染：負債（按卡分組：當期應繳 + 分期未到期）
 // ═══════════════════════════════════
 function renderDebt(netWorth, totalAsset) {
     const installmentRemaining = (gInstallments && +gInstallments.totalRemaining) || 0;
-    const totalDebt = TOTAL_DEBT + installmentRemaining;
-    const creditCard = (gDebts && gDebts.creditCard) || 0;
-    const pct = (totalDebt / totalAsset * 100).toFixed(1);
+    // 信用卡當期帳單（排除分期追蹤列與房貸，避免重複計算）
+    const ccBillRows = (gDebts && gDebts.rows || []).filter(d =>
+        d.type !== '房貸' && !/分期|人壽|保險費/.test(d.type)
+    );
+    const ccBillTotal = ccBillRows.reduce((s, d) => s + d.balance, 0);
+    const mortgageBalance = (gDebts && gDebts.byType && gDebts.byType['房貸']
+        && gDebts.byType['房貸'].balance) || MORTGAGE;
+    // 正確總負債 = 房貸 + 各卡當期帳單 + 分期未到期（三者不重疊）
+    const liveTotalDebt = mortgageBalance + ccBillTotal + installmentRemaining;
+    const pct = totalAsset > 0 ? (liveTotalDebt / totalAsset * 100).toFixed(1) : 0;
+
     document.getElementById('debt-pct').textContent = pct + '%';
-    document.getElementById('debt-balance').textContent = 'NT$' + fmt(MORTGAGE);
-    document.getElementById('debt-cc').textContent = 'NT$' + fmt(creditCard);
-    document.getElementById('debt-cc').style.color = creditCard > 0 ? 'var(--r)' : 'var(--g)';
-    const good = pct < 30;
-    document.getElementById('debt-status-label').textContent = good ? '🟢 健康水準' : '🟡 注意';
+    document.getElementById('debt-balance').textContent = 'NT$' + fmt(mortgageBalance);
+    document.getElementById('debt-cc').textContent = 'NT$' + fmt(ccBillTotal + installmentRemaining);
+    document.getElementById('debt-cc').style.color = (ccBillTotal + installmentRemaining) > 0 ? 'var(--r)' : 'var(--g)';
+    document.getElementById('debt-status-label').textContent = +pct < 30 ? '🟢 健康水準' : '🟡 注意';
 
-    // 各卡明細 + 分期保險 + 分期未到期
+    // 各卡負債明細
     const detail = document.getElementById('debt-cards-detail');
-    if (detail) {
-        let html = '';
-        if (gDebts && gDebts.rows && gDebts.rows.length) {
-            const instRows = (gInstallments && gInstallments.rows) || [];
+    if (!detail) return;
 
-            // 模糊比對：從「分期負債」找對應的 monthly（去掉括號後比對 card 欄）
-            const matchInst = (debtType) => {
-                const clean = debtType.split('（')[0].trim();
-                return instRows.find(i => i.isActive && (
-                    i.card === debtType || i.card === clean ||
-                    clean.startsWith(i.card) || debtType.includes(i.card)
-                ));
-            };
+    // 建立 分期未到期 的按卡索引
+    const instByCard = {};
+    (gInstallments && gInstallments.rows || []).filter(i => i.isActive).forEach(i => {
+        if (!instByCard[i.card]) instByCard[i.card] = [];
+        instByCard[i.card].push(i);
+    });
 
-            // 判斷是否為分期/保險追蹤列（type 含關鍵字，或 D 欄有月付款，或模糊比對到分期負債）
-            const isInstDebt = (d) =>
-                +d.monthly > 0 ||
-                /分期|人壽|保險費/.test(d.type) ||
-                !!matchInst(d.type);
-
-            const creditCards    = gDebts.rows.filter(d => d.type !== '房貸' && !isInstDebt(d));
-            const installDebtRows = gDebts.rows.filter(d => d.type !== '房貸' && isInstDebt(d));
-
-            // ── 💳 各卡當期應繳 ──────────────────────
-            if (creditCards.length) {
-                html += '<div style="font-size:12px;color:var(--t3);margin-bottom:6px;font-weight:600">💳 各卡當期應繳</div>' +
-                    creditCards.map(c => {
-                        const color = c.balance > 0 ? 'var(--r)' : 'var(--t3)';
-                        const dateTxt = c.date ? `<span style="font-size:11px;color:var(--t3)">（${c.date} 更新）</span>` : '';
-                        return `<div class="list-item" style="padding:6px 0;border-bottom:1px solid #eee">
-                            <span style="font-size:13px">💳 ${c.type} ${dateTxt}</span>
-                            <span style="font-weight:600;color:${color}">NT$${fmt(c.balance)}</span>
-                        </div>`;
-                    }).join('');
-            }
-
-            // ── 📋 分期保險（月付款 vs 債務餘額）──────
-            if (installDebtRows.length) {
-                const totalMonthly = installDebtRows.reduce((s, d) => {
-                    const m = +d.monthly > 0 ? +d.monthly : (matchInst(d.type)?.monthly || 0);
-                    return s + m;
-                }, 0);
-                html += '<div style="font-size:12px;color:var(--t3);margin:14px 0 2px;font-weight:600">📋 分期保險負債</div>' +
-                    `<div style="font-size:11px;color:var(--t3);margin-bottom:6px">月付款＝本期帳單刷卡金額；債務餘額＝剩餘未還總額${totalMonthly > 0 ? '（本月合計月付 NT$' + fmt(totalMonthly) + '）' : ''}</div>` +
-                    installDebtRows.map(d => {
-                        const instMatch  = matchInst(d.type);
-                        const monthlyAmt = +d.monthly > 0 ? +d.monthly : (instMatch?.monthly || 0);
-                        // 優先用分期負債計算的剩餘未還總額（最精確），若無則用 負債管理 儲存值
-                        const remaining  = instMatch ? instMatch.remainingAmount : d.balance;
-                        const stale      = instMatch && (d.balance !== remaining);
-                        const dateTxt    = d.date ? `<span style="font-size:11px;color:var(--t3)">（${d.date}）</span>` : '';
-                        const staleTxt   = stale ? `<span style="font-size:10px;color:#f59e0b"> ⚠ 試算值，請按「同步分期債務餘額」更新工作表</span>` : '';
-                        return `<div class="list-item" style="padding:6px 0;border-bottom:1px solid #eee;align-items:flex-start">
-                            <div style="flex:1">
-                                <div style="font-size:13px">📋 ${d.type} ${dateTxt}</div>
-                                ${monthlyAmt > 0 ? `<div style="font-size:12px;color:#0e6494;margin-top:2px">月付款 NT$${fmt(monthlyAmt)}</div>` : ''}
-                                ${staleTxt}
-                            </div>
-                            <div style="text-align:right;white-space:nowrap;padding-left:8px">
-                                <div style="font-size:11px;color:var(--t3)">剩餘未還</div>
-                                <div style="font-weight:600;color:var(--t2)">NT$${fmt(remaining)}</div>
-                            </div>
-                        </div>`;
-                    }).join('');
-            }
+    // 合併卡名清單：gDebts 信用卡 + gInstallments 有但 gDebts 沒有的卡
+    const cardList = [...ccBillRows];
+    const shownCards = new Set(cardList.map(c => c.type));
+    Object.keys(instByCard).forEach(card => {
+        if (!shownCards.has(card)) {
+            cardList.push({ type: card, balance: 0, date: '' });
         }
+    });
 
-        // ── 📅 分期未到期（來自「分期負債」分頁，顯示期數明細）──
-        if (gInstallments && gInstallments.rows && gInstallments.rows.length) {
-            const active = gInstallments.rows.filter(i => i.isActive);
-            if (active.length) {
-                html += '<div style="font-size:12px;color:var(--t3);margin:14px 0 4px;font-weight:600">📅 分期未到期 — 剩餘總額 NT$' + fmt(installmentRemaining) + '</div>' +
-                    active.map(i => `<div class="list-item" style="padding:6px 0;border-bottom:1px solid #eee">
-                        <div style="flex:1">
-                            <div style="font-size:13px">${i.item}（${i.card}）</div>
-                            <div style="font-size:11px;color:var(--t3)">剩 ${i.remainingPeriods}/${i.totalPeriods} 期</div>
-                        </div>
-                        <div style="text-align:right">
-                            <div style="font-weight:600;color:#0e6494;font-size:13px">月付 NT$${fmt(i.monthly)}</div>
-                            <div style="font-size:11px;color:var(--t3)">剩餘 NT$${fmt(i.remainingAmount)}</div>
-                        </div>
-                    </div>`).join('');
+    let html = '';
+    if (cardList.length === 0) {
+        html = '<div style="color:var(--t3);font-size:13px">暫無信用卡資料</div>';
+    } else {
+        html += '<div style="font-size:12px;color:var(--t3);margin-bottom:6px;font-weight:600">' +
+                '各卡負債 ＝ 當期應繳 ＋ 分期未到期</div>';
+
+        cardList.forEach(c => {
+            const cardInst = instByCard[c.type] || [];
+            const instTotal = cardInst.reduce((s, i) => s + i.remainingAmount, 0);
+            const cardTotal = c.balance + instTotal;
+            const totalColor = cardTotal > 0 ? 'var(--r)' : 'var(--t3)';
+            const dateTxt = c.date ? `<span style="font-size:11px;font-weight:400;color:var(--t3)">（${c.date}）</span>` : '';
+
+            html += `<div style="border-bottom:1px solid #f0f0f0;padding:8px 0 6px">
+                <div class="list-item" style="padding:1px 0">
+                    <span style="font-size:13px;font-weight:600">💳 ${c.type} ${dateTxt}</span>
+                    <span style="font-weight:700;font-size:14px;color:${totalColor}">NT$${fmt(cardTotal)}</span>
+                </div>
+                <div class="list-item" style="padding:1px 0;padding-left:14px">
+                    <span style="font-size:12px;color:var(--t2)">當期應繳</span>
+                    <span style="font-size:12px;color:${c.balance>0?'var(--r)':'var(--t3)'}">NT$${fmt(c.balance)}</span>
+                </div>`;
+
+            cardInst.forEach(i => {
+                html += `<div class="list-item" style="padding:1px 0;padding-left:14px">
+                    <span style="font-size:12px;color:var(--t3)">${i.item}（剩${i.remainingPeriods}/${i.totalPeriods}期）</span>
+                    <span style="font-size:12px;color:var(--y)">月付NT$${fmt(i.monthly)} / 剩NT$${fmt(i.remainingAmount)}</span>
+                </div>`;
+            });
+
+            if (cardInst.length > 0) {
+                html += `<div class="list-item" style="padding:1px 0;padding-left:14px;margin-top:2px">
+                    <span style="font-size:11px;color:var(--t3)">分期未到期小計</span>
+                    <span style="font-size:11px;color:var(--y);font-weight:600">NT$${fmt(instTotal)}</span>
+                </div>`;
             }
-        }
-        detail.innerHTML = html;
+
+            html += '</div>';
+        });
     }
+    detail.innerHTML = html;
 }
 
 // ═══════════════════════════════════
