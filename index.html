@@ -1970,10 +1970,25 @@ function renderDebt(netWorth, totalAsset) {
     if (detail) {
         let html = '';
         if (gDebts && gDebts.rows && gDebts.rows.length) {
-            const cards = gDebts.rows.filter(d => d.type !== '房貸' && !(+d.monthly > 0));
-            if (cards.length) {
-                html += '<div style="font-size:12px;color:var(--t3);margin-bottom:6px;font-weight:600">各卡當期應繳</div>' +
-                    cards.map(c => {
+            // 找出已在「分期負債」追蹤的卡/名稱（透過 card 欄位對應 負債管理 type）
+            const installTrackedTypes = new Set(
+                (gInstallments && gInstallments.rows || []).map(i => i.card)
+            );
+            // 一般信用卡當期應繳（monthly=0 且不在分期追蹤清單）
+            const creditCards = gDebts.rows.filter(d =>
+                d.type !== '房貸' &&
+                !(+d.monthly > 0) &&
+                !installTrackedTypes.has(d.type)
+            );
+            // 負債管理中的分期負債列（monthly>0 或已被分期負債追蹤）→ 不計入信用卡當期
+            const installDebtRows = gDebts.rows.filter(d =>
+                d.type !== '房貸' &&
+                (+d.monthly > 0 || installTrackedTypes.has(d.type))
+            );
+
+            if (creditCards.length) {
+                html += '<div style="font-size:12px;color:var(--t3);margin-bottom:6px;font-weight:600">💳 各卡當期應繳</div>' +
+                    creditCards.map(c => {
                         const color = c.balance > 0 ? 'var(--r)' : 'var(--t3)';
                         const dateTxt = c.date ? `<span style="font-size:11px;color:var(--t3)">（${c.date} 更新）</span>` : '';
                         return `<div class="list-item" style="padding:6px 0;border-bottom:1px solid #eee">
@@ -1982,15 +1997,38 @@ function renderDebt(netWorth, totalAsset) {
                         </div>`;
                     }).join('');
             }
+
+            // 負債管理裡有月付欄的分期項目（顯示剩餘總額，不是本期應繳）
+            if (installDebtRows.length) {
+                html += '<div style="font-size:12px;color:var(--t3);margin:14px 0 4px;font-weight:600">📋 分期負債追蹤（剩餘總額）</div>' +
+                    '<div style="font-size:11px;color:var(--t3);margin-bottom:6px">※ 本期帳單每月只需繳「月付款」，非下列總額</div>' +
+                    installDebtRows.map(d => {
+                        const monthlyAmt = +d.monthly > 0 ? d.monthly
+                            : (gInstallments && gInstallments.rows || []).find(i => i.card === d.type)?.monthly || 0;
+                        const monthlyTxt = monthlyAmt > 0
+                            ? `<span style="color:#0e6494;font-size:11px">月付 NT$${fmt(monthlyAmt)}</span>` : '';
+                        const dateTxt = d.date ? `<span style="font-size:11px;color:var(--t3)">（${d.date}）</span>` : '';
+                        return `<div class="list-item" style="padding:6px 0;border-bottom:1px solid #eee">
+                            <span style="font-size:13px">📋 ${d.type} ${dateTxt}${monthlyTxt ? '<br>' + monthlyTxt : ''}</span>
+                            <span style="font-weight:600;color:var(--t2);font-size:13px">剩 NT$${fmt(d.balance)}</span>
+                        </div>`;
+                    }).join('');
+            }
         }
-        // 分期未到期明細
+        // 分期未到期明細（來自「分期負債」分頁，顯示每期明細）
         if (gInstallments && gInstallments.rows && gInstallments.rows.length) {
             const active = gInstallments.rows.filter(i => i.isActive);
             if (active.length) {
-                html += '<div style="font-size:12px;color:var(--t3);margin:14px 0 6px;font-weight:600">📅 分期未到期 NT$' + fmt(installmentRemaining) + '</div>' +
+                html += '<div style="font-size:12px;color:var(--t3);margin:14px 0 4px;font-weight:600">📅 分期未到期 — 剩餘總額 NT$' + fmt(installmentRemaining) + '</div>' +
                     active.map(i => `<div class="list-item" style="padding:6px 0;border-bottom:1px solid #eee">
-                        <span style="font-size:13px">${i.item}（${i.card}）<span style="color:var(--t3);font-size:11px">剩 ${i.remainingPeriods}/${i.totalPeriods} 期 × NT$${fmt(i.monthly)}</span></span>
-                        <span style="font-weight:600;color:var(--y)">NT$${fmt(i.remainingAmount)}</span>
+                        <div style="flex:1">
+                            <div style="font-size:13px">${i.item}（${i.card}）</div>
+                            <div style="font-size:11px;color:var(--t3)">剩 ${i.remainingPeriods}/${i.totalPeriods} 期</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-weight:600;color:#0e6494;font-size:13px">月付 NT$${fmt(i.monthly)}</div>
+                            <div style="font-size:11px;color:var(--t3)">剩餘 NT$${fmt(i.remainingAmount)}</div>
+                        </div>
                     </div>`).join('');
             }
         }
