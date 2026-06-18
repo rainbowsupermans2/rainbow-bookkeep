@@ -1858,7 +1858,7 @@ function renderDebt(netWorth, totalAsset) {
     if (detail) {
         let html = '';
         if (gDebts && gDebts.rows && gDebts.rows.length) {
-            const cards = gDebts.rows.filter(d => d.type !== '房貸');
+            const cards = gDebts.rows.filter(d => d.type !== '房貸' && !(+d.monthly > 0));
             if (cards.length) {
                 html += '<div style="font-size:12px;color:var(--t3);margin-bottom:6px;font-weight:600">各卡當期應繳</div>' +
                     cards.map(c => {
@@ -2086,29 +2086,18 @@ function renderMonthlyHealth() {
         </div>`;
     }
 
-    // 信用卡當期應繳（純信用卡顯示 balance；分期顯示 monthly 月繳額）
+    // 信用卡當期應繳（只顯示純信用卡，monthly>0 的分期已在負債頁顯示，不重疊）
     let ccRows = '';
     if (gDebts && gDebts.rows) {
-        const allItems  = gDebts.rows.filter(d => d.type!=='房貸' && (+d.balance||0)>0);
-        const pureCards = allItems.filter(c => !(+c.monthly));
-        const instItems = allItems.filter(c => (+c.monthly)>0);
-        let ccHtml = '';
+        const pureCards = gDebts.rows.filter(d => d.type!=='房貸' && (+d.balance||0)>0 && !(+d.monthly>0));
         if (pureCards.length) {
-            ccHtml += pureCards.map(c => `<div class="list-item" style="padding:5px 0">
+            ccRows = `
+            <div style="margin:10px 0 2px;font-size:12px;font-weight:600;color:var(--t2)">💳 信用卡當期應繳</div>
+            ${pureCards.map(c => `<div class="list-item" style="padding:5px 0">
                 <span style="font-size:13px;color:var(--t2)">${c.type}</span>
                 <span style="font-weight:700;color:var(--r)">NT$${fmt(c.balance)}</span>
-            </div>`).join('');
+            </div>`).join('')}`;
         }
-        if (instItems.length) {
-            if (pureCards.length) ccHtml += `<div style="font-size:11px;color:var(--t3);margin:6px 0 2px">📅 分期月繳</div>`;
-            ccHtml += instItems.map(c => `<div class="list-item" style="padding:5px 0">
-                <span style="font-size:13px;color:var(--t2)">${c.type}</span>
-                <span style="font-weight:700;color:var(--r)">NT$${fmt(c.monthly)}</span>
-            </div>`).join('');
-        }
-        if (ccHtml) ccRows = `
-            <div style="margin:10px 0 2px;font-size:12px;font-weight:600;color:var(--t2)">💳 信用卡當期應繳</div>
-            ${ccHtml}`;
     }
 
     const balC = balance>=0 ? 'var(--g)' : 'var(--r)';
