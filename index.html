@@ -1965,27 +1965,32 @@ function renderDebt(netWorth, totalAsset) {
     const good = pct < 30;
     document.getElementById('debt-status-label').textContent = good ? '🟢 健康水準' : '🟡 注意';
 
-    // 各卡明細 + 分期未到期
+    // 各卡明細 + 分期保險 + 分期未到期
     const detail = document.getElementById('debt-cards-detail');
     if (detail) {
         let html = '';
         if (gDebts && gDebts.rows && gDebts.rows.length) {
-            // 找出已在「分期負債」追蹤的卡/名稱（透過 card 欄位對應 負債管理 type）
-            const installTrackedTypes = new Set(
-                (gInstallments && gInstallments.rows || []).map(i => i.card)
-            );
-            // 一般信用卡當期應繳（monthly=0 且不在分期追蹤清單）
-            const creditCards = gDebts.rows.filter(d =>
-                d.type !== '房貸' &&
-                !(+d.monthly > 0) &&
-                !installTrackedTypes.has(d.type)
-            );
-            // 負債管理中的分期負債列（monthly>0 或已被分期負債追蹤）→ 不計入信用卡當期
-            const installDebtRows = gDebts.rows.filter(d =>
-                d.type !== '房貸' &&
-                (+d.monthly > 0 || installTrackedTypes.has(d.type))
-            );
+            const instRows = (gInstallments && gInstallments.rows) || [];
 
+            // 模糊比對：從「分期負債」找對應的 monthly（去掉括號後比對 card 欄）
+            const matchInst = (debtType) => {
+                const clean = debtType.split('（')[0].trim();
+                return instRows.find(i => i.isActive && (
+                    i.card === debtType || i.card === clean ||
+                    clean.startsWith(i.card) || debtType.includes(i.card)
+                ));
+            };
+
+            // 判斷是否為分期/保險追蹤列（type 含關鍵字，或 D 欄有月付款，或模糊比對到分期負債）
+            const isInstDebt = (d) =>
+                +d.monthly > 0 ||
+                /分期|人壽|保險費/.test(d.type) ||
+                !!matchInst(d.type);
+
+            const creditCards    = gDebts.rows.filter(d => d.type !== '房貸' && !isInstDebt(d));
+            const installDebtRows = gDebts.rows.filter(d => d.type !== '房貸' && isInstDebt(d));
+
+            // ── 💳 各卡當期應繳 ──────────────────────
             if (creditCards.length) {
                 html += '<div style="font-size:12px;color:var(--t3);margin-bottom:6px;font-weight:600">💳 各卡當期應繳</div>' +
                     creditCards.map(c => {
@@ -1998,24 +2003,32 @@ function renderDebt(netWorth, totalAsset) {
                     }).join('');
             }
 
-            // 負債管理裡有月付欄的分期項目（顯示剩餘總額，不是本期應繳）
+            // ── 📋 分期保險（月付款 vs 債務餘額）──────
             if (installDebtRows.length) {
-                html += '<div style="font-size:12px;color:var(--t3);margin:14px 0 4px;font-weight:600">📋 分期負債追蹤（剩餘總額）</div>' +
-                    '<div style="font-size:11px;color:var(--t3);margin-bottom:6px">※ 本期帳單每月只需繳「月付款」，非下列總額</div>' +
+                const totalMonthly = installDebtRows.reduce((s, d) => {
+                    const m = +d.monthly > 0 ? +d.monthly : (matchInst(d.type)?.monthly || 0);
+                    return s + m;
+                }, 0);
+                html += '<div style="font-size:12px;color:var(--t3);margin:14px 0 2px;font-weight:600">📋 分期保險負債</div>' +
+                    `<div style="font-size:11px;color:var(--t3);margin-bottom:6px">月付款＝本期帳單刷卡金額；債務餘額＝尚未支付總額${totalMonthly > 0 ? '（本月合計月付 NT$' + fmt(totalMonthly) + '）' : ''}</div>` +
                     installDebtRows.map(d => {
-                        const monthlyAmt = +d.monthly > 0 ? d.monthly
-                            : (gInstallments && gInstallments.rows || []).find(i => i.card === d.type)?.monthly || 0;
-                        const monthlyTxt = monthlyAmt > 0
-                            ? `<span style="color:#0e6494;font-size:11px">月付 NT$${fmt(monthlyAmt)}</span>` : '';
+                        const monthlyAmt = +d.monthly > 0 ? +d.monthly : (matchInst(d.type)?.monthly || 0);
                         const dateTxt = d.date ? `<span style="font-size:11px;color:var(--t3)">（${d.date}）</span>` : '';
-                        return `<div class="list-item" style="padding:6px 0;border-bottom:1px solid #eee">
-                            <span style="font-size:13px">📋 ${d.type} ${dateTxt}${monthlyTxt ? '<br>' + monthlyTxt : ''}</span>
-                            <span style="font-weight:600;color:var(--t2);font-size:13px">剩 NT$${fmt(d.balance)}</span>
+                        return `<div class="list-item" style="padding:6px 0;border-bottom:1px solid #eee;align-items:flex-start">
+                            <div style="flex:1">
+                                <div style="font-size:13px">📋 ${d.type} ${dateTxt}</div>
+                                ${monthlyAmt > 0 ? `<div style="font-size:12px;color:#0e6494;margin-top:2px">月付款 NT$${fmt(monthlyAmt)}</div>` : ''}
+                            </div>
+                            <div style="text-align:right;white-space:nowrap;padding-left:8px">
+                                <div style="font-size:11px;color:var(--t3)">債務餘額</div>
+                                <div style="font-weight:600;color:var(--t2)">NT$${fmt(d.balance)}</div>
+                            </div>
                         </div>`;
                     }).join('');
             }
         }
-        // 分期未到期明細（來自「分期負債」分頁，顯示每期明細）
+
+        // ── 📅 分期未到期（來自「分期負債」分頁，顯示期數明細）──
         if (gInstallments && gInstallments.rows && gInstallments.rows.length) {
             const active = gInstallments.rows.filter(i => i.isActive);
             if (active.length) {
