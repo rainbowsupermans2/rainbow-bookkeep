@@ -567,7 +567,6 @@ function dailyAssetUpdate(force) {
         : String(existingRows[i][0]);
       if (d === today) { todayRowIndex = i + 1; break; }  // +1 for 1-based
     }
-    }
 
     const stockSheetValues = findMarketValues(stockSheet);
     const fundSheetValues  = findMarketValues(fundSheet);
