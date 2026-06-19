@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.26
+// 彩虹CFO Apps Script v3.27
 // 更新日期：2026/06/19
 // ───────────────────────────────────────────────────────
 // 新增（vs v3.20）：
@@ -588,7 +588,15 @@ function dailyAssetUpdate(force) {
     const fixed = getFixedAssets();
     const debts = getDebts();
     const installments = getInstallments();
-    const totalDebt = debts.totalDebt + installments.totalRemaining;
+    // ★ v3.27: 與 renderAllAsset() 使用相同邏輯，避免雙重計算
+    // 負債管理裡的分期追蹤列（富邦人壽分期等）已被 installments.totalRemaining 覆蓋，
+    // 故此處 ccRows 只取信用卡帳單列（排除 分期|人壽|保険費 關鍵字）
+    const mortgageBalance = (debts.byType && debts.byType['房貸'] && debts.byType['房貸'].balance) || 0;
+    const ccRows = debts.rows.filter(function(d) {
+      return d.type !== '房貸' && !/分期|人壽|保險費/.test(d.type);
+    });
+    const ccTotal = ccRows.reduce(function(s, d) { return s + d.balance; }, 0);
+    const totalDebt = mortgageBalance + ccTotal + installments.totalRemaining;
 
     const total    = stockValue + vtValue + fundValue + fixed.cash + fixed.husbandRetire + fixed.wifeRetire;
     const netWorth = total - totalDebt;
