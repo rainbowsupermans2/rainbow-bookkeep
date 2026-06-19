@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.27
+// 彩虹CFO Apps Script v3.28
 // 更新日期：2026/06/19
 // ───────────────────────────────────────────────────────
 // 新增（vs v3.20）：
@@ -556,15 +556,17 @@ function dailyAssetUpdate(force) {
     const assetSheet = ss.getSheetByName('資產記錄');
     if (!stockSheet || !fundSheet || !assetSheet) return { success: false, error: '找不到必要工作表' };
 
-    // ★ v3.26: 防重複 — 同一天已有記錄就跳過（force 模式除外）
+    // ★ v3.28: 同一天已有記錄時「覆寫」該列，而非跳過
+    // 這樣手動執行 dailyUpdateAndPush 可隨時更新到最新股價
     const today = Utilities.formatDate(now, 'Asia/Taipei', 'yyyy/MM/dd');
-    if (!force) {
-      const existingRows = assetSheet.getDataRange().getValues();
-      const alreadyToday = existingRows.some(r => {
-        const d = r[0] instanceof Date ? Utilities.formatDate(r[0], 'Asia/Taipei', 'yyyy/MM/dd') : String(r[0]);
-        return d === today;
-      });
-      if (alreadyToday) return { success: true, skipped: true, reason: 'already_updated_today', date: today };
+    let todayRowIndex = -1;  // 1-based row index in sheet, -1 = 尚無今日記錄
+    const existingRows = assetSheet.getDataRange().getValues();
+    for (let i = 1; i < existingRows.length; i++) {
+      const d = existingRows[i][0] instanceof Date
+        ? Utilities.formatDate(existingRows[i][0], 'Asia/Taipei', 'yyyy/MM/dd')
+        : String(existingRows[i][0]);
+      if (d === today) { todayRowIndex = i + 1; break; }  // +1 for 1-based
+    }
     }
 
     const stockSheetValues = findMarketValues(stockSheet);
@@ -602,8 +604,13 @@ function dailyAssetUpdate(force) {
     const netWorth = total - totalDebt;
     const progress = Math.round(netWorth / RETIRE_GOAL_GROSS * 10000) / 100;
     const gap      = RETIRE_GOAL_GROSS - netWorth;
-    assetSheet.appendRow([today, stockValue, vtValue, fundValue, fixed.cash, fixed.husbandRetire, fixed.wifeRetire, total, netWorth, progress, gap]);
-    return { success: true, date: today, stockValue, vtValue, fundValue, total, netWorth, totalDebt, progress, gap, forced: !!force };
+    const newRow = [today, stockValue, vtValue, fundValue, fixed.cash, fixed.husbandRetire, fixed.wifeRetire, total, netWorth, progress, gap];
+    if (todayRowIndex > 0) {
+      assetSheet.getRange(todayRowIndex, 1, 1, newRow.length).setValues([newRow]);  // 覆寫今日列
+    } else {
+      assetSheet.appendRow(newRow);  // 新增
+    }
+    return { success: true, date: today, stockValue, vtValue, fundValue, total, netWorth, totalDebt, progress, gap, forced: !!force, updated: todayRowIndex > 0 };
   } catch(e) { return { success: false, error: e.message }; }
 }
 
