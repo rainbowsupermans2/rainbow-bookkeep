@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.21
-// 更新日期：2026/05/07
+// 彩虹CFO Apps Script v3.25
+// 更新日期：2026/06/19
 // ───────────────────────────────────────────────────────
 // 新增（vs v3.20）：
 //   ★ getFixedAssets：whitelist 支援玉山日幣/富邦美金/旅遊基金/Suica/現金日幣
@@ -820,7 +820,7 @@ function monthlyInstallmentAutoPost(force) {
       const desc = it.item + '（第' + it.currentPeriod + '/' + it.totalPeriods + '期）';
       sheet.appendRow([dateStr, '支出', it.category, desc, it.monthly, '分期預付', '一般']);
       debtSheet.getRange(it.rowIndex, 7).setValue(it.passedPeriods + 1);
-      updateDebtBalance(it.card, it.monthly);
+      // ★ v3.25: Removed updateDebtBalance(it.card, it.monthly) — installments tracked via syncInstallmentDebtBalances()
       posted.push(desc + ' ' + it.monthly);
     });
 
