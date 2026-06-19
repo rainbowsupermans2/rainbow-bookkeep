@@ -277,18 +277,15 @@ function syncInstallmentDebtBalances() {
       for (let r = 1; r < debtRows.length; r++) {
         const type = String(debtRows[r][1] || '');
         if (!type || type === '房貸') continue;
+        // ★ v3.25 CRITICAL: 只匹配分期追蹤列，絕不匹配信用卡帳單列
+        if (!/分期|人壽|保險/.test(type)) continue;
         const typeClean = type.split('（')[0].trim();
 
-        // 方法1：card 欄名稱直接對應 負債管理 type
-        if (i.card && (type === i.card || typeClean === i.card ||
-            typeClean.startsWith(i.card) || i.card.startsWith(typeClean))) {
-          matchRow = r; break;
-        }
-        // 方法2：同時含「分期/人壽/保險」關鍵字 + 相同末尾數字
+        // 同時含「分期/人壽/保險」關鍵字 + 相同末尾數字
         const typeNum  = (typeClean.match(/\d+$|\d+(?=期|\s)/) || typeClean.match(/\d+/) || [''])[0];
         const instStr  = i.item + ' ' + i.card;
         const instNum  = (instStr.match(/\d+/) || [''])[0];
-        if (typeNum && instNum && typeNum === instNum && /分期|人壽|保險/.test(type)) {
+        if (typeNum && instNum && typeNum === instNum) {
           const banks = ['富邦','中信','玉山','南山','新光','台灣人壽','國泰'];
           const bankMatch = banks.some(function(k) {
             return (type.includes(k) || typeClean.includes(k)) &&
