@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.25
+// 彩虹CFO Apps Script v3.26
 // 更新日期：2026/06/19
 // ───────────────────────────────────────────────────────
 // 新增（vs v3.20）：
@@ -556,18 +556,32 @@ function dailyAssetUpdate(force) {
     const assetSheet = ss.getSheetByName('資產記錄');
     if (!stockSheet || !fundSheet || !assetSheet) return { success: false, error: '找不到必要工作表' };
 
+    // ★ v3.26: 防重複 — 同一天已有記錄就跳過（force 模式除外）
+    const today = Utilities.formatDate(now, 'Asia/Taipei', 'yyyy/MM/dd');
+    if (!force) {
+      const existingRows = assetSheet.getDataRange().getValues();
+      const alreadyToday = existingRows.some(r => {
+        const d = r[0] instanceof Date ? Utilities.formatDate(r[0], 'Asia/Taipei', 'yyyy/MM/dd') : String(r[0]);
+        return d === today;
+      });
+      if (alreadyToday) return { success: true, skipped: true, reason: 'already_updated_today', date: today };
+    }
+
     const stockSheetValues = findMarketValues(stockSheet);
     const fundSheetValues  = findMarketValues(fundSheet);
+    // ★ v3.26: F15 手動覆蓋值需 > 1,000,000 才採用，避免小數值污染
     const stockManual = parseFloat(stockSheet.getRange('F15').getValue()) || 0;
-    const stockValue  = stockManual > 0 ? stockManual : (stockSheetValues[0] || 0);
+    const stockValue  = stockManual > 1000000 ? stockManual : (stockSheetValues[0] || 0);
     const vtNew = findVtMarketValue(stockSheet);
     const vtValue = vtNew > 0 ? vtNew : (stockSheetValues[1] || 0);
     const fundValue = fundSheetValues[0] || 0;
-    if (stockValue === 0 || fundValue === 0 || vtValue === 0) {
+    // ★ v3.26: 最低合理門檻，任一市值 < 100,000 視為異常資料
+    const MIN_VALID = 100000;
+    if (stockValue < MIN_VALID || fundValue < MIN_VALID || vtValue < MIN_VALID) {
       const missing = [];
-      if (stockValue === 0) missing.push('台股市值');
-      if (fundValue === 0)  missing.push('基金市值');
-      if (vtValue === 0)    missing.push('VT市值');
+      if (stockValue < MIN_VALID) missing.push('台股市值(' + stockValue + ')');
+      if (fundValue  < MIN_VALID) missing.push('基金市值(' + fundValue + ')');
+      if (vtValue    < MIN_VALID) missing.push('VT市值(' + vtValue + ')');
       return { success: true, skipped: true, reason: 'invalid_data', missing };
     }
 
@@ -580,7 +594,6 @@ function dailyAssetUpdate(force) {
     const netWorth = total - totalDebt;
     const progress = Math.round(netWorth / RETIRE_GOAL_GROSS * 10000) / 100;
     const gap      = RETIRE_GOAL_GROSS - netWorth;
-    const today = Utilities.formatDate(now, 'Asia/Taipei', 'yyyy/MM/dd');
     assetSheet.appendRow([today, stockValue, vtValue, fundValue, fixed.cash, fixed.husbandRetire, fixed.wifeRetire, total, netWorth, progress, gap]);
     return { success: true, date: today, stockValue, vtValue, fundValue, total, netWorth, totalDebt, progress, gap, forced: !!force };
   } catch(e) { return { success: false, error: e.message }; }
