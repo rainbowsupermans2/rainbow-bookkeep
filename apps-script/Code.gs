@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.28
+// 彩虹CFO Apps Script v3.29
 // 更新日期：2026/06/19
 // ───────────────────────────────────────────────────────
 // 新增（vs v3.20）：
@@ -570,12 +570,15 @@ function dailyAssetUpdate(force) {
 
     const stockSheetValues = findMarketValues(stockSheet);
     const fundSheetValues  = findMarketValues(fundSheet);
-    // ★ v3.26: F15 手動覆蓋值需 > 1,000,000 才採用，避免小數值污染
+    // ★ v3.29: 取所有「台幣市值」列中的最大值作為台股總市值（避免抓到個股小計）
+    // F15 手動覆蓋仍需 > 1,000,000 才採用
     const stockManual = parseFloat(stockSheet.getRange('F15').getValue()) || 0;
-    const stockValue  = stockManual > 1000000 ? stockManual : (stockSheetValues[0] || 0);
+    const stockMax    = stockSheetValues.length > 0 ? Math.max.apply(null, stockSheetValues) : 0;
+    const stockValue  = stockManual > 1000000 ? stockManual : stockMax;
     const vtNew = findVtMarketValue(stockSheet);
-    const vtValue = vtNew > 0 ? vtNew : (stockSheetValues[1] || 0);
-    const fundValue = fundSheetValues[0] || 0;
+    const vtValue = vtNew > 0 ? vtNew : 0;
+    const fundMax  = fundSheetValues.length > 0 ? Math.max.apply(null, fundSheetValues) : 0;
+    const fundValue = fundMax;
     // ★ v3.26: 最低合理門檻，任一市值 < 100,000 視為異常資料
     const MIN_VALID = 100000;
     if (stockValue < MIN_VALID || fundValue < MIN_VALID || vtValue < MIN_VALID) {
