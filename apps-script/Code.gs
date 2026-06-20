@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.21
-// 更新日期：2026/05/07
+// 彩虹CFO Apps Script v3.29
+// 更新日期：2026/06/19
 // ───────────────────────────────────────────────────────
 // 新增（vs v3.20）：
 //   ★ getFixedAssets：whitelist 支援玉山日幣/富邦美金/旅遊基金/Suica/現金日幣
@@ -277,18 +277,15 @@ function syncInstallmentDebtBalances() {
       for (let r = 1; r < debtRows.length; r++) {
         const type = String(debtRows[r][1] || '');
         if (!type || type === '房貸') continue;
+        // ★ v3.25 CRITICAL: 只匹配分期追蹤列，絕不匹配信用卡帳單列
+        if (!/分期|人壽|保險/.test(type)) continue;
         const typeClean = type.split('（')[0].trim();
 
-        // 方法1：card 欄名稱直接對應 負債管理 type
-        if (i.card && (type === i.card || typeClean === i.card ||
-            typeClean.startsWith(i.card) || i.card.startsWith(typeClean))) {
-          matchRow = r; break;
-        }
-        // 方法2：同時含「分期/人壽/保險」關鍵字 + 相同末尾數字
+        // 同時含「分期/人壽/保險」關鍵字 + 相同末尾數字
         const typeNum  = (typeClean.match(/\d+$|\d+(?=期|\s)/) || typeClean.match(/\d+/) || [''])[0];
         const instStr  = i.item + ' ' + i.card;
         const instNum  = (instStr.match(/\d+/) || [''])[0];
-        if (typeNum && instNum && typeNum === instNum && /分期|人壽|保險/.test(type)) {
+        if (typeNum && instNum && typeNum === instNum) {
           const banks = ['富邦','中信','玉山','南山','新光','台灣人壽','國泰'];
           const bankMatch = banks.some(function(k) {
             return (type.includes(k) || typeClean.includes(k)) &&
@@ -559,33 +556,63 @@ function dailyAssetUpdate(force) {
     const assetSheet = ss.getSheetByName('資產記錄');
     if (!stockSheet || !fundSheet || !assetSheet) return { success: false, error: '找不到必要工作表' };
 
+    // ★ v3.28: 同一天已有記錄時「覆寫」該列，而非跳過
+    // 這樣手動執行 dailyUpdateAndPush 可隨時更新到最新股價
+    const today = Utilities.formatDate(now, 'Asia/Taipei', 'yyyy/MM/dd');
+    let todayRowIndex = -1;  // 1-based row index in sheet, -1 = 尚無今日記錄
+    const existingRows = assetSheet.getDataRange().getValues();
+    for (let i = 1; i < existingRows.length; i++) {
+      const d = existingRows[i][0] instanceof Date
+        ? Utilities.formatDate(existingRows[i][0], 'Asia/Taipei', 'yyyy/MM/dd')
+        : String(existingRows[i][0]);
+      if (d === today) { todayRowIndex = i + 1; break; }  // +1 for 1-based
+    }
+
     const stockSheetValues = findMarketValues(stockSheet);
     const fundSheetValues  = findMarketValues(fundSheet);
+    // ★ v3.29: 取所有「台幣市值」列中的最大值作為台股總市值（避免抓到個股小計）
+    // F15 手動覆蓋仍需 > 1,000,000 才採用
     const stockManual = parseFloat(stockSheet.getRange('F15').getValue()) || 0;
-    const stockValue  = stockManual > 0 ? stockManual : (stockSheetValues[0] || 0);
+    const stockMax    = stockSheetValues.length > 0 ? Math.max.apply(null, stockSheetValues) : 0;
+    const stockValue  = stockManual > 1000000 ? stockManual : stockMax;
     const vtNew = findVtMarketValue(stockSheet);
-    const vtValue = vtNew > 0 ? vtNew : (stockSheetValues[1] || 0);
-    const fundValue = fundSheetValues[0] || 0;
-    if (stockValue === 0 || fundValue === 0 || vtValue === 0) {
+    const vtValue = vtNew > 0 ? vtNew : 0;
+    const fundMax  = fundSheetValues.length > 0 ? Math.max.apply(null, fundSheetValues) : 0;
+    const fundValue = fundMax;
+    // ★ v3.26: 最低合理門檻，任一市值 < 100,000 視為異常資料
+    const MIN_VALID = 100000;
+    if (stockValue < MIN_VALID || fundValue < MIN_VALID || vtValue < MIN_VALID) {
       const missing = [];
-      if (stockValue === 0) missing.push('台股市值');
-      if (fundValue === 0)  missing.push('基金市值');
-      if (vtValue === 0)    missing.push('VT市值');
+      if (stockValue < MIN_VALID) missing.push('台股市值(' + stockValue + ')');
+      if (fundValue  < MIN_VALID) missing.push('基金市值(' + fundValue + ')');
+      if (vtValue    < MIN_VALID) missing.push('VT市值(' + vtValue + ')');
       return { success: true, skipped: true, reason: 'invalid_data', missing };
     }
 
     const fixed = getFixedAssets();
     const debts = getDebts();
     const installments = getInstallments();
-    const totalDebt = debts.totalDebt + installments.totalRemaining;
+    // ★ v3.27: 與 renderAllAsset() 使用相同邏輯，避免雙重計算
+    // 負債管理裡的分期追蹤列（富邦人壽分期等）已被 installments.totalRemaining 覆蓋，
+    // 故此處 ccRows 只取信用卡帳單列（排除 分期|人壽|保険費 關鍵字）
+    const mortgageBalance = (debts.byType && debts.byType['房貸'] && debts.byType['房貸'].balance) || 0;
+    const ccRows = debts.rows.filter(function(d) {
+      return d.type !== '房貸' && !/分期|人壽|保險費/.test(d.type);
+    });
+    const ccTotal = ccRows.reduce(function(s, d) { return s + d.balance; }, 0);
+    const totalDebt = mortgageBalance + ccTotal + installments.totalRemaining;
 
     const total    = stockValue + vtValue + fundValue + fixed.cash + fixed.husbandRetire + fixed.wifeRetire;
     const netWorth = total - totalDebt;
     const progress = Math.round(netWorth / RETIRE_GOAL_GROSS * 10000) / 100;
     const gap      = RETIRE_GOAL_GROSS - netWorth;
-    const today = Utilities.formatDate(now, 'Asia/Taipei', 'yyyy/MM/dd');
-    assetSheet.appendRow([today, stockValue, vtValue, fundValue, fixed.cash, fixed.husbandRetire, fixed.wifeRetire, total, netWorth, progress, gap]);
-    return { success: true, date: today, stockValue, vtValue, fundValue, total, netWorth, totalDebt, progress, gap, forced: !!force };
+    const newRow = [today, stockValue, vtValue, fundValue, fixed.cash, fixed.husbandRetire, fixed.wifeRetire, total, netWorth, progress, gap];
+    if (todayRowIndex > 0) {
+      assetSheet.getRange(todayRowIndex, 1, 1, newRow.length).setValues([newRow]);  // 覆寫今日列
+    } else {
+      assetSheet.appendRow(newRow);  // 新增
+    }
+    return { success: true, date: today, stockValue, vtValue, fundValue, total, netWorth, totalDebt, progress, gap, forced: !!force, updated: todayRowIndex > 0 };
   } catch(e) { return { success: false, error: e.message }; }
 }
 
@@ -820,7 +847,7 @@ function monthlyInstallmentAutoPost(force) {
       const desc = it.item + '（第' + it.currentPeriod + '/' + it.totalPeriods + '期）';
       sheet.appendRow([dateStr, '支出', it.category, desc, it.monthly, '分期預付', '一般']);
       debtSheet.getRange(it.rowIndex, 7).setValue(it.passedPeriods + 1);
-      updateDebtBalance(it.card, it.monthly);
+      // ★ v3.25: Removed updateDebtBalance(it.card, it.monthly) — installments tracked via syncInstallmentDebtBalances()
       posted.push(desc + ' ' + it.monthly);
     });
 
