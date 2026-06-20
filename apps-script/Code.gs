@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.29
-// 更新日期：2026/06/19
+// 彩虹CFO Apps Script v3.30
+// 更新日期：2026/06/20
 // ───────────────────────────────────────────────────────
 // 新增（vs v3.20）：
 //   ★ getFixedAssets：whitelist 支援玉山日幣/富邦美金/旅遊基金/Suica/現金日幣
@@ -37,6 +37,15 @@ const SNAPSHOT_PATH = 'data/snapshot.json';
 function doGet(e) {
   try {
     const type     = e.parameter.type     || '';
+
+    // ★ v3.30: 沒有 type 參數時，直接回傳 App 頁面（全部在 GAS 架構）
+    if (!type) {
+      return HtmlService.createTemplateFromFile('index').evaluate()
+        .setTitle('彩虹超人CFO')
+        .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, user-scalable=no')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    }
+
     const callback = e.parameter.callback || 'cb';
     const data     = e.parameter.data     || '';
     const project  = e.parameter.project  || '';
