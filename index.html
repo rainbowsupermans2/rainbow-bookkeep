@@ -1821,9 +1821,16 @@ function renderAllAsset() {
                 <div class="metric-value" style="font-size:16px">NT$${fmtW(a.vt||0)}</div>
             </div>
             <div class="metric">
+                <div class="metric-label">現金（活存＋定存）</div>
+                <div class="metric-value" style="font-size:16px">NT$${fmtW(a.cash||0)}</div>
+            </div>
+            <div class="metric">
                 <div class="metric-label">勞退合計</div>
                 <div class="metric-value" style="font-size:16px">NT$${fmtW((+(a.husbandRetire||0))+(+(a.wifeRetire||0)))}</div>
             </div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);text-align:right;margin-top:4px">
+            明細合計 NT$${fmtW((+(a.stock||0))+(+(a.vt||0))+(+(a.fund||0))+(+(a.cash||0))+(+(a.husbandRetire||0))+(+(a.wifeRetire||0)))}
         </div>
     `;
 
