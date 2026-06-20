@@ -2654,7 +2654,6 @@ function fmt(n) {
 
 function fmtW(n) {
     n = +n;
-    if (n >= 10000000) return (n/10000000).toFixed(2) + '千萬';
     if (n >= 1000000) return (n/1000000).toFixed(2) + '百萬';
     if (n >= 10000) return (n/10000).toFixed(1) + '萬';
     return fmt(n);
