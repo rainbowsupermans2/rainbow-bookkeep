@@ -46,7 +46,7 @@ function doGet(e) {
         .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
     }
 
-    const callback = e.parameter.callback || 'cb';
+    const callback = e.parameter.callback || '';
     const data     = e.parameter.data     || '';
     const project  = e.parameter.project  || '';
     const months   = parseInt(e.parameter.months) || 12;
@@ -71,13 +71,24 @@ function doGet(e) {
     else if (type === 'syncInstDebt')  result = syncInstallmentDebtBalances();
     else result = { success: false, error: 'unknown type: ' + type };
 
+    const jsonStr = JSON.stringify(result);
+    // ★ v3.31: 沒有 callback 時回傳純 JSON（給 fetch() 使用）
+    if (!callback) {
+      return ContentService
+        .createTextOutput(jsonStr)
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     return ContentService
-      .createTextOutput(callback + '(' + JSON.stringify(result) + ')')
+      .createTextOutput(callback + '(' + jsonStr + ')')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
   } catch(err) {
-    const cb = (e && e.parameter && e.parameter.callback) || 'cb';
+    const cb = (e && e.parameter && e.parameter.callback) || '';
+    const errJson = '{"success":false,"error":' + JSON.stringify(err.message) + '}';
+    if (!cb) {
+      return ContentService.createTextOutput(errJson).setMimeType(ContentService.MimeType.JSON);
+    }
     return ContentService
-      .createTextOutput(cb + '({"success":false,"error":' + JSON.stringify(err.message) + '})')
+      .createTextOutput(cb + '(' + errJson + ')')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
 }
