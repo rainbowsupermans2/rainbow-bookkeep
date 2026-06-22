@@ -638,9 +638,9 @@
         </div>
     </div>
 
-    <!-- 台股月收益分析（6月離職規劃） -->
+    <!-- 台股月收益分析（離職後規劃） -->
     <div class="card" id="tw-retire-card">
-        <div class="ctitle">📊 台股月收益分析（6月離職規劃）</div>
+        <div class="ctitle">📊 台股月收益分析（離職後規劃）</div>
         <div id="tw-retire-content">
             <div class="loading"><span class="spin">⟳</span></div>
         </div>
@@ -2328,7 +2328,7 @@ function renderHealth(netWorth, totalAsset, progress) {
     const _bTotal = BUDGETS.reduce((s,b)=>s+b.budget,0);
     const _bPct   = _bTotal>0 ? Math.round(_exp.reduce((s,r)=>s+(+r.amount||0),0)/_bTotal*100) : 0;
     const _ccPend = (gDebts&&gDebts.rows) ? gDebts.rows.filter(d=>d.type!=='房貸'&&(+d.balance||0)>0).map(c=>`${c.type} NT$${fmt(c.balance)}`).join('、') : '';
-    const _dLeft  = Math.max(0, Math.ceil((new Date('2026-06-30')-new Date())/86400000));
+    const _dLeft  = Math.max(0, Math.ceil((new Date('2026-06-22')-new Date())/86400000));
     const _actionEl = document.getElementById('health-action');
     if (_actionEl) _actionEl.innerHTML = [
         liquidityMonths>=6 ? `✅ 現金儲備 ${liquidityMonths.toFixed(1)} 個月，流動性充足` : `⚠️ 現金可撐 ${liquidityMonths.toFixed(1)} 個月，建議保持 ≥ 6 個月`,
@@ -2460,7 +2460,7 @@ function renderTaiwanStockAnalysis() {
     const MONTHLY_NEED = 63000;
 
     const today      = new Date();
-    const departure  = new Date('2026-06-30');
+    const departure  = new Date('2026-06-22');
     const hasDeparted = today > departure;
     const daysLeft   = Math.max(0, Math.ceil((departure - today) / 86400000));
     const weeksLeft  = Math.floor(daysLeft / 7);
