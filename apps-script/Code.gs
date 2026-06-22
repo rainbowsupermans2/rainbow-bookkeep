@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════
-// 彩虹CFO Apps Script v3.29
-// 更新日期：2026/06/19
+// 彩虹CFO Apps Script v3.30
+// 更新日期：2026/06/20
 // ───────────────────────────────────────────────────────
 // 新增（vs v3.20）：
 //   ★ getFixedAssets：whitelist 支援玉山日幣/富邦美金/旅遊基金/Suica/現金日幣
@@ -37,7 +37,16 @@ const SNAPSHOT_PATH = 'data/snapshot.json';
 function doGet(e) {
   try {
     const type     = e.parameter.type     || '';
-    const callback = e.parameter.callback || 'cb';
+
+    // ★ v3.30: 沒有 type 參數時，直接回傳 App 頁面（全部在 GAS 架構）
+    if (!type) {
+      return HtmlService.createTemplateFromFile('index').evaluate()
+        .setTitle('彩虹超人CFO')
+        .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, user-scalable=no')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    }
+
+    const callback = e.parameter.callback || '';
     const data     = e.parameter.data     || '';
     const project  = e.parameter.project  || '';
     const months   = parseInt(e.parameter.months) || 12;
@@ -62,13 +71,24 @@ function doGet(e) {
     else if (type === 'syncInstDebt')  result = syncInstallmentDebtBalances();
     else result = { success: false, error: 'unknown type: ' + type };
 
+    const jsonStr = JSON.stringify(result);
+    // ★ v3.31: 沒有 callback 時回傳純 JSON（給 fetch() 使用）
+    if (!callback) {
+      return ContentService
+        .createTextOutput(jsonStr)
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     return ContentService
-      .createTextOutput(callback + '(' + JSON.stringify(result) + ')')
+      .createTextOutput(callback + '(' + jsonStr + ')')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
   } catch(err) {
-    const cb = (e && e.parameter && e.parameter.callback) || 'cb';
+    const cb = (e && e.parameter && e.parameter.callback) || '';
+    const errJson = '{"success":false,"error":' + JSON.stringify(err.message) + '}';
+    if (!cb) {
+      return ContentService.createTextOutput(errJson).setMimeType(ContentService.MimeType.JSON);
+    }
     return ContentService
-      .createTextOutput(cb + '({"success":false,"error":' + JSON.stringify(err.message) + '})')
+      .createTextOutput(cb + '(' + errJson + ')')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
 }

@@ -1605,6 +1605,26 @@ function renderExpense(records) {
         // 旅遊帳連動：顯示該月旅遊花費（外幣獨立，不合入台幣）
         const travelHtml = buildTravelMonthHtml(getTravelForMonth(m));
 
+        // 逐筆明細（由新到舊排序）
+        const sortedRecs = [...recs].sort((a, b) => {
+            const da = new Date(a.date || 0), db = new Date(b.date || 0);
+            return db - da;
+        });
+        const txListHtml = sortedRecs.map(r => {
+            const isOut = r.type === '支出';
+            const col = isOut ? 'var(--r)' : 'var(--g)';
+            const sign = isOut ? '-' : '+';
+            const desc = r.desc || r.description || '';
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:600;color:var(--t1)">${r.cat||r.category||'—'}</div>
+                    <div style="font-size:11px;color:var(--t3)">${fmtDate(r.date)}${desc?' · '+desc:''} · ${r.account||''}</div>
+                </div>
+                <div style="font-size:13px;font-weight:700;color:${col};white-space:nowrap;margin-left:8px">${sign}NT$${fmt(r.amount)}</div>
+            </div>`;
+        }).join('');
+        const txBodyId = `${bodyId}-tx`;
+
         return `
         <div class="card" style="margin-bottom:12px;padding:0;overflow:hidden">
             <div onclick="toggleExpMonth('${bodyId}')" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none">
@@ -1634,6 +1654,15 @@ function renderExpense(records) {
                 </div>
                 ${catsHtml}
                 ${travelHtml}
+                <div style="margin-top:10px">
+                    <div onclick="toggleExpMonth('${txBodyId}')" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;user-select:none">
+                        <span id="${txBodyId}-arrow" style="font-size:10px;color:var(--t3);transition:transform 0.2s;display:inline-block">▶</span>
+                        <span style="font-size:12px;font-weight:600;color:var(--t2)">明細（${recs.length} 筆）</span>
+                    </div>
+                    <div id="${txBodyId}" style="display:none">
+                        ${txListHtml}
+                    </div>
+                </div>
             </div>
         </div>`;
     }).join('');
@@ -1821,9 +1850,16 @@ function renderAllAsset() {
                 <div class="metric-value" style="font-size:16px">NT$${fmtW(a.vt||0)}</div>
             </div>
             <div class="metric">
+                <div class="metric-label">現金（活存＋定存）</div>
+                <div class="metric-value" style="font-size:16px">NT$${fmtW(a.cash||0)}</div>
+            </div>
+            <div class="metric">
                 <div class="metric-label">勞退合計</div>
                 <div class="metric-value" style="font-size:16px">NT$${fmtW((+(a.husbandRetire||0))+(+(a.wifeRetire||0)))}</div>
             </div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);text-align:right;margin-top:4px">
+            明細合計 NT$${fmtW((+(a.stock||0))+(+(a.vt||0))+(+(a.fund||0))+(+(a.cash||0))+(+(a.husbandRetire||0))+(+(a.wifeRetire||0)))}
         </div>
     `;
 
